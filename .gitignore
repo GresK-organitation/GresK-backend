@@ -1,5 +1,8 @@
 HELP.md
 target/
+
+# Variables de entorno — contienen credenciales, nunca al repositorio
+.env
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
