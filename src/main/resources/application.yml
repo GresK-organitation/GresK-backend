@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: gresk-backend
+
+  # ─── Base de datos ────────────────────────────────────────────────────────
+  datasource:
+    url: jdbc:postgresql://localhost:${POSTGRES_PORT:5432}/${POSTGRES_DB}
+    # jdbc:postgresql → protocolo que usa el driver de PostgreSQL.
+    # localhost       → el host donde escucha el contenedor Docker (puerto mapeado al host).
+    # ${POSTGRES_PORT:5432} → lee la variable de entorno POSTGRES_PORT;
+    #                         si no está definida, usa 5432 como valor por defecto.
+    # ${POSTGRES_DB}  → nombre de la base de datos, definido en .env.
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    # Spring Boot podría inferir el driver por la URL, pero declararlo
+    # explícitamente evita ambigüedad y fallos en builds sin auto-configuración.
+
+  # ─── JPA / Hibernate ─────────────────────────────────────────────────────
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    # Le dice a Hibernate qué "dialecto" SQL usar. PostgreSQL tiene extensiones
+    # propias (ej. tipos JSONB, arrays) que no existen en MySQL o H2. Sin esto,
+    # Hibernate generaría SQL genérico que podría fallar con features específicas.
+    hibernate:
+      ddl-auto: validate
+      # validate: Hibernate SOLO comprueba que las entidades Java tienen su tabla
+      # correspondiente en la BD. Flyway es el único responsable de crear/alterar
+      # el esquema. Nunca uses 'create' o 'update' en un proyecto real.
+
+  # ─── Flyway ──────────────────────────────────────────────────────────────
+  flyway:
+    enabled: true
+    # Activa la integración automática de Flyway con Spring Boot.
+    # Al arrancar, Spring Boot ejecutará Flyway ANTES de que Hibernate valide
+    # el esquema, garantizando que las tablas ya existen cuando Hibernate las busca.
+    locations: classpath:db/migration
+    # Classpath apunta a src/main/resources. Flyway buscará los scripts SQL en
+    # src/main/resources/db/migration/.
+    # Patrón de nombre obligatorio: V{versión}__{descripción}.sql
+    #   V1__init.sql → primera migración
+    #   V2__add_users_table.sql → segunda migración
+    # El doble guión (__) separa la versión de la descripción.
