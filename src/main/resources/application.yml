@@ -1,20 +1,8 @@
 spring:
   application:
     name: gresk-backend
-
-  # ─── Base de datos ────────────────────────────────────────────────────────
-  datasource:
-    url: jdbc:postgresql://localhost:${POSTGRES_PORT:5432}/${POSTGRES_DB}
-    # jdbc:postgresql → protocolo que usa el driver de PostgreSQL.
-    # localhost       → el host donde escucha el contenedor Docker (puerto mapeado al host).
-    # ${POSTGRES_PORT:5432} → lee la variable de entorno POSTGRES_PORT;
-    #                         si no está definida, usa 5432 como valor por defecto.
-    # ${POSTGRES_DB}  → nombre de la base de datos, definido en .env.
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-    # Spring Boot podría inferir el driver por la URL, pero declararlo
-    # explícitamente evita ambigüedad y fallos en builds sin auto-configuración.
+    # El nombre de la aplicación es global: lo usan Actuator (/actuator/info),
+    # los logs y herramientas de monitorización. No cambia entre entornos.
 
   # ─── JPA / Hibernate ─────────────────────────────────────────────────────
   jpa:
@@ -27,6 +15,9 @@ spring:
       # validate: Hibernate SOLO comprueba que las entidades Java tienen su tabla
       # correspondiente en la BD. Flyway es el único responsable de crear/alterar
       # el esquema. Nunca uses 'create' o 'update' en un proyecto real.
+    open-in-view: false
+    # En una API REST no hay "vista" que renderizar, por lo que mantener la sesión
+    # de Hibernate abierta durante todo el ciclo HTTP es innecesario y costoso.
 
   # ─── Flyway ──────────────────────────────────────────────────────────────
   flyway:
@@ -41,6 +32,13 @@ spring:
     #   V1__init.sql → primera migración
     #   V2__add_users_table.sql → segunda migración
     # El doble guión (__) separa la versión de la descripción.
+
+  # ─── Datasource ──────────────────────────────────────────────────────────
+  # La configuración de la base de datos es específica de cada entorno.
+  # Se define en el perfil correspondiente:
+  #   · application-dev.yml  → PostgreSQL Docker local
+  #   · application-test.yml → sin BD (H2/Testcontainers en el futuro)
+  #   · producción           → variables de entorno inyectadas por el sistema
 
 # ─── Spring Boot Actuator ────────────────────────────────────────────────────
 management:

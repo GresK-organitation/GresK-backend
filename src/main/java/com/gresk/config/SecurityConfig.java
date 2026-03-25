@@ -38,8 +38,17 @@ public class SecurityConfig {
         http
             // Disable CSRF for a stateless REST API.
             // CSRF protection is only meaningful for browser-based session flows.
+                // El CSRF es una protección para webs que usan "cookies" (como Facebook). C
+                // omo tu API es Stateless (usa JWT, no cookies), esta protección no es necesaria y
+                // solo estorbaría. Por eso la desactivamos.
             .csrf(AbstractHttpConfigurer::disable)
+                //"Deja pasar a todo el mundo a las rutas que pusimos en la lista de arriba".
             .authorizeHttpRequests(auth -> auth
+                    //¡Ojo aquí! Esto dice: "Cualquier otra ruta que no esté en la lista, también déjala pasar".
+                    //
+                    //Como dice tu comentario en el código (TODO), esto es temporal. Ahora mismo
+                    // lo dejas abierto porque estás construyendo los cimientos, pero más adelante,
+                    // cuando tengas usuarios reales, cambiarás esto por .authenticated().
                 .requestMatchers(PUBLIC_PATHS).permitAll()
                 // TODO: replace with authenticated() when domain endpoints are added
                 .anyRequest().permitAll()

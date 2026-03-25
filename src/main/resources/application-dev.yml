@@ -1,0 +1,47 @@
+# ─── Perfil: dev ─────────────────────────────────────────────────────────────
+# Se activa con: SPRING_PROFILES_ACTIVE=dev
+# Apunta a la base de datos PostgreSQL que levanta docker-compose.yml.
+# Las credenciales se leen del fichero .env (nunca se hardcodean aquí).
+# ─────────────────────────────────────────────────────────────────────────────
+
+spring:
+
+  # ─── Datasource — PostgreSQL Docker local ──────────────────────────────────
+  datasource:
+    url: jdbc:postgresql://localhost:${POSTGRES_PORT:5432}/${POSTGRES_DB}
+    # localhost → el contenedor Docker mapea su puerto 5432 al host local.
+    # ${POSTGRES_PORT:5432} → usa la variable de .env; 5432 como fallback.
+    # ${POSTGRES_DB}        → nombre de la BD definido en .env.
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    # Nunca valores literales aquí. Si alguien hace 'git log' no verá credenciales.
+    driver-class-name: org.postgresql.Driver
+
+  # ─── JPA — overrides para desarrollo ───────────────────────────────────────
+  jpa:
+    show-sql: true
+    # Imprime cada query SQL en la consola. Imprescindible para depurar
+    # consultas generadas por Hibernate. NO activar en producción: llena
+    # los logs y puede exponer datos sensibles en trazas de errores.
+    properties:
+      hibernate:
+        format_sql: true
+        # Añade saltos de línea e indentación al SQL. Sin esto, el SQL
+        # aparece en una sola línea ilegible.
+
+# ─── Actuator — más detalle en dev ─────────────────────────────────────────
+management:
+  endpoint:
+    health:
+      show-details: always
+      # En dev es útil ver el estado de cada componente (BD, disco, memoria).
+      # En producción está en 'never' para no exponer información de infraestructura.
+
+# ─── Logging ─────────────────────────────────────────────────────────────────
+logging:
+  level:
+    com.gresk: DEBUG
+    # Logs detallados de todo el código propio del proyecto.
+    org.springframework.security: DEBUG
+    # Útil para depurar por qué una petición es rechazada o aceptada por Security.
+    # Muestra cada filtro que procesa la request.
