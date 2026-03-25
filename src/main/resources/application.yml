@@ -41,3 +41,35 @@ spring:
     #   V1__init.sql → primera migración
     #   V2__add_users_table.sql → segunda migración
     # El doble guión (__) separa la versión de la descripción.
+
+# ─── Spring Boot Actuator ────────────────────────────────────────────────────
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+  info:
+    env:
+      enabled: true
+
+# ─── Info endpoint metadata ──────────────────────────────────────────────────
+info:
+  app:
+    name: GresK Backend
+    version: 0.0.1-SNAPSHOT
+    description: GresK application REST API
+    java-version: "@java.version@"
+
+# ─── SpringDoc / Swagger UI ──────────────────────────────────────────────────
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    try-it-out-enabled: true
+    operations-sorter: alpha
+    tags-sorter: alpha
+  show-actuator: false
