@@ -4,22 +4,21 @@ import java.util.Objects;
 
 public final class Description {
 
-    private static final int MIN_LENGTH = 2;
     private static final int MAX_LENGTH = 600;
 
     public final String value;
 
     public Description (String value){
         if (value == null || value.isBlank()) {
-            this.value = "No description";
+            this.value =  null;
             return;
         }
 
         String cleanedValue = value.trim();
 
-        if (cleanedValue.length() < MIN_LENGTH || cleanedValue.length() > MAX_LENGTH) {
+        if (cleanedValue.length() > MAX_LENGTH) {
             throw new IllegalArgumentException(
-                    String.format("Description must have between %d and %d characters", MIN_LENGTH, MAX_LENGTH)
+                    String.format("Description has a limit of %d characters", MAX_LENGTH)
             );
         }
         this.value = cleanedValue;
@@ -47,6 +46,6 @@ public final class Description {
 
     @Override
     public String toString() {
-        return value;
-    }
+        return value != null ? value : ""; }
+
 }

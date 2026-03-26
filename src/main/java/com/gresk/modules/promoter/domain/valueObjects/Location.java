@@ -16,12 +16,11 @@ public final class Location {
             throw new IllegalArgumentException("Country cannot be empty");
         }
 
-        this.address = (address == null || address.isBlank())
-                ? "No address"
-                : address.trim();
-
         this.city = city.trim();
         this.country = country.trim();
+        this.address = (address == null || address.isBlank())
+                ? null
+                : address.trim();
     }
 
     public String city() { return city; }
@@ -31,20 +30,20 @@ public final class Location {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Location location)) return false;
-        return Objects.equals(city, location.city) &&
-                Objects.equals(country, location.country) &&
-                Objects.equals(address, location.address);
+        if (!(o instanceof Location l)) return false;
+        return Objects.equals(city, l.city)
+                && Objects.equals(country, l.country)
+                && Objects.equals(address, l.address);
     }
-
     @Override
     public int hashCode() {
         return Objects.hash(city, country, address);
     }
 
-    @Override
-    public String toString() {
-        return String.format("%s, %s (%s)", address, city, country);
+    @Override public String toString() {
+        return address != null
+                ? String.format("%s, %s (%s)", address, city, country)
+                : String.format("%s, %s", city, country);
     }
 
 
