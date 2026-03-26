@@ -4,40 +4,21 @@ spring:
     # El nombre de la aplicación es global: lo usan Actuator (/actuator/info),
     # los logs y herramientas de monitorización. No cambia entre entornos.
 
-  # ─── JPA / Hibernate ─────────────────────────────────────────────────────
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    # Le dice a Hibernate qué "dialecto" SQL usar. PostgreSQL tiene extensiones
-    # propias (ej. tipos JSONB, arrays) que no existen en MySQL o H2. Sin esto,
-    # Hibernate generaría SQL genérico que podría fallar con features específicas.
-    hibernate:
-      ddl-auto: validate
-      # validate: Hibernate SOLO comprueba que las entidades Java tienen su tabla
-      # correspondiente en la BD. Flyway es el único responsable de crear/alterar
-      # el esquema. Nunca uses 'create' o 'update' en un proyecto real.
-    open-in-view: false
-    # En una API REST no hay "vista" que renderizar, por lo que mantener la sesión
-    # de Hibernate abierta durante todo el ciclo HTTP es innecesario y costoso.
-
   # ─── Flyway ──────────────────────────────────────────────────────────────
   flyway:
     enabled: true
-    # Activa la integración automática de Flyway con Spring Boot.
-    # Al arrancar, Spring Boot ejecutará Flyway ANTES de que Hibernate valide
-    # el esquema, garantizando que las tablas ya existen cuando Hibernate las busca.
+    # Flyway es síncrono (JDBC). Spring Boot lo ejecuta durante el arranque,
+    # ANTES de que la app empiece a aceptar peticiones reactivas.
+    # Aunque la app usa R2DBC, Flyway necesita su propia URL JDBC (ver dev/prod).
     locations: classpath:db/migration
-    # Classpath apunta a src/main/resources. Flyway buscará los scripts SQL en
-    # src/main/resources/db/migration/.
-    # Patrón de nombre obligatorio: V{versión}__{descripción}.sql
-    #   V1__init.sql → primera migración
-    #   V2__add_users_table.sql → segunda migración
-    # El doble guión (__) separa la versión de la descripción.
+    # Patrón de nombre: V{versión}__{descripción}.sql
+    #   V1__init.sql, V2__create_promoters.sql, etc.
 
-  # ─── Datasource ──────────────────────────────────────────────────────────
-  # La configuración de la base de datos es específica de cada entorno.
+  # ─── R2DBC / Flyway (JDBC) ───────────────────────────────────────────────
+  # La configuración de conexión es específica de cada entorno.
   # Se define en el perfil correspondiente:
-  #   · application-dev.yml  → PostgreSQL Docker local
-  #   · application-test.yml → sin BD (H2/Testcontainers en el futuro)
+  #   · application-dev.yml  → r2dbc: (app) + flyway JDBC URL (migraciones)
+  #   · application-test.yml → sin BD (R2DBC y Flyway excluidos)
   #   · producción           → variables de entorno inyectadas por el sistema
 
 # ─── Spring Boot Actuator ────────────────────────────────────────────────────
@@ -60,6 +41,15 @@ info:
     version: 0.0.1-SNAPSHOT
     description: GresK application REST API
     java-version: "@java.version@"
+
+# ─── JWT ─────────────────────────────────────────────────────────────────────
+jwt:
+  secret: ${JWT_SECRET}
+  # Clave secreta en Base64, mínimo 256 bits para HS256.
+  # Generar con: openssl rand -base64 64
+  # Nunca hardcodeada. Nunca en git. Solo en variables de entorno o secretos del sistema.
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  # 86_400_000 ms = 24 horas. Configurable por entorno sin recompilar.
 
 # ─── SpringDoc / Swagger UI ──────────────────────────────────────────────────
 springdoc:
