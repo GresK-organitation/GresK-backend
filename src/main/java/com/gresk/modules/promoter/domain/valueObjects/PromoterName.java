@@ -1,5 +1,7 @@
 package com.gresk.modules.promoter.domain.valueObjects;
 
+import com.gresk.modules.promoter.domain.exception.InvalidPromoterNameException;
+
 import java.util.Objects;
 
 public final class PromoterName {
@@ -11,11 +13,11 @@ public final class PromoterName {
 
     public PromoterName(String value) {
         if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException("El nombre no puede estar vacío");
+            throw new InvalidPromoterNameException("El nombre no puede estar vacío");
         }
         String cleanedValue = value.trim();
 
-        if (cleanedValue.length() < MIN_LENGTH || cleanedValue.length() > MAX_LENGTH) {
+        if (cleanedValue.length() > MAX_LENGTH) {
             throw new IllegalArgumentException(
                     String.format("El nombre debe tener entre %d y %d caracteres", MIN_LENGTH, MAX_LENGTH)
             );
