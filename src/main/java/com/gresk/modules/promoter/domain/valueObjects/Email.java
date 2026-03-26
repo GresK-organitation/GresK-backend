@@ -1,4 +1,4 @@
-package com.gresk.modules.promoter.domain;
+package com.gresk.modules.promoter.domain.valueObjects;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
