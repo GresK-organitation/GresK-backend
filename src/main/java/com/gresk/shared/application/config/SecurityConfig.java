@@ -1,4 +1,4 @@
-package com.gresk.config;
+package com.gresk.shared.application.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
