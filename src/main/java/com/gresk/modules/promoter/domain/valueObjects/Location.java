@@ -2,7 +2,7 @@ package com.gresk.modules.promoter.domain.valueObjects;
 
 import java.util.Objects;
 
-public class Location {
+public final class Location {
 
     public final String city;
     public final String country;
