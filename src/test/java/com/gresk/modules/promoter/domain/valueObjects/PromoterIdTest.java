@@ -1,5 +1,6 @@
 package com.gresk.modules.promoter.domain.valueObjects;
 
+import com.gresk.modules.promoter.valueObjects.PromoterId;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;

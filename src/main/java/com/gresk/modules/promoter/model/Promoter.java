@@ -1,12 +1,11 @@
-package com.gresk.modules.promoter.domain.model;
+package com.gresk.modules.promoter.model;
 
-import com.gresk.modules.promoter.domain.MusicGenre;
-import com.gresk.modules.promoter.domain.PromoterStatus;
-import com.gresk.modules.promoter.domain.exception.GenreNotFoundException;
-import com.gresk.modules.promoter.domain.exception.PromoterAlreadyActiveException;
-import com.gresk.modules.promoter.domain.exception.PromoterNotActiveException;
-import com.gresk.modules.promoter.domain.valueObjects.*;
-import io.swagger.v3.oas.models.links.Link;
+import com.gresk.modules.promoter.MusicGenre;
+import com.gresk.modules.promoter.PromoterStatus;
+import com.gresk.modules.promoter.exception.GenreNotFoundException;
+import com.gresk.modules.promoter.exception.PromoterAlreadyActiveException;
+import com.gresk.modules.promoter.exception.PromoterNotActiveException;
+import com.gresk.modules.promoter.valueObjects.*;
 
 import java.time.LocalDateTime;
 import java.util.Collections;

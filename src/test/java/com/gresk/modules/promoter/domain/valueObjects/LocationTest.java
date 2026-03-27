@@ -1,5 +1,6 @@
 package com.gresk.modules.promoter.domain.valueObjects;
 
+import com.gresk.modules.promoter.valueObjects.Location;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;

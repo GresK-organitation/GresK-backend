@@ -1,4 +1,4 @@
-package com.gresk.modules.promoter.domain.exception;
+package com.gresk.modules.promoter.exception;
 
 public class PromoterNotActiveException extends RuntimeException {
     public PromoterNotActiveException(String message) {

@@ -1,11 +1,12 @@
 package com.gresk.modules.promoter.domain.model;
 
-import com.gresk.modules.promoter.domain.MusicGenre;
-import com.gresk.modules.promoter.domain.PromoterStatus;
-import com.gresk.modules.promoter.domain.exception.GenreNotFoundException;
-import com.gresk.modules.promoter.domain.exception.PromoterAlreadyActiveException;
-import com.gresk.modules.promoter.domain.exception.PromoterNotActiveException;
-import com.gresk.modules.promoter.domain.valueObjects.*;
+import com.gresk.modules.promoter.MusicGenre;
+import com.gresk.modules.promoter.PromoterStatus;
+import com.gresk.modules.promoter.exception.GenreNotFoundException;
+import com.gresk.modules.promoter.exception.PromoterAlreadyActiveException;
+import com.gresk.modules.promoter.exception.PromoterNotActiveException;
+import com.gresk.modules.promoter.model.Promoter;
+import com.gresk.modules.promoter.valueObjects.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
