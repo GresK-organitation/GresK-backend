@@ -25,7 +25,6 @@ public final class Promoter {
     private final LocalDateTime createdAt;
     private boolean active;
 
-
     private Promoter(PromoterId id, Email email, Password password, PromoterName name, Description description,
                      Location location, Set<MusicGenre> musicalGenres, PromoterStatus status, LocalDateTime createdAt, boolean active) {
         this.id = id;
@@ -40,10 +39,10 @@ public final class Promoter {
         this.active = active;
     }
 
-    public static Promoter create (Email email, Password password, PromoterName name, Location location){
+    public static Promoter create(Email email, Password password, PromoterName name, Location location, Description description){
         return new Promoter(
                 PromoterId.generate(), email, password, name,
-                new Description(null),
+                description != null ? description : new Description(null),
                 location,
                 new LinkedHashSet<>(),
                 PromoterStatus.PENDING,
