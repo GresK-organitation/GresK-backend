@@ -1,4 +1,4 @@
-package com.gresk.modules.promoter;
+package com.gresk.modules.promoter.domain;
 
 public enum MusicGenre {
     ROCK("Rock"),

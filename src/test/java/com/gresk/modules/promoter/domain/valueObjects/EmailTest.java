@@ -1,6 +1,6 @@
 package com.gresk.modules.promoter.domain.valueObjects;
 
-import com.gresk.modules.promoter.valueObjects.Email;
+import com.gresk.modules.promoter.domain.valueobject.Email;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;

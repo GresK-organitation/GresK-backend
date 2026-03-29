@@ -1,9 +1,9 @@
 package com.gresk.modules.promoter.port;
 
-import com.gresk.modules.promoter.MusicGenre;
-import com.gresk.modules.promoter.model.Promoter;
-import com.gresk.modules.promoter.valueObjects.Email;
-import com.gresk.modules.promoter.valueObjects.PromoterId;
+import com.gresk.modules.promoter.domain.MusicGenre;
+import com.gresk.modules.promoter.domain.model.Promoter;
+import com.gresk.modules.promoter.domain.valueobject.Email;
+import com.gresk.modules.promoter.domain.valueobject.PromoterId;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

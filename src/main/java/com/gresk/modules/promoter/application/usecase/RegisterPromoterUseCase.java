@@ -1,11 +1,11 @@
 package com.gresk.modules.promoter.application.usecase;
 
-import com.gresk.modules.promoter.MusicGenre;
+import com.gresk.modules.promoter.domain.MusicGenre;
 import com.gresk.modules.promoter.application.command.RegisterPromoterCommand;
-import com.gresk.modules.promoter.exception.EmailAlreadyExistsException;
-import com.gresk.modules.promoter.model.Promoter;
+import com.gresk.modules.promoter.domain.exception.EmailAlreadyExistsException;
+import com.gresk.modules.promoter.domain.model.Promoter;
+import com.gresk.modules.promoter.domain.valueobject.*;
 import com.gresk.modules.promoter.port.PromoterRepository;
-import com.gresk.modules.promoter.valueObjects.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,6 @@
-package com.gresk.modules.promoter.valueObjects;
+package com.gresk.modules.promoter.domain.valueobject;
 
-import com.gresk.modules.promoter.exception.InvalidPromoterNameException;
+import com.gresk.modules.promoter.domain.exception.InvalidPromoterNameException;
 
 import java.util.Objects;
 

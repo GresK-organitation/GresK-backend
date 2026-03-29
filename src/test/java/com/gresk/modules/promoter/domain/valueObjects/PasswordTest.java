@@ -1,6 +1,6 @@
 package com.gresk.modules.promoter.domain.valueObjects;
 
-import com.gresk.modules.promoter.valueObjects.Password;
+import com.gresk.modules.promoter.domain.valueobject.Password;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;

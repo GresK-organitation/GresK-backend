@@ -1,12 +1,12 @@
 package com.gresk.modules.promoter.application.usecase;
 
-import com.gresk.modules.promoter.MusicGenre;
+import com.gresk.modules.promoter.domain.MusicGenre;
 import com.gresk.modules.promoter.application.command.RegisterPromoterCommand;
-import com.gresk.modules.promoter.exception.EmailAlreadyExistsException;
-import com.gresk.modules.promoter.model.Promoter;
+import com.gresk.modules.promoter.domain.exception.EmailAlreadyExistsException;
+import com.gresk.modules.promoter.domain.model.Promoter;
 import com.gresk.modules.promoter.port.PromoterRepository;
-import com.gresk.modules.promoter.valueObjects.Email;
-import com.gresk.modules.promoter.valueObjects.PromoterId;
+import com.gresk.modules.promoter.domain.valueobject.Email;
+import com.gresk.modules.promoter.domain.valueobject.PromoterId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
