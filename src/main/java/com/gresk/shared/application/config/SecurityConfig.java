@@ -2,58 +2,49 @@ package com.gresk.shared.application.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.web.server.SecurityWebFilterChain;
 
 /**
- * Central HTTP security configuration.
+ * Central HTTP security configuration for Spring WebFlux.
  *
- * <p>Provides a single {@link SecurityFilterChain} bean that replaces Spring Security's
+ * <p>Provides a single {@link SecurityWebFilterChain} bean that replaces Spring Security's
  * default auto-configured chain (which blocks every request with HTTP Basic).
  *
  * <p>Open paths follow the principle of least surface area: only the minimum set
- * required for documentation tooling and operational monitoring is whitelisted.
- * All other paths are left open for now (permitAll) because no domain endpoints
- * exist yet; this must be revisited when user-facing API endpoints are added.
+ * required for documentation tooling, operational monitoring and auth endpoints
+ * is whitelisted. Endpoints under /me require a valid authenticated principal.
  */
 @Configuration
-@EnableWebSecurity
+@EnableWebFluxSecurity
 public class SecurityConfig {
 
-    private static final String[] PUBLIC_PATHS = {
-        // Actuator
-        "/actuator/**",
-        // SpringDoc – raw OpenAPI JSON/YAML spec
-        "/v3/api-docs/**",
-        // SpringDoc – Swagger UI static resources (JS, CSS, HTML fragments)
-        "/swagger-ui/**",
-        // Redirect entry point (Spring MVC maps this → /swagger-ui/index.html)
-        "/swagger-ui.html"
-    };
-
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            // Disable CSRF for a stateless REST API.
-            // CSRF protection is only meaningful for browser-based session flows.
-                // El CSRF es una protección para webs que usan "cookies" (como Facebook). C
-                // omo tu API es Stateless (usa JWT, no cookies), esta protección no es necesaria y
-                // solo estorbaría. Por eso la desactivamos.
-            .csrf(AbstractHttpConfigurer::disable)
-                //"Deja pasar a todo el mundo a las rutas que pusimos en la lista de arriba".
-            .authorizeHttpRequests(auth -> auth
-                    //¡Ojo aquí! Esto dice: "Cualquier otra ruta que no esté en la lista, también déjala pasar".
-                    //
-                    //Como dice tu comentario en el código (TODO), esto es temporal. Ahora mismo
-                    // lo dejas abierto porque estás construyendo los cimientos, pero más adelante,
-                    // cuando tengas usuarios reales, cambiarás esto por .authenticated().
-                .requestMatchers(PUBLIC_PATHS).permitAll()
-                // TODO: replace with authenticated() when domain endpoints are added
-                .anyRequest().permitAll()
-            );
-
-        return http.build();
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+        return http
+                // Disable CSRF: stateless REST API using JWT — no session cookies, no CSRF risk.
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .authorizeExchange(exchanges -> exchanges
+                        // Swagger / OpenAPI docs
+                        .pathMatchers(
+                                "/actuator/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+                        // Auth endpoints — public by design
+                        .pathMatchers(
+                                "/api/v1/promoters/register",
+                                "/api/v1/promoters/login"
+                        ).permitAll()
+                        // Profile endpoints — require an authenticated JWT principal
+                        .pathMatchers("/api/v1/promoters/me").authenticated()
+                        // Everything else is open for now (no other domain endpoints yet)
+                        // TODO: replace anyExchange().permitAll() with authenticated() globally
+                        //       once the JWT filter is wired and all endpoints are protected.
+                        .anyExchange().permitAll()
+                )
+                .build();
     }
 }
