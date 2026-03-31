@@ -1,0 +1,69 @@
+package com.gresk.modules.event.application.usecase;
+
+import com.gresk.modules.event.domain.model.Event;
+import com.gresk.modules.event.domain.model.EventId;
+import com.gresk.modules.event.domain.port.out.EventFilter;
+import com.gresk.modules.event.domain.port.out.EventRepository;
+import com.gresk.modules.promoter.domain.valueobject.PromoterId;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class ListEventsUseCaseTest {
+
+    @Mock
+    private EventRepository eventRepository;
+
+    @InjectMocks
+    private ListEventsUseCase useCase;
+
+    private final EventFilter filter = EventFilter.empty();
+    private final PageRequest pageRequest = PageRequest.of(0, 10);
+
+    // --- execute() ---
+
+    @Test
+    void execute_shouldReturnAllEventsFromRepository() {
+        Event event1 = Event.create("Summer Fest", PromoterId.generate());
+        Event event2 = Event.create("Winter Bash", PromoterId.generate());
+        when(eventRepository.findAll(eq(filter), eq(pageRequest)))
+                .thenReturn(Flux.just(event1, event2));
+
+        StepVerifier.create(useCase.execute(filter, pageRequest))
+                .assertNext(e -> assertThat(e.getTitle()).isEqualTo("Summer Fest"))
+                .assertNext(e -> assertThat(e.getTitle()).isEqualTo("Winter Bash"))
+                .verifyComplete();
+    }
+
+    @Test
+    void execute_shouldReturnEmptyFluxWhenNoResults() {
+        when(eventRepository.findAll(any(EventFilter.class), any(PageRequest.class)))
+                .thenReturn(Flux.empty());
+
+        StepVerifier.create(useCase.execute(filter, pageRequest))
+                .verifyComplete();
+    }
+
+    // --- count() ---
+
+    @Test
+    void count_shouldReturnTotalCountFromRepository() {
+        when(eventRepository.count(eq(filter))).thenReturn(Mono.just(42L));
+
+        StepVerifier.create(useCase.count(filter))
+                .assertNext(total -> assertThat(total).isEqualTo(42L))
+                .verifyComplete();
+    }
+}
