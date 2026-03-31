@@ -46,7 +46,7 @@ public final class Event {
         );
     }
 
-    static Event reconstitute(EventId id, String title, PromoterId promoterId,
+    public static Event reconstitute(EventId id, String title, PromoterId promoterId,
                                Genre genre, Price price, Capacity capacity,
                                LocalDateTime eventDate, Location location,
                                LocalDateTime revealAt, EventStatus status,
