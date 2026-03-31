@@ -43,11 +43,11 @@ class CreateEventUseCaseTest {
     // --- execute() happy path ---
 
     @Test
-    void execute_shouldReturnEventIdOnSuccess() {
+    void execute_shouldReturnEventOnSuccess() {
         when(eventRepository.save(any(Event.class))).thenAnswer(inv -> Mono.just(inv.getArgument(0)));
 
         StepVerifier.create(useCase.execute(minimalCommand))
-                .assertNext(id -> assertThat(id).isNotNull())
+                .assertNext(event -> assertThat(event).isNotNull())
                 .verifyComplete();
 
         verify(eventRepository).save(any(Event.class));
@@ -68,7 +68,7 @@ class CreateEventUseCaseTest {
         );
 
         StepVerifier.create(useCase.execute(fullCommand))
-                .assertNext(id -> assertThat(id).isNotNull())
+                .assertNext(event -> assertThat(event).isNotNull())
                 .verifyComplete();
 
         verify(eventRepository).save(argThat(event -> {
@@ -86,7 +86,7 @@ class CreateEventUseCaseTest {
         when(eventRepository.save(any(Event.class))).thenAnswer(inv -> Mono.just(inv.getArgument(0)));
 
         StepVerifier.create(useCase.execute(minimalCommand))
-                .assertNext(id -> assertThat(id).isNotNull())
+                .assertNext(event -> assertThat(event).isNotNull())
                 .verifyComplete();
 
         verify(eventRepository).save(argThat(event ->

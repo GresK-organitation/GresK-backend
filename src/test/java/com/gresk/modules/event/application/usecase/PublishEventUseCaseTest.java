@@ -18,6 +18,7 @@ import reactor.test.StepVerifier;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -52,12 +53,13 @@ class PublishEventUseCaseTest {
     // --- happy path ---
 
     @Test
-    void execute_shouldPublishEventAndReturnVoid() {
+    void execute_shouldPublishEventAndReturnEvent() {
         Event event = completeEvent(ownerId);
         when(eventRepository.findById(any(EventId.class))).thenReturn(Mono.just(event));
         when(eventRepository.save(any(Event.class))).thenAnswer(inv -> Mono.just(inv.getArgument(0)));
 
         StepVerifier.create(useCase.execute(eventIdStr, ownerIdStr))
+                .assertNext(e -> assertThat(e.getStatus()).isEqualTo(EventStatus.PUBLISHED))
                 .verifyComplete();
 
         verify(eventRepository).save(argThat(e -> e.getStatus() == EventStatus.PUBLISHED));

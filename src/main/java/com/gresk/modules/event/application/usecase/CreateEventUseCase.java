@@ -13,7 +13,7 @@ public class CreateEventUseCase {
 
     private final EventRepository eventRepository;
 
-    public Mono<EventId> execute(CreateEventCommand command) {
+    public Mono<Event> execute(CreateEventCommand command) {
         return Mono.defer(() -> {
             PromoterId promoterId = PromoterId.of(command.promoterId());
 
@@ -41,8 +41,7 @@ public class CreateEventUseCase {
 
                         return event;
                     })
-                    .flatMap(eventRepository::save)
-                    .map(Event::getId);
+                    .flatMap(eventRepository::save);
         });
     }
 }
