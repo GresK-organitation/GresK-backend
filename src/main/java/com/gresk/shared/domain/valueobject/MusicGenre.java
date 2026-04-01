@@ -1,4 +1,4 @@
-package com.gresk.shared.domain;
+package com.gresk.shared.domain.valueobject;
 
 public enum MusicGenre {
     ROCK, POP, TECHNO, REGGAETON, HIP_HOP, HOUSE,
