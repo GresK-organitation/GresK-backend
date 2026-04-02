@@ -9,7 +9,7 @@ import com.gresk.modules.promoter.domain.exception.EmailAlreadyExistsException;
 import com.gresk.modules.promoter.domain.exception.InvalidCredentialsException;
 import com.gresk.modules.promoter.domain.model.Promoter;
 import com.gresk.modules.promoter.domain.valueobject.*;
-import com.gresk.shared.port.AuthToken;
+import com.gresk.infrastructure.port.AuthToken;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

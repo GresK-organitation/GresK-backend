@@ -1,4 +1,4 @@
-package com.gresk.shared.port;
+package com.gresk.infrastructure.port;
 
 public record AuthToken(String token, long expiresIn) {
     public AuthToken {
