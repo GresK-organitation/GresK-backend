@@ -14,7 +14,7 @@ public record Description(String value) {
         } else {
             value = value.trim();
             if (value.length() > MAX_LENGTH) {
-                throw new InvalidDescriptionException( String.format("Description exceeds the limit of %d characters", MAX_LENGTH)
+                throw new InvalidDescriptionException(String.format("Description exceeds the limit of %d characters", MAX_LENGTH)
                 );
             }
         }
@@ -26,6 +26,14 @@ public record Description(String value) {
 
     public Optional<String> optionalValue() {
         return isEmpty() ? Optional.empty() : Optional.of(value);
+    }
+
+    public static Description of(String value) {
+        return new Description(value);
+    }
+
+    public static Description reconstitute(String value) {
+        return new Description(value);
     }
 
     @Override

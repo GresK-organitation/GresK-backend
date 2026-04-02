@@ -18,6 +18,14 @@ public record Password(String hashedValue) {
         return value.length() < 20;
     }
 
+    public static Password of(String hashedValue) {
+        return new Password(hashedValue);
+    }
+
+    public static Password reconstitute(String hashedValue) {
+        return new Password(hashedValue);
+    }
+
     @Override
     public String toString() {
         return "********";

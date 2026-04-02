@@ -21,6 +21,14 @@ public record Name(String value) {
         }
     }
 
+    public static Name of(String value) {
+        return new Name(value);
+    }
+
+    public static Name reconstitute(String value) {
+        return new Name(value);
+    }
+
     @Override
     public String toString() {
         return value;
