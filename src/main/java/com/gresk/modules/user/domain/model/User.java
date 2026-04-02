@@ -10,30 +10,27 @@ import com.gresk.shared.domain.valueobject.Password;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public final class User {
     private final UserId id;
     private final Email email;
     private final Password password;
-    private final Name name;
-    private final Description description;
-    private final List<MusicGenre> musicGenres;
-    private final AccountStatus status;
-    private final UserTier tier;
-    private final Set<Role> roles;
     private final LocalDateTime createdAt;
 
-    private User(UserId id,
-                 Email email,
-                 Password password,
-                 Name name,
-                 Description description,
-                 List<MusicGenre> musicGenres,
-                 AccountStatus status,
-                 UserTier tier,
-                 Set<Role> roles,
-                 LocalDateTime createdAt) {
+    private Name name;
+    private Description description;
+    private List<MusicGenre> musicGenres;
+    private AccountStatus status;
+    private UserTier tier;
+    private int loyaltyPoints;
+    private final Set<Role> roles;
+
+    private User(UserId id, Email email, Password password, Name name,
+                 Description description, List<MusicGenre> musicGenres,
+                 AccountStatus status, UserTier tier, int loyaltyPoints,
+                 Set<Role> roles, LocalDateTime createdAt) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -42,41 +39,39 @@ public final class User {
         this.musicGenres = List.copyOf(musicGenres);
         this.status = status;
         this.tier = tier;
+        this.loyaltyPoints = loyaltyPoints;
         this.roles = Set.copyOf(roles);
         this.createdAt = createdAt;
     }
 
-    public static User create(Email email,
-                          Password password,
-                          Name name,
-                          Description description,
-                          List<MusicGenre> musicGenres) {
+    public static User create(Email email, Password password, Name name,
+                              Description description, List<MusicGenre> musicGenres) {
         return new User(
-                UserId.generate(),
-                email,
-                password,
-                name,
-                description,
-                musicGenres,
-                AccountStatus.ACTIVE,
-                UserTier.FREE,
-                Set.of(Role.USER),
-                LocalDateTime.now());
+                UserId.generate(), email, password, name, description,
+                musicGenres, AccountStatus.ACTIVE, UserTier.FREE, 0,
+                Set.of(Role.USER), LocalDateTime.now());
     }
 
-    public static User reconstitute(UserId userId,
-                                    Email email,
-                                    Password password,
-                                    Name name,
-                                    Description description,
-                                    List<MusicGenre> musicGenres,
-                                    AccountStatus status,
-                                    UserTier tier,
-                                    Set<Role> roles,
-                                    LocalDateTime createdAt) {
-        return new User(userId, email, password, name, description, musicGenres, status, tier, roles, createdAt);
+
+    public void updateProfile(Name name, Description description, List<MusicGenre> genres) {
+        this.name = Objects.requireNonNull(name);
+        this.description = Objects.requireNonNull(description);
+        this.musicGenres = List.copyOf(genres);
     }
 
+    public void addPoints(int points) {
+        if (points < 0) throw new IllegalArgumentException("Points cannot be negative");
+        this.loyaltyPoints += points;
+        checkTierUpgrade();
+    }
+
+    private void checkTierUpgrade() {
+        if (this.loyaltyPoints >= 500 && this.tier == UserTier.FREE) {
+            this.tier = UserTier.PREMIUM;
+        }
+    }
+
+    public int getLoyaltyPoints() { return loyaltyPoints; }
     public UserId getId() { return id; }
     public Email getEmail() { return email; }
     public Password getPassword() { return password; }
