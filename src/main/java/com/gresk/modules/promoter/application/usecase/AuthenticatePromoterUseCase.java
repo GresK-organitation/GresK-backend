@@ -5,8 +5,8 @@ import com.gresk.modules.promoter.application.command.AuthenticatePromoterComman
 import com.gresk.modules.promoter.domain.exception.InvalidCredentialsException;
 import com.gresk.modules.promoter.port.PromoterRepository;
 import com.gresk.modules.promoter.domain.valueobject.Email;
-import com.gresk.shared.port.AuthToken;
-import com.gresk.shared.port.JwtTokenGenerator;
+import com.gresk.infrastructure.port.AuthToken;
+import com.gresk.infrastructure.port.JwtTokenGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
