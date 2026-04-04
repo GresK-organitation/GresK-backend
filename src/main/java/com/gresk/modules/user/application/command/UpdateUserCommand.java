@@ -1,11 +1,10 @@
 package com.gresk.modules.user.application.command;
 
-import java.util.List;
+import java.util.Set;
 
 public record UpdateUserCommand(
-        String userId,
         String name,
         String description,
         String city,
-        List<String> musicGenres
+        Set<String> musicGenres
 ) {}
