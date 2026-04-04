@@ -8,6 +8,7 @@ public record UserDashboardDTO(
         String userId,
         String userName,
         String currentTier,
+        String city,
         int loyaltyPoints,
         List<EventRecommendedDTO> recommendedEvents,
         List<MusicRecommendedDTO> recommendedMusic

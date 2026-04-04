@@ -7,5 +7,6 @@ public record RegisterUserCommand(
         String password,
         String name,
         String description,
+        String city,
         List<String> musicGenres
 ) {}

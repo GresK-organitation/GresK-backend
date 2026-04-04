@@ -25,26 +25,30 @@ public class GetUserDashboardUseCaseImpl implements GetUserDashboardUseCase {
     private final MusicRecommendationProvider musicRecommendationProvider;
 
     @Override
-    @Transactional(readOnly = true)
     public UserDashboardDTO execute(UserId userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        List<EventRecommendedDTO> topEvents = eventRecommendationProvider.getTopEventsForUser(user.getId()).stream()
+        List<EventRecommendedDTO> topEvents = eventRecommendationProvider
+                .getTopEvents(user.getCity(), user.getMusicGenres())
+                .stream()
                 .map(EventRecommendedDTO::fromDomain)
                 .toList();
 
-        List<MusicRecommendedDTO> topTracks = musicRecommendationProvider.getSpotifyTopTracks(user.getId()).stream()
+        List<MusicRecommendedDTO> topTracks = musicRecommendationProvider
+                .getSpotifyTopTracks(user.getMusicGenres())
+                .stream()
                 .map(MusicRecommendedDTO::fromDomain)
                 .toList();
 
-        return UserDashboardDTO.builder()
-                .userId(user.getId().toString())
-                .userName(user.getName().toString())
-                .currentTier(user.getTier().name())
-                .loyaltyPoints(user.getLoyaltyPoints())
-                .recommendedEvents(topEvents)
-                .recommendedMusic(topTracks)
-                .build();
+        return new UserDashboardDTO(
+                user.getId().value().toString(),
+                user.getName().value(),
+                user.getTier().name(),
+                user.getCity().value(),
+                user.getLoyaltyPoints(),
+                topEvents,
+                topTracks
+        );
     }
 }

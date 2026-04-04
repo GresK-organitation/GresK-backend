@@ -6,5 +6,6 @@ public record UpdateUserCommand(
         String userId,
         String name,
         String description,
+        String city,
         List<String> musicGenres
 ) {}
