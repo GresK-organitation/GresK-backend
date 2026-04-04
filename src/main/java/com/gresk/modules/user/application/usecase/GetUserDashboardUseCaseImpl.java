@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,7 +28,8 @@ public class GetUserDashboardUseCaseImpl implements GetUserDashboardUseCase {
     private final MusicRecommendationProvider musicRecommendationProvider;
 
     @Override
-    public UserDashboardDTO execute(UserId userId) {
+    public UserDashboardDTO execute(UUID id) {
+        UserId userId = UserId.of(id);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
