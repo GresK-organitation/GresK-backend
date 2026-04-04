@@ -1,7 +1,9 @@
 package com.gresk.modules.user.application.dto;
 
 import lombok.Builder;
+
 import java.util.List;
+import java.util.Set;
 
 @Builder
 public record UserDashboardDTO(
@@ -10,6 +12,7 @@ public record UserDashboardDTO(
         String currentTier,
         String city,
         int loyaltyPoints,
-        List<EventRecommendedDTO> recommendedEvents,
-        List<MusicRecommendedDTO> recommendedMusic
-) {}
+        Set<EventRecommendedDTO> recommendedEvents,
+        Set<MusicRecommendedDTO> recommendedMusic
+) {
+}

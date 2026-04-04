@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,17 +31,17 @@ public class GetUserDashboardUseCaseImpl implements GetUserDashboardUseCase {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        List<EventRecommendedDTO> topEvents = eventRecommendationProvider
+        Set<EventRecommendedDTO> topEvents = eventRecommendationProvider
                 .getTopEvents(user.getCity(), user.getMusicGenres())
                 .stream()
                 .map(EventRecommendedDTO::fromDomain)
-                .toList();
+                .collect(Collectors.toSet());
 
-        List<MusicRecommendedDTO> topTracks = musicRecommendationProvider
+        Set<MusicRecommendedDTO> topTracks = musicRecommendationProvider
                 .getSpotifyTopTracks(user.getMusicGenres())
                 .stream()
                 .map(MusicRecommendedDTO::fromDomain)
-                .toList();
+                .collect(Collectors.toSet());
 
         return new UserDashboardDTO(
                 user.getId().value().toString(),

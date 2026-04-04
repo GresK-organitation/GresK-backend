@@ -1,6 +1,6 @@
 package com.gresk.modules.user.application.command;
 
-import java.util.List;
+import java.util.Set;
 
 public record RegisterUserCommand(
         String email,
@@ -8,5 +8,5 @@ public record RegisterUserCommand(
         String name,
         String description,
         String city,
-        List<String> musicGenres
+        Set<String> musicGenres
 ) {}
