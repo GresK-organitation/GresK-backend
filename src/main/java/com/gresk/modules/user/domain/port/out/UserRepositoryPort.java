@@ -11,6 +11,4 @@ public interface UserRepositoryPort {
     Optional<User> findById(UserId id);
 
     User save(User user);
-
-    boolean existsByEmail(Email email);
 }
