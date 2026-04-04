@@ -1,5 +1,6 @@
 package com.gresk.modules.user.domain.model;
 
+import com.gresk.modules.user.domain.exception.InvalidPointsException;
 import com.gresk.shared.domain.AccountStatus;
 import com.gresk.shared.domain.MusicGenre;
 import com.gresk.shared.domain.Role;
@@ -64,7 +65,7 @@ public final class User {
         if (this.status == AccountStatus.SUSPENDED) {
             throw new IllegalStateException("Suspended users cannot earn points");
         }
-        if (points <= 0) throw new IllegalArgumentException("Points must be positive");
+        if (points <= 0) throw new InvalidPointsException("Points must be positive");
         this.loyaltyPoints += points;
         checkTierUpgrade();
     }
