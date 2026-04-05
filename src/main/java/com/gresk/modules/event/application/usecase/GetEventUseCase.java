@@ -7,7 +7,7 @@ import com.gresk.modules.event.domain.model.EventId;
 import com.gresk.modules.event.domain.port.out.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,11 +15,10 @@ public class GetEventUseCase {
 
     private final EventRepository eventRepository;
 
-    public Mono<Event> execute(GetEventQuery query) {
-        return Mono.defer(() -> {
-            EventId id = EventId.of(query.eventId());
-            return eventRepository.findById(id)
-                    .switchIfEmpty(Mono.error(new EventNotFoundException(query.eventId())));
-        });
+    @Transactional(readOnly = true)
+    public Event execute(GetEventQuery query) {
+        EventId id = EventId.of(query.eventId());
+        return eventRepository.findById(id)
+                .orElseThrow(() -> new EventNotFoundException(query.eventId()));
     }
 }

@@ -1,52 +1,52 @@
 package com.gresk.modules.promoter.application.usecase;
 
-import com.gresk.modules.promoter.domain.MusicGenre;
 import com.gresk.modules.promoter.application.command.RegisterPromoterCommand;
+import com.gresk.modules.promoter.application.port.in.RegisterPromoterPort;
+import com.gresk.modules.promoter.application.port.out.PasswordHasher;
+import com.gresk.modules.promoter.domain.MusicGenre;
 import com.gresk.modules.promoter.domain.exception.EmailAlreadyExistsException;
+import com.gresk.modules.promoter.domain.exception.InvalidGenreException;
 import com.gresk.modules.promoter.domain.model.Promoter;
+import com.gresk.modules.promoter.domain.port.out.PromoterRepository;
 import com.gresk.modules.promoter.domain.valueobject.*;
-import com.gresk.modules.promoter.port.PromoterRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class RegisterPromoterUseCase {
+public class RegisterPromoterUseCase implements RegisterPromoterPort {
 
     private final PromoterRepository promoterRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordHasher passwordHasher;
 
-    public Mono<PromoterId> execute (RegisterPromoterCommand command){
-        return Mono.defer(() -> {
-            Email email = new Email(command.email());
-            return promoterRepository.existsByEmail(email)
-                    .flatMap(exists -> {
-                        if (exists) {
-                            return Mono.error(new EmailAlreadyExistsException(command.email()));
-                        }
-                        return Mono.fromCallable(() -> passwordEncoder.encode(command.rawPassword()))
-                                .subscribeOn(Schedulers.boundedElastic())
-                                .flatMap(hashedPassword -> {
-                                    PromoterName name = new PromoterName(command.name());
-                                    Password password = new Password(hashedPassword);
-                                    Location location = new Location(command.city(), command.country(), command.address());
-                                    Description description = new Description(command.description());
+    @Transactional
+    @Override
+    public PromoterId execute(RegisterPromoterCommand command) {
+        Email email = new Email(command.email());
 
-                                    Promoter promoter = Promoter.create(email, password, name, location, description);
+        if (promoterRepository.existsByEmail(email)) {
+            throw new EmailAlreadyExistsException(command.email());
+        }
 
-                                    if (command.musicalGenres() != null) {
-                                        command.musicalGenres().stream()
-                                                .map(MusicGenre::valueOf)
-                                                .forEach(promoter::addGenre);
-                                    }
+        String hashedPassword = passwordHasher.hash(command.rawPassword());
+        PromoterName name = new PromoterName(command.name());
+        Password password = new Password(hashedPassword);
+        Location location = new Location(command.city(), command.country(), command.address());
+        Description description = new Description(command.description());
 
-                                    return promoterRepository.save(promoter)
-                                            .map(Promoter::getId);
-                                });
-                    });
-        });
+        Promoter promoter = Promoter.create(email, password, name, location, description);
+
+        if (command.musicalGenres() != null) {
+            command.musicalGenres().forEach(raw -> {
+                try {
+                    promoter.addGenre(MusicGenre.valueOf(raw));
+                } catch (IllegalArgumentException e) {
+                    throw new InvalidGenreException(raw);
+                }
+            });
+        }
+
+        return promoterRepository.save(promoter).getId();
     }
 }

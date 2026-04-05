@@ -19,12 +19,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -40,38 +39,34 @@ public class EventController {
 
     @PostMapping
     @PreAuthorize("hasRole('PROMOTER')")
-    public Mono<ResponseEntity<EventResponse>> create(
-            @Valid @RequestBody CreateEventRequest request) {
-        return currentPromoterId()
-                .flatMap(promoterId -> {
-                    CreateEventCommand command = new CreateEventCommand(
-                            promoterId.toString(), request.title(),
-                            request.genre(), request.price(), request.currency(),
-                            request.totalCapacity(), request.eventDate(),
-                            request.city(), request.address(), request.venue(), null);
-                    return createUseCase.execute(command);
-                })
-                .map(event -> ResponseEntity.status(201).body(mapper.toResponse(event)));
+    public ResponseEntity<EventResponse> create(
+            @Valid @RequestBody CreateEventRequest request,
+            @AuthenticationPrincipal PromoterId promoterId) {
+        CreateEventCommand command = new CreateEventCommand(
+                promoterId.toString(), request.title(),
+                request.genre(), request.price(), request.currency(),
+                request.totalCapacity(), request.eventDate(),
+                request.city(), request.address(), request.venue(), null);
+        return ResponseEntity.status(201).body(mapper.toResponse(createUseCase.execute(command)));
     }
 
     @PutMapping("/{id}/publish")
     @PreAuthorize("hasRole('PROMOTER')")
-    public Mono<ResponseEntity<EventResponse>> publish(@PathVariable String id) {
-        return currentPromoterId()
-                .flatMap(promoterId -> publishUseCase.execute(id, promoterId.toString()))
-                .map(event -> ResponseEntity.ok(mapper.toResponse(event)));
+    public ResponseEntity<EventResponse> publish(
+            @PathVariable String id,
+            @AuthenticationPrincipal PromoterId promoterId) {
+        return ResponseEntity.ok(mapper.toResponse(publishUseCase.execute(id, promoterId.toString())));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public Mono<ResponseEntity<EventResponse>> getById(@PathVariable String id) {
-        return getUseCase.execute(new GetEventQuery(id))
-                .map(event -> ResponseEntity.ok(mapper.toResponse(event)));
+    public ResponseEntity<EventResponse> getById(@PathVariable String id) {
+        return ResponseEntity.ok(mapper.toResponse(getUseCase.execute(new GetEventQuery(id))));
     }
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public Mono<ResponseEntity<PageResponse<EventResponse>>> list(
+    public ResponseEntity<PageResponse<EventResponse>> list(
             @RequestParam(required = false) String genre,
             @RequestParam(required = false) String city,
             @RequestParam(required = false)
@@ -88,18 +83,10 @@ public class EventController {
 
         PageRequest pageRequest = PageRequest.of(page, size);
 
-        return Mono.zip(
-                listUseCase.execute(filter, pageRequest).map(mapper::toResponse).collectList(),
-                listUseCase.count(filter)
-        ).map(tuple -> ResponseEntity.ok(
-                PageResponse.of(tuple.getT1(), tuple.getT2(), pageRequest)));
-    }
+        List<EventResponse> content = listUseCase.execute(filter, pageRequest)
+                .stream().map(mapper::toResponse).toList();
+        long total = listUseCase.count(filter);
 
-    // --- helpers ---
-
-    private Mono<PromoterId> currentPromoterId() {
-        return ReactiveSecurityContextHolder.getContext()
-                .map(SecurityContext::getAuthentication)
-                .map(auth -> (PromoterId) auth.getPrincipal());
+        return ResponseEntity.ok(PageResponse.of(content, total, pageRequest));
     }
 }

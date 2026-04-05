@@ -11,10 +11,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -31,27 +32,24 @@ class GetEventUseCaseTest {
     void execute_shouldReturnEventWhenFound() {
         Event event = Event.create("Summer Fest", PromoterId.generate());
         String eventId = event.getId().toString();
-        when(eventRepository.findById(any(EventId.class))).thenReturn(Mono.just(event));
+        when(eventRepository.findById(any(EventId.class))).thenReturn(Optional.of(event));
 
-        StepVerifier.create(useCase.execute(new GetEventQuery(eventId)))
-                .assertNext(e -> assertThat(e).isNotNull())
-                .verifyComplete();
+        Event result = useCase.execute(new GetEventQuery(eventId));
+        assertThat(result).isNotNull();
     }
 
     @Test
     void execute_shouldThrowEventNotFoundExceptionWhenMissing() {
         String eventId = EventId.generate().toString();
-        when(eventRepository.findById(any(EventId.class))).thenReturn(Mono.empty());
+        when(eventRepository.findById(any(EventId.class))).thenReturn(Optional.empty());
 
-        StepVerifier.create(useCase.execute(new GetEventQuery(eventId)))
-                .expectError(EventNotFoundException.class)
-                .verify();
+        assertThrows(EventNotFoundException.class,
+                () -> useCase.execute(new GetEventQuery(eventId)));
     }
 
     @Test
     void execute_shouldThrowWhenEventIdIsInvalid() {
-        StepVerifier.create(useCase.execute(new GetEventQuery("not-a-uuid")))
-                .expectError(IllegalArgumentException.class)
-                .verify();
+        assertThrows(IllegalArgumentException.class,
+                () -> useCase.execute(new GetEventQuery("not-a-uuid")));
     }
 }

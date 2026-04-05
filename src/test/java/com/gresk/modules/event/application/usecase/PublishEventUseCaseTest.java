@@ -12,13 +12,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -55,12 +55,11 @@ class PublishEventUseCaseTest {
     @Test
     void execute_shouldPublishEventAndReturnEvent() {
         Event event = completeEvent(ownerId);
-        when(eventRepository.findById(any(EventId.class))).thenReturn(Mono.just(event));
-        when(eventRepository.save(any(Event.class))).thenAnswer(inv -> Mono.just(inv.getArgument(0)));
+        when(eventRepository.findById(any(EventId.class))).thenReturn(Optional.of(event));
+        when(eventRepository.save(any(Event.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        StepVerifier.create(useCase.execute(eventIdStr, ownerIdStr))
-                .assertNext(e -> assertThat(e.getStatus()).isEqualTo(EventStatus.PUBLISHED))
-                .verifyComplete();
+        Event result = useCase.execute(eventIdStr, ownerIdStr);
+        assertThat(result.getStatus()).isEqualTo(EventStatus.PUBLISHED);
 
         verify(eventRepository).save(argThat(e -> e.getStatus() == EventStatus.PUBLISHED));
     }
@@ -69,11 +68,10 @@ class PublishEventUseCaseTest {
 
     @Test
     void execute_shouldThrowEventNotFoundExceptionWhenEventDoesNotExist() {
-        when(eventRepository.findById(any(EventId.class))).thenReturn(Mono.empty());
+        when(eventRepository.findById(any(EventId.class))).thenReturn(Optional.empty());
 
-        StepVerifier.create(useCase.execute(eventIdStr, ownerIdStr))
-                .expectError(EventNotFoundException.class)
-                .verify();
+        assertThrows(EventNotFoundException.class,
+                () -> useCase.execute(eventIdStr, ownerIdStr));
 
         verify(eventRepository, never()).save(any());
     }
@@ -84,11 +82,10 @@ class PublishEventUseCaseTest {
     void execute_shouldThrowForbiddenOperationExceptionWhenRequesterIsNotOwner() {
         PromoterId differentOwner = PromoterId.generate();
         Event event = completeEvent(differentOwner);
-        when(eventRepository.findById(any(EventId.class))).thenReturn(Mono.just(event));
+        when(eventRepository.findById(any(EventId.class))).thenReturn(Optional.of(event));
 
-        StepVerifier.create(useCase.execute(eventIdStr, ownerIdStr))
-                .expectError(ForbiddenOperationException.class)
-                .verify();
+        assertThrows(ForbiddenOperationException.class,
+                () -> useCase.execute(eventIdStr, ownerIdStr));
 
         verify(eventRepository, never()).save(any());
     }
@@ -97,12 +94,11 @@ class PublishEventUseCaseTest {
 
     @Test
     void execute_shouldPropagateIncompleteEventExceptionFromDomain() {
-        Event incompleteEvent = Event.create("Summer Fest", ownerId); // no genre/price/capacity/eventDate
-        when(eventRepository.findById(any(EventId.class))).thenReturn(Mono.just(incompleteEvent));
+        Event incompleteEvent = Event.create("Summer Fest", ownerId);
+        when(eventRepository.findById(any(EventId.class))).thenReturn(Optional.of(incompleteEvent));
 
-        StepVerifier.create(useCase.execute(eventIdStr, ownerIdStr))
-                .expectError(IncompleteEventException.class)
-                .verify();
+        assertThrows(IncompleteEventException.class,
+                () -> useCase.execute(eventIdStr, ownerIdStr));
 
         verify(eventRepository, never()).save(any());
     }

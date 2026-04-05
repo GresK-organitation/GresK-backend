@@ -15,4 +15,8 @@ public record Price(BigDecimal amount, String currency) {
             throw new IllegalArgumentException("Price amount must be greater than 0");
         }
     }
+
+    public static Price of(double amount) {
+        return new Price(BigDecimal.valueOf(amount), "EUR");
+    }
 }

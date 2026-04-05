@@ -9,14 +9,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,18 +44,17 @@ class CreateEventUseCaseTest {
 
     @Test
     void execute_shouldReturnEventOnSuccess() {
-        when(eventRepository.save(any(Event.class))).thenAnswer(inv -> Mono.just(inv.getArgument(0)));
+        when(eventRepository.save(any(Event.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        StepVerifier.create(useCase.execute(minimalCommand))
-                .assertNext(event -> assertThat(event).isNotNull())
-                .verifyComplete();
+        Event result = useCase.execute(minimalCommand);
+        assertThat(result).isNotNull();
 
         verify(eventRepository).save(any(Event.class));
     }
 
     @Test
     void execute_shouldBuildEventWithOptionalFields() {
-        when(eventRepository.save(any(Event.class))).thenAnswer(inv -> Mono.just(inv.getArgument(0)));
+        when(eventRepository.save(any(Event.class))).thenAnswer(inv -> inv.getArgument(0));
         LocalDateTime eventDate = LocalDateTime.now().plusMonths(1);
         CreateEventCommand fullCommand = new CreateEventCommand(
                 promoterId, "Summer Fest",
@@ -67,9 +66,8 @@ class CreateEventUseCaseTest {
                 null
         );
 
-        StepVerifier.create(useCase.execute(fullCommand))
-                .assertNext(event -> assertThat(event).isNotNull())
-                .verifyComplete();
+        Event result = useCase.execute(fullCommand);
+        assertThat(result).isNotNull();
 
         verify(eventRepository).save(argThat(event -> {
             assertThat(event.getGenre()).isEqualTo(Genre.ELECTRONIC);
@@ -83,11 +81,9 @@ class CreateEventUseCaseTest {
 
     @Test
     void execute_shouldSaveEventInDraftStatus() {
-        when(eventRepository.save(any(Event.class))).thenAnswer(inv -> Mono.just(inv.getArgument(0)));
+        when(eventRepository.save(any(Event.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        StepVerifier.create(useCase.execute(minimalCommand))
-                .assertNext(event -> assertThat(event).isNotNull())
-                .verifyComplete();
+        useCase.execute(minimalCommand);
 
         verify(eventRepository).save(argThat(event ->
                 event.getStatus() == EventStatus.DRAFT));
@@ -98,11 +94,9 @@ class CreateEventUseCaseTest {
     @Test
     void execute_shouldPropagateErrorWhenRepositoryFails() {
         when(eventRepository.save(any(Event.class)))
-                .thenReturn(Mono.error(new RuntimeException("DB error")));
+                .thenThrow(new RuntimeException("DB error"));
 
-        StepVerifier.create(useCase.execute(minimalCommand))
-                .expectErrorMessage("DB error")
-                .verify();
+        assertThrows(RuntimeException.class, () -> useCase.execute(minimalCommand));
     }
 
     @Test
@@ -112,9 +106,7 @@ class CreateEventUseCaseTest {
                 null, null, null, null, null, null, null, null, null
         );
 
-        StepVerifier.create(useCase.execute(badCommand))
-                .expectError(IllegalArgumentException.class)
-                .verify();
+        assertThrows(IllegalArgumentException.class, () -> useCase.execute(badCommand));
 
         verify(eventRepository, never()).save(any());
     }

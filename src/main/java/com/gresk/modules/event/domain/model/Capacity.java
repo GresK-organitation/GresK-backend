@@ -17,4 +17,10 @@ public record Capacity(int total, int available) {
     public static Capacity of(int total) {
         return new Capacity(total, total);
     }
+
+    public Capacity reserve(int seats) {
+        if (seats > available)
+            throw new IllegalArgumentException("Not enough available seats");
+        return new Capacity(total, available - seats);
+    }
 }

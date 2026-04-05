@@ -1,67 +1,70 @@
 package com.gresk.modules.event.infrastructure.persistence;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
+import com.gresk.modules.event.domain.model.EventStatus;
+import com.gresk.modules.event.domain.model.Genre;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Table("events")
+@Entity
+@Table(name = "events")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventEntity implements Persistable<UUID> {
+public class EventEntity {
 
     @Id
     private UUID id;
 
+    @Column(nullable = false, length = 255)
     private String title;
 
-    @Column("promoter_id")
+    @Column(name = "promoter_id", nullable = false)
     private UUID promoterId;
 
-    private String status;
-    private String genre;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private EventStatus status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private Genre genre;
+
+    @Column(name = "amount", precision = 10, scale = 2)
     private BigDecimal amount;
+
+    @Column(name = "currency", length = 10)
     private String currency;
 
-    @Column("total_capacity")
+    @Column(name = "total_capacity")
     private Integer totalCapacity;
 
-    @Column("available_capacity")
+    @Column(name = "available_capacity")
     private Integer availableCapacity;
 
-    @Column("event_date")
-    private OffsetDateTime eventDate;
+    @Column(name = "event_date")
+    private LocalDateTime eventDate;
 
+    @Column(length = 100)
     private String city;
+
+    @Column(length = 255)
     private String address;
+
+    @Column(length = 255)
     private String venue;
 
-    @Column("reveal_at")
-    private OffsetDateTime revealAt;
+    @Column(name = "reveal_at")
+    private LocalDateTime revealAt;
 
-    @Column("created_at")
-    private OffsetDateTime createdAt;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-    @Column("updated_at")
-    private OffsetDateTime updatedAt;
-
-    @Transient
-    private boolean isNew;
-
-    @Override
-    public UUID getId() { return id; }
-
-    @Override
-    public boolean isNew() { return isNew; }
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 }
