@@ -14,11 +14,17 @@ spring:
     # Patrón de nombre: V{versión}__{descripción}.sql
     #   V1__init.sql, V2__create_promoters.sql, etc.
 
-  # ─── R2DBC / Flyway (JDBC) ───────────────────────────────────────────────
+  # ─── JPA / Hibernate ─────────────────────────────────────────────────────
+  jpa:
+    hibernate:
+      ddl-auto: none   # Flyway gestiona el esquema; Hibernate nunca toca DDL
+    open-in-view: false
+
+  # ─── Datasource / Flyway (JDBC) ──────────────────────────────────────────
   # La configuración de conexión es específica de cada entorno.
   # Se define en el perfil correspondiente:
-  #   · application-dev.yml  → r2dbc: (app) + flyway JDBC URL (migraciones)
-  #   · application-test.yml → sin BD (R2DBC y Flyway excluidos)
+  #   · application-dev.yml  → datasource: + flyway JDBC URL (migraciones)
+  #   · application-test.yml → sin BD (datasource y Flyway excluidos)
   #   · producción           → variables de entorno inyectadas por el sistema
 
 # ─── Spring Boot Actuator ────────────────────────────────────────────────────

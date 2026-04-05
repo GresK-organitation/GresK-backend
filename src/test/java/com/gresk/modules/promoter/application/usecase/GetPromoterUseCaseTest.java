@@ -5,19 +5,19 @@ import com.gresk.modules.promoter.domain.PromoterStatus;
 import com.gresk.modules.promoter.domain.exception.PromoterNotFoundException;
 import com.gresk.modules.promoter.domain.model.Promoter;
 import com.gresk.modules.promoter.domain.valueobject.*;
-import com.gresk.modules.promoter.port.PromoterRepository;
+import com.gresk.modules.promoter.domain.port.out.PromoterRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -43,23 +43,22 @@ class GetPromoterUseCaseTest {
     }
 
     @Test
-    void execute_shouldEmitPromoterWhenFound() {
+    void execute_shouldReturnPromoterWhenFound() {
         Promoter promoter = buildPromoter();
         String id = promoter.getId().value().toString();
-        when(promoterRepository.findById(any(PromoterId.class))).thenReturn(Mono.just(promoter));
+        when(promoterRepository.findById(any(PromoterId.class))).thenReturn(Optional.of(promoter));
 
-        StepVerifier.create(useCase.execute(new GetPromoterQuery(id)))
-                .assertNext(p -> assertThat(p).isNotNull())
-                .verifyComplete();
+        Promoter result = useCase.execute(new GetPromoterQuery(id));
+
+        assertThat(result).isNotNull();
     }
 
     @Test
-    void execute_shouldEmitPromoterNotFoundExceptionWhenMissing() {
-        when(promoterRepository.findById(any(PromoterId.class))).thenReturn(Mono.empty());
+    void execute_shouldThrowPromoterNotFoundExceptionWhenMissing() {
+        when(promoterRepository.findById(any(PromoterId.class))).thenReturn(Optional.empty());
         String id = PromoterId.generate().value().toString();
 
-        StepVerifier.create(useCase.execute(new GetPromoterQuery(id)))
-                .expectError(PromoterNotFoundException.class)
-                .verify();
+        assertThrows(PromoterNotFoundException.class,
+                () -> useCase.execute(new GetPromoterQuery(id)));
     }
 }

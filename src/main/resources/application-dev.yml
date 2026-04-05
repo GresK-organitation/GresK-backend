@@ -6,28 +6,20 @@
 
 spring:
 
-  # ─── R2DBC — driver reactivo para la aplicación ──────────────────────────
-  r2dbc:
-    url: r2dbc:postgresql://localhost:${POSTGRES_PORT:5432}/${POSTGRES_DB}
-    # r2dbc:postgresql → protocolo del driver reactivo (distinto de jdbc:postgresql).
-    # La app usa ESTA conexión para todas las queries reactivas (Mono/Flux).
-    # localhost → el contenedor Docker mapea su puerto 5432 al host local.
-    # ${POSTGRES_PORT:5432} → usa la variable de .env; 5432 como fallback.
-    # ${POSTGRES_DB}        → nombre de la BD definido en .env.
+  # ─── DataSource — HikariCP para JPA, Spring Data JDBC y Flyway ───────────
+  datasource:
+    url: jdbc:postgresql://localhost:${POSTGRES_PORT:5432}/${POSTGRES_DB}
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
-    # Nunca valores literales. Si alguien hace 'git log' no verá credenciales.
+    driver-class-name: org.postgresql.Driver
+    # Una sola fuente JDBC compartida por JPA (Hibernate), Spring Data JDBC
+    # (módulo promoter) y Flyway (migraciones).
 
-  # ─── Flyway — URL JDBC independiente para migraciones síncronas ──────────
+  # ─── Flyway — usa el datasource de arriba automáticamente ────────────────
   flyway:
     url: jdbc:postgresql://localhost:${POSTGRES_PORT:5432}/${POSTGRES_DB}
-    # Flyway NO es reactivo. Necesita una URL JDBC (jdbc:, no r2dbc:) para
-    # poder ejecutar los scripts SQL de forma síncrona durante el arranque.
-    # Esta URL es INDEPENDIENTE de la R2DBC de arriba — ambas apuntan al mismo
-    # servidor PostgreSQL pero usan protocolos distintos.
     user: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
-    # 'user' (no 'username') es la propiedad correcta para Flyway.
 
 # ─── Actuator — más detalle en dev ───────────────────────────────────────────
 management:
@@ -45,7 +37,6 @@ logging:
     org.springframework.security: DEBUG
     # Útil para depurar por qué una petición es rechazada o aceptada por Security.
     # Muestra cada WebFilter que procesa la request.
-    io.r2dbc: DEBUG
-    # Equivalente a JPA show-sql pero para R2DBC.
-    # Muestra las queries SQL reactivas enviadas a PostgreSQL.
+    org.hibernate.SQL: DEBUG
+    # Muestra las queries SQL generadas por Hibernate.
     # NO activar en producción: puede exponer datos sensibles en los logs.

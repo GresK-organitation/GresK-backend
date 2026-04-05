@@ -31,38 +31,23 @@
 	</properties>
 	<dependencies>
 
-		<!-- ─── Web reactivo ──────────────────────────────────────────────────── -->
+		<!-- ─── Web MVC (Tomcat) ─────────────────────────────────────────────── -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webflux</artifactId>
-			<!-- Sustituye spring-boot-starter-web.
-			     Usa Netty como servidor y Project Reactor (Mono/Flux) como modelo
-			     de concurrencia. No bloquea hilos esperando I/O. -->
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<!-- ─── Persistencia reactiva ─────────────────────────────────────────── -->
+		<!-- ─── Persistencia JPA/Hibernate ───────────────────────────────────── -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-r2dbc</artifactId>
-			<!-- Sustituye spring-boot-starter-data-jpa.
-			     R2DBC = Reactive Relational Database Connectivity.
-			     Los repositorios devuelven Mono<T>/Flux<T> en lugar de tipos bloqueantes. -->
-		</dependency>
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>r2dbc-postgresql</artifactId>
-			<scope>runtime</scope>
-			<!-- Driver R2DBC oficial de PostgreSQL.
-			     Versión gestionada por Spring Boot parent — sin versión explícita. -->
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
-		<!-- ─── JDBC PostgreSQL — exclusivamente para Flyway ─────────────────── -->
+		<!-- ─── JDBC PostgreSQL — para Flyway y JPA ─────────────────────────── -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
-			<!-- Flyway NO es reactivo: necesita JDBC síncrono para ejecutar scripts SQL.
-			     La app solo usa R2DBC; este driver solo existe para que Flyway funcione. -->
 		</dependency>
 
 		<!-- ─── Flyway ────────────────────────────────────────────────────────── -->
@@ -105,13 +90,11 @@
 			<!-- Serialización/deserialización JSON de claims via Jackson. Runtime. -->
 		</dependency>
 
-		<!-- ─── SpringDoc / Swagger UI — versión WebFlux ─────────────────────── -->
+		<!-- ─── SpringDoc / Swagger UI — versión MVC ────────────────────────── -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.8.6</version>
-			<!-- Sustituye webmvc-ui. Compatible con WebFlux/Netty.
-			     Expone /swagger-ui.html y /v3/api-docs. -->
 		</dependency>
 
 		<!-- ─── Otros starters ────────────────────────────────────────────────── -->
@@ -145,13 +128,6 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.projectreactor</groupId>
-			<artifactId>reactor-test</artifactId>
-			<scope>test</scope>
-			<!-- Incluye StepVerifier: herramienta para testear Mono/Flux paso a paso.
-			     Describe la secuencia de eventos esperada (assertNext, verifyComplete, verifyError). -->
 		</dependency>
 
 	</dependencies>

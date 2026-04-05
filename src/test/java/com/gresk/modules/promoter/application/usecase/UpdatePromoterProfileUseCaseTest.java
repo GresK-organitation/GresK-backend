@@ -6,18 +6,19 @@ import com.gresk.modules.promoter.domain.exception.InvalidGenreException;
 import com.gresk.modules.promoter.domain.exception.PromoterNotFoundException;
 import com.gresk.modules.promoter.domain.model.Promoter;
 import com.gresk.modules.promoter.domain.valueobject.*;
-import com.gresk.modules.promoter.port.PromoterRepository;
+import com.gresk.modules.promoter.domain.port.out.PromoterRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -42,50 +43,43 @@ class UpdatePromoterProfileUseCaseTest {
         );
     }
 
-    // Orden de campos del command: promoterId, name, city, country, address, description, musicalGenres
-
     @Test
-    void execute_shouldUpdateAndCompleteSuccessfully() {
+    void execute_shouldUpdateSuccessfully() {
         Promoter promoter = buildPromoter();
         String id = promoter.getId().value().toString();
-        when(promoterRepository.findById(any(PromoterId.class))).thenReturn(Mono.just(promoter));
-        when(promoterRepository.save(any(Promoter.class))).thenReturn(Mono.just(promoter));
+        when(promoterRepository.findById(any(PromoterId.class))).thenReturn(Optional.of(promoter));
+        when(promoterRepository.save(any(Promoter.class))).thenAnswer(inv -> inv.getArgument(0));
 
         UpdatePromoterProfileCommand command = new UpdatePromoterProfileCommand(
                 id, "Nuevo Nombre", "Barcelona", "España", null, "New description",
                 Set.of("ROCK", "JAZZ")
         );
 
-        StepVerifier.create(useCase.execute(command))
-                .verifyComplete();
+        assertDoesNotThrow(() -> useCase.execute(command));
     }
 
     @Test
-    void execute_shouldEmitPromoterNotFoundExceptionWhenMissing() {
-        when(promoterRepository.findById(any(PromoterId.class))).thenReturn(Mono.empty());
+    void execute_shouldThrowPromoterNotFoundExceptionWhenMissing() {
+        when(promoterRepository.findById(any(PromoterId.class))).thenReturn(Optional.empty());
         String id = PromoterId.generate().value().toString();
 
         UpdatePromoterProfileCommand command = new UpdatePromoterProfileCommand(
                 id, null, null, null, null, null, null
         );
 
-        StepVerifier.create(useCase.execute(command))
-                .expectError(PromoterNotFoundException.class)
-                .verify();
+        assertThrows(PromoterNotFoundException.class, () -> useCase.execute(command));
     }
 
     @Test
-    void execute_shouldEmitInvalidGenreExceptionForBadGenre() {
+    void execute_shouldThrowInvalidGenreExceptionForBadGenre() {
         Promoter promoter = buildPromoter();
         String id = promoter.getId().value().toString();
-        when(promoterRepository.findById(any(PromoterId.class))).thenReturn(Mono.just(promoter));
+        when(promoterRepository.findById(any(PromoterId.class))).thenReturn(Optional.of(promoter));
 
         UpdatePromoterProfileCommand command = new UpdatePromoterProfileCommand(
                 id, null, null, null, null, null, Set.of("ROCK", "NOT_A_GENRE")
         );
 
-        StepVerifier.create(useCase.execute(command))
-                .expectError(InvalidGenreException.class)
-                .verify();
+        assertThrows(InvalidGenreException.class, () -> useCase.execute(command));
     }
 }
