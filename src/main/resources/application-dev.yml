@@ -1,42 +1,56 @@
 # ─── Perfil: dev ─────────────────────────────────────────────────────────────
 # Se activa con: SPRING_PROFILES_ACTIVE=dev
-# Apunta a la base de datos PostgreSQL que levanta docker-compose.yml.
-# Las credenciales se leen del fichero .env (nunca se hardcodean aquí).
+# Apunta a la base de datos PostgreSQL mediante JDBC (JPA/Hibernate).
+# Las credenciales se leen de variables de entorno (ej. .env o Docker).
 # ─────────────────────────────────────────────────────────────────────────────
 
 spring:
+  # Indica explícitamente el modo Servlet (No reactivo)
+  main:
+    web-application-type: servlet
 
-  # ─── DataSource — HikariCP para JPA, Spring Data JDBC y Flyway ───────────
+  # ─── DataSource — HikariCP para JPA y Flyway ──────────────────────────────
   datasource:
     url: jdbc:postgresql://localhost:${POSTGRES_PORT:5432}/${POSTGRES_DB}
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
-    # Una sola fuente JDBC compartida por JPA (Hibernate), Spring Data JDBC
-    # (módulo promoter) y Flyway (migraciones).
 
-  # ─── Flyway — usa el datasource de arriba automáticamente ────────────────
+  # ─── JPA / Hibernate ──────────────────────────────────────────────────────
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  # ─── Flyway ───────────────────────────────────────────────────────────────
+  # Al usar MVC/JDBC, Flyway detecta automáticamente el datasource de arriba.
+  # Solo necesitas definir la URL si quieres usar un usuario distinto para migraciones.
   flyway:
-    url: jdbc:postgresql://localhost:${POSTGRES_PORT:5432}/${POSTGRES_DB}
-    user: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
+    enabled: true
+    baseline-on-migrate: true
 
-# ─── Actuator — más detalle en dev ───────────────────────────────────────────
+# ─── Actuator ────────────────────────────────────────────────────────────────
 management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
   endpoint:
     health:
       show-details: always
-      # En dev es útil ver el estado de cada componente (BD R2DBC, disco, etc.).
-      # En producción está en 'never' para no exponer información de infraestructura.
+      # Muestra el estado del DataSource JDBC y el espacio en disco.
 
 # ─── Logging ──────────────────────────────────────────────────────────────────
-logging:
+logging
   level:
+    root: INFO
     com.gresk: DEBUG
-    # Logs detallados de todo el código propio del proyecto.
+    # Logs de seguridad para Spring Security (filtros de Servlet)
     org.springframework.security: DEBUG
-    # Útil para depurar por qué una petición es rechazada o aceptada por Security.
-    # Muestra cada WebFilter que procesa la request.
+    # Muestra las queries SQL generadas por Hibernate
     org.hibernate.SQL: DEBUG
-    # Muestra las queries SQL generadas por Hibernate.
-    # NO activar en producción: puede exponer datos sensibles en los logs.
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

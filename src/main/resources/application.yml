@@ -1,38 +1,37 @@
 spring:
   application:
     name: gresk-backend
-    # El nombre de la aplicación es global: lo usan Actuator (/actuator/info),
-    # los logs y herramientas de monitorización. No cambia entre entornos.
+    # Nombre global de la aplicación para logs y Actuator.
 
-  # ─── Flyway ──────────────────────────────────────────────────────────────
+  # ─── Flyway (JDBC) ──────────────────────────────────────────────────────────
   flyway:
     enabled: true
-    # Flyway es síncrono (JDBC). Spring Boot lo ejecuta durante el arranque,
-    # ANTES de que la app empiece a aceptar peticiones reactivas.
-    # Aunque la app usa R2DBC, Flyway necesita su propia URL JDBC (ver dev/prod).
+    # En Spring MVC, Flyway usa el DataSource principal por defecto.
+    # Se ejecuta de forma síncrona al arrancar el contexto.
     locations: classpath:db/migration
-    # Patrón de nombre: V{versión}__{descripción}.sql
-    #   V1__init.sql, V2__create_promoters.sql, etc.
+    baseline-on-migrate: true
+    # Patrón de nombre: V{versión}__{descripción}.sql (V1__init.sql)
 
-  # ─── JPA / Hibernate ─────────────────────────────────────────────────────
+  # ─── JPA / Hibernate ────────────────────────────────────────────────────────
   jpa:
     hibernate:
-      ddl-auto: none   # Flyway gestiona el esquema; Hibernate nunca toca DDL
+      # Flyway gestiona el esquema. Hibernate NO debe tocar el DDL en producción.
+      # En dev puedes usar 'update', pero en el main dejamos 'none' por seguridad.
+      ddl-auto: none
     open-in-view: false
+    # Recomendado false para evitar el anti-patrón de consultas Lazy fuera de transacciones.
+    show-sql: false
 
-  # ─── Datasource / Flyway (JDBC) ──────────────────────────────────────────
-  # La configuración de conexión es específica de cada entorno.
-  # Se define en el perfil correspondiente:
-  #   · application-dev.yml  → datasource: + flyway JDBC URL (migraciones)
-  #   · application-test.yml → sin BD (datasource y Flyway excluidos)
-  #   · producción           → variables de entorno inyectadas por el sistema
+  # ─── Configuración Web (Servlet) ────────────────────────────────────────────
+  main:
+    web-application-type: servlet
 
 # ─── Spring Boot Actuator ────────────────────────────────────────────────────
 management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics
   endpoint:
     health:
       show-details: never
@@ -40,7 +39,7 @@ management:
     env:
       enabled: true
 
-# ─── Info endpoint metadata ──────────────────────────────────────────────────
+# ─── Info Metadata ───────────────────────────────────────────────────────────
 info:
   app:
     name: GresK Backend
@@ -48,16 +47,14 @@ info:
     description: GresK application REST API
     java-version: "@java.version@"
 
-# ─── JWT ─────────────────────────────────────────────────────────────────────
+# ─── JWT (Configuración Segura) ─────────────────────────────────────────────
 jwt:
+  # La clave secreta DEBE ser inyectada por variable de entorno (JWT_SECRET)
   secret: ${JWT_SECRET}
-  # Clave secreta en Base64, mínimo 256 bits para HS256.
-  # Generar con: openssl rand -base64 64
-  # Nunca hardcodeada. Nunca en git. Solo en variables de entorno o secretos del sistema.
+  # Tiempo de vida: 86.400.000 ms = 24 horas por defecto
   expiration-ms: ${JWT_EXPIRATION_MS:86400000}
-  # 86_400_000 ms = 24 horas. Configurable por entorno sin recompilar.
 
-# ─── SpringDoc / Swagger UI ──────────────────────────────────────────────────
+# ─── SpringDoc / Swagger UI (WebMVC) ────────────────────────────────────────
 springdoc:
   api-docs:
     path: /v3/api-docs
