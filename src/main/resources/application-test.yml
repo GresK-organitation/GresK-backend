@@ -1,50 +1,35 @@
-# ─── Perfil: test ────────────────────────────────────────────────────────────
-# Se activa con: SPRING_PROFILES_ACTIVE=test  o  @ActiveProfiles("test") en tests.
-# Desactiva toda la infraestructura de base de datos para que los tests unitarios
-# puedan ejecutarse sin necesidad de tener Docker levantado.
+# ─── Perfil de Configuración ─────────────────────────────────────────────────
+# Si quieres que esto solo aplique a los tests, asegúrate de que el archivo
+# se llame application-test.properties y activa el perfil "test".
 # ─────────────────────────────────────────────────────────────────────────────
 
-spring:
-
-  # ─── Flyway — desactivado en tests ─────────────────────────────────────────
-  flyway:
-    enabled: false
-    # Los tests unitarios no deben ejecutar migraciones SQL. Flyway intenta
-    # conectar a la BD al arrancar; sin BD disponible, el contexto Spring falla.
-
-  # ─── Autoconfiguración — excluir componentes que necesitan BD ──────────────
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration
-      # Sin esto, Spring Boot intenta crear una conexión R2DBC al arrancar el contexto.
-      # Si no hay BD configurada, falla con BeanCreationException.
-      - org.springframework.boot.autoconfigure.data.r2dbc.R2dbcDataAutoConfiguration
-      # Depende de R2dbcAutoConfiguration. Excluirlo evita errores en cascada
-      # al intentar crear repositorios reactivos sin conexión.
-      - org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
-      # Capa de seguridad adicional: aunque flyway.enabled=false, esta exclusión
-      # garantiza que el bean de Flyway ni siquiera se intenta crear.
+# 1. Forzar el tipo de aplicación a Servlet (Evita cualquier intento de WebFlux)
+spring.main.web-application-type=servlet
+  
+  # 2. Desactivar Flyway completamente
+spring.flyway.enabled=false
+  
+  # 3. EXCLUSIONES CRÍTICAS (Soluciona el error de "suitable driver class")
+  # Al excluir estas clases, Spring dejará de buscar una URL de base de datos
+  # y un Driver de PostgreSQL al arrancar el contexto.
+spring.autoconfigure.exclude=\
+org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,\
+org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration,\
+org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration,\
+org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
+  
+  # 4. Desactivar validaciones automáticas de JPA que requieran conexión
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
 
 # ─────────────────────────────────────────────────────────────────────────────
-# TODO: cuando se añadan tests de integración, usar Testcontainers (R2DBC):
+# NOTA PARA EL FUTURO (PostgreSQL Real):
+# Cuando quieras conectar a tu base de datos real, COMENTA las líneas de
+# 'spring.autoconfigure.exclude' arriba y DESCOMENTA estas:
 #
-#   @Testcontainers
-#   class MiIntegrationTest {
-#       @Container
-#       static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine");
-#
-#       @DynamicPropertySource
-#       static void props(DynamicPropertyRegistry registry) {
-#           registry.add("spring.r2dbc.url", () ->
-#               "r2dbc:postgresql://" + postgres.getHost() + ":"
-#               + postgres.getMappedPort(5432) + "/" + postgres.getDatabaseName());
-#           registry.add("spring.r2dbc.username", postgres::getUsername);
-#           registry.add("spring.r2dbc.password", postgres::getPassword);
-#           registry.add("spring.flyway.url",      postgres::getJdbcUrl);
-#           registry.add("spring.flyway.user",     postgres::getUsername);
-#           registry.add("spring.flyway.password", postgres::getPassword);
-#       }
-#   }
-#
-# Ventaja sobre H2: garantiza paridad con producción (mismo PostgreSQL real).
+# spring.datasource.url=jdbc:postgresql://localhost:5432/tu_base_de_datos
+# spring.datasource.username=postgres
+# spring.datasource.password=tu_password
+# spring.datasource.driver-class-name=org.postgresql.Driver
+# spring.flyway.enabled=true
 # ─────────────────────────────────────────────────────────────────────────────
