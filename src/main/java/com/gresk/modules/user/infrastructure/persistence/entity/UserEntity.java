@@ -28,9 +28,6 @@ public class UserEntity {
     private String email;
 
     @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false)
     private String name;
 
     @Column(length = 500)

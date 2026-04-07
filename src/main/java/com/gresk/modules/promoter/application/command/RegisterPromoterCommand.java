@@ -1,16 +1,15 @@
 package com.gresk.modules.promoter.application.command;
 
 import java.util.List;
+import java.util.UUID;
 
 public record RegisterPromoterCommand(
+        UUID accountId,
         String email,
-        String rawPassword,
         String name,
         String city,
         String country,
         String address,
         String description,
         List<String> musicalGenres
-        //el command solo contiene datos que transmite el usuario. El resto los gestiona el propiop dominio.
-) {
-}
+) {}

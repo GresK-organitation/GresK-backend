@@ -22,11 +22,11 @@ public class PromoterEntity {
     @Id
     private UUID id;
 
+    @Column(name = "account_id")
+    private UUID accountId;
+
     @Column(nullable = false, unique = true, length = 255)
     private String email;
-
-    @Column(name = "password_hash", nullable = false, length = 255)
-    private String passwordHash;
 
     @Column(nullable = false, length = 100)
     private String name;

@@ -7,7 +7,6 @@ import com.gresk.shared.domain.Role;
 import com.gresk.shared.domain.valueobject.Description;
 import com.gresk.shared.domain.valueobject.Email;
 import com.gresk.shared.domain.valueobject.Name;
-import com.gresk.shared.domain.valueobject.Password;
 
 import java.time.Instant;
 import java.util.HashSet;
@@ -19,7 +18,6 @@ public final class User {
 
     private final UserId id;
     private final Email email;
-    private final Password password;
     private final Instant createdAt;
 
     private Name name;
@@ -31,10 +29,11 @@ public final class User {
     private int loyaltyPoints;
     private final Set<Role> roles;
 
-    private User(UserId id, Email email, Password password, Name name, Description description, City city, Set<MusicGenre> musicGenres, AccountStatus status, UserTier tier, int loyaltyPoints, Set<Role> roles, Instant createdAt) {
+    private User(UserId id, Email email, Name name, Description description, City city,
+                 Set<MusicGenre> musicGenres, AccountStatus status, UserTier tier,
+                 int loyaltyPoints, Set<Role> roles, Instant createdAt) {
         this.id = Objects.requireNonNull(id);
         this.email = Objects.requireNonNull(email);
-        this.password = Objects.requireNonNull(password);
         this.name = Objects.requireNonNull(name);
         this.description = description;
         this.city = Objects.requireNonNull(city);
@@ -46,12 +45,15 @@ public final class User {
         this.createdAt = Objects.requireNonNull(createdAt);
     }
 
-    public static User create(Email email, Password password, Name name, Description description, City city, Set<MusicGenre> musicGenres) {
-        return new User(UserId.generate(), email, password, name, description, city, musicGenres, AccountStatus.ACTIVE, UserTier.FREE, 0, Set.of(Role.USER), Instant.now());
+    public static User create(Email email, Name name, Description description, City city, Set<MusicGenre> musicGenres) {
+        return new User(UserId.generate(), email, name, description, city, musicGenres,
+                AccountStatus.ACTIVE, UserTier.FREE, 0, Set.of(Role.USER), Instant.now());
     }
 
-    public static User reconstitute(UserId id, Email email, Password password, Name name, Description description, City city, Set<MusicGenre> musicGenres, AccountStatus status, UserTier tier, int loyaltyPoints, Set<Role> roles, Instant createdAt) {
-        return new User(id, email, password, name, description, city, musicGenres, status, tier, loyaltyPoints, roles, createdAt);
+    public static User reconstitute(UserId id, Email email, Name name, Description description, City city,
+                                    Set<MusicGenre> musicGenres, AccountStatus status, UserTier tier,
+                                    int loyaltyPoints, Set<Role> roles, Instant createdAt) {
+        return new User(id, email, name, description, city, musicGenres, status, tier, loyaltyPoints, roles, createdAt);
     }
 
     public void updateProfile(Name name, Description description, City city, Set<MusicGenre> genres) {
@@ -90,61 +92,23 @@ public final class User {
     public void deleteAccount() {
         this.status = AccountStatus.DELETED;
     }
+
     private void checkTierUpgrade() {
         if (this.loyaltyPoints >= PREMIUM_THRESHOLD && this.tier == UserTier.FREE) {
             this.tier = UserTier.PREMIUM;
         }
     }
 
-    public City getCity() {
-        return city;
-    }
-
-    public void changeCity(City newCity) {
-        this.city = Objects.requireNonNull(newCity);
-    }
-
-    public UserId getId() {
-        return id;
-    }
-
-    public Email getEmail() {
-        return email;
-    }
-
-    public Password getPassword() {
-        return password;
-    }
-
-    public Name getName() {
-        return name;
-    }
-
-    public Description getDescription() {
-        return description;
-    }
-
-    public Set<MusicGenre> getMusicGenres() {
-        return Set.copyOf(musicGenres);
-    }
-
-    public AccountStatus getStatus() {
-        return status;
-    }
-
-    public UserTier getTier() {
-        return tier;
-    }
-
-    public int getLoyaltyPoints() {
-        return loyaltyPoints;
-    }
-
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
+    public City getCity() { return city; }
+    public void changeCity(City newCity) { this.city = Objects.requireNonNull(newCity); }
+    public UserId getId() { return id; }
+    public Email getEmail() { return email; }
+    public Name getName() { return name; }
+    public Description getDescription() { return description; }
+    public Set<MusicGenre> getMusicGenres() { return Set.copyOf(musicGenres); }
+    public AccountStatus getStatus() { return status; }
+    public UserTier getTier() { return tier; }
+    public int getLoyaltyPoints() { return loyaltyPoints; }
+    public Set<Role> getRoles() { return roles; }
+    public Instant getCreatedAt() { return createdAt; }
 }

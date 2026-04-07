@@ -49,8 +49,8 @@ public class UpdatePromoterProfileUseCase implements UpdatePromoterProfilePort {
 
         Promoter updated = Promoter.reconstitute(
                 promoter.getId(),
+                promoter.getAccountId(),
                 promoter.getEmail(),
-                promoter.getPassword(),
                 newName,
                 newDescription,
                 newLocation,

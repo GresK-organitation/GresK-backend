@@ -12,10 +12,14 @@ public class SecurityContextService {
     public UUID currentUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !(auth.getPrincipal() instanceof UUID uuid)) {
+        if (auth == null || !(auth.getPrincipal() instanceof String principalStr)) {
             throw new UnauthorizedException("Invalid security principal");
         }
 
-        return uuid;
+        try {
+            return UUID.fromString(principalStr);
+        } catch (IllegalArgumentException e) {
+            throw new UnauthorizedException("Invalid principal UUID: " + principalStr);
+        }
     }
 }

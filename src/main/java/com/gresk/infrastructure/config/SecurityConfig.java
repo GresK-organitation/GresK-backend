@@ -1,5 +1,6 @@
 package com.gresk.infrastructure.config;
 
+import com.gresk.modules.identity.infrastructure.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -10,6 +11,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Central HTTP security configuration for Spring MVC.
@@ -26,31 +28,27 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                // Disable CSRF: stateless REST API using JWT — no session cookies, no CSRF risk.
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        // Swagger / OpenAPI docs
                         .requestMatchers(
                                 "/actuator/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
-                        // Auth endpoints — public by design
-                        .requestMatchers(
-                                "/api/v1/promoters/register",
-                                "/api/v1/promoters/login"
-                        ).permitAll()
-                        // Profile endpoints — require an authenticated JWT principal
-                        .requestMatchers("/api/v1/promoters/me").authenticated()
-                        // Everything else is open for now (no JWT filter wired yet)
-                        // TODO: replace anyRequest().permitAll() with authenticated()
-                        //       once the JWT filter is wired and all endpoints are protected.
-                        .anyRequest().permitAll()
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .anyRequest().authenticated()
                 ).build();
     }
 

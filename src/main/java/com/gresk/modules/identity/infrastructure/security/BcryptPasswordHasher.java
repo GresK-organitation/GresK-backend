@@ -1,13 +1,13 @@
-package com.gresk.modules.promoter.infrastructure.security;
+package com.gresk.modules.identity.infrastructure.security;
 
-import com.gresk.modules.promoter.application.port.out.PasswordHasher;
+import com.gresk.modules.identity.application.port.out.PasswordHasherPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class BcryptPasswordHasher implements PasswordHasher {
+public class BcryptPasswordHasher implements PasswordHasherPort {
 
     private final PasswordEncoder passwordEncoder;
 

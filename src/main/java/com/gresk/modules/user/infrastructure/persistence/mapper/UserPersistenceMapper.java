@@ -7,7 +7,6 @@ import com.gresk.modules.user.infrastructure.persistence.entity.UserEntity;
 import com.gresk.shared.domain.valueobject.Description;
 import com.gresk.shared.domain.valueobject.Email;
 import com.gresk.shared.domain.valueobject.Name;
-import com.gresk.shared.domain.valueobject.Password;
 
 import java.util.HashSet;
 
@@ -17,7 +16,6 @@ public class UserPersistenceMapper {
         return UserEntity.builder()
                 .id(user.getId().value())
                 .email(user.getEmail().value())
-                .password(user.getPassword().hashedValue())
                 .name(user.getName().value())
                 .description(user.getDescription().value())
                 .city(user.getCity().value())
@@ -34,7 +32,6 @@ public class UserPersistenceMapper {
         return User.reconstitute(
                 UserId.of(entity.getId()),
                 Email.reconstitute(entity.getEmail()),
-                Password.reconstitute(entity.getPassword()),
                 Name.reconstitute(entity.getName()),
                 Description.of(entity.getDescription()),
                 City.of(entity.getCity()),

@@ -3,13 +3,14 @@ package com.gresk.modules.promoter.infrastructure.persitence;
 import com.gresk.modules.promoter.domain.MusicGenre;
 import com.gresk.modules.promoter.domain.model.Promoter;
 import com.gresk.modules.promoter.domain.port.out.PromoterRepository;
-import com.gresk.modules.promoter.domain.valueobject.Email;
 import com.gresk.modules.promoter.domain.valueobject.PromoterId;
+import com.gresk.shared.domain.valueobject.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -31,6 +32,11 @@ public class JpaPromoterAdapter implements PromoterRepository {
     @Override
     public Optional<Promoter> findByEmail(Email email) {
         return repo.findByEmail(email.value()).map(mapper::toDomain);
+    }
+
+    @Override
+    public Optional<Promoter> findByAccountId(UUID accountId) {
+        return repo.findByAccountId(accountId).map(mapper::toDomain);
     }
 
     @Override

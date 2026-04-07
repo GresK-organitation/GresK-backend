@@ -1,10 +1,12 @@
-package com.gresk.modules.promoter.infrastructure.web;
+package com.gresk.shared.infrastructure.web;
 
+import com.gresk.modules.identity.domain.exception.AccountAlreadyExistsException;
+import com.gresk.modules.identity.domain.exception.InvalidAccountCredentialsException;
 import com.gresk.modules.promoter.domain.exception.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -12,6 +14,18 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // Identity exceptions
+    @ExceptionHandler(AccountAlreadyExistsException.class)
+    ResponseEntity<Map<String, String>> handleAccountAlreadyExists(AccountAlreadyExistsException ex) {
+        return ResponseEntity.status(409).body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidAccountCredentialsException.class)
+    ResponseEntity<Map<String, String>> handleInvalidCredentials(InvalidAccountCredentialsException ex) {
+        return ResponseEntity.status(401).body(Map.of("error", ex.getMessage()));
+    }
+
+    // Promoter exceptions
     @ExceptionHandler(PromoterNotFoundException.class)
     ResponseEntity<Map<String, String>> handleNotFound(PromoterNotFoundException ex) {
         return ResponseEntity.status(404).body(Map.of("error", ex.getMessage()));
@@ -23,7 +37,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
-    ResponseEntity<Map<String, String>> handleUnauthorized(InvalidCredentialsException ex) {
+    ResponseEntity<Map<String, String>> handlePromoterUnauthorized(InvalidCredentialsException ex) {
         return ResponseEntity.status(401).body(Map.of("error", ex.getMessage()));
     }
 

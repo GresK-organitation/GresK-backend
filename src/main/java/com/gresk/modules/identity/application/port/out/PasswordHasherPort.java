@@ -1,6 +1,8 @@
-package com.gresk.modules.promoter.application.port.out;
+package com.gresk.modules.identity.application.port.out;
 
-public interface PasswordHasher {
+public interface PasswordHasherPort {
+
     String hash(String rawPassword);
+
     boolean matches(String rawPassword, String hashedPassword);
 }

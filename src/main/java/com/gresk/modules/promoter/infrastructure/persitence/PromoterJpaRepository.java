@@ -11,6 +11,8 @@ public interface PromoterJpaRepository extends JpaRepository<PromoterEntity, UUI
 
     Optional<PromoterEntity> findByEmail(String email);
 
+    Optional<PromoterEntity> findByAccountId(UUID accountId);
+
     boolean existsByEmail(String email);
 
     List<PromoterEntity> findByActiveTrue();
