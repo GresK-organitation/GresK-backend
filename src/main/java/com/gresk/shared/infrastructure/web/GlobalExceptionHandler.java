@@ -3,6 +3,7 @@ package com.gresk.shared.infrastructure.web;
 import com.gresk.modules.identity.domain.exception.AccountAlreadyExistsException;
 import com.gresk.modules.identity.domain.exception.InvalidAccountCredentialsException;
 import com.gresk.modules.promoter.domain.exception.*;
+import com.gresk.modules.user.domain.exception.UserNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,6 +24,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidAccountCredentialsException.class)
     ResponseEntity<Map<String, String>> handleInvalidCredentials(InvalidAccountCredentialsException ex) {
         return ResponseEntity.status(401).body(Map.of("error", ex.getMessage()));
+    }
+
+    // User exceptions
+    @ExceptionHandler(UserNotFoundException.class)
+    ResponseEntity<Map<String, String>> handleUserNotFound(UserNotFoundException ex) {
+        return ResponseEntity.status(404).body(Map.of("error", ex.getMessage()));
     }
 
     // Promoter exceptions
@@ -48,6 +55,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidGenreException.class)
     ResponseEntity<Map<String, String>> handleInvalidGenre(InvalidGenreException ex) {
+        return ResponseEntity.status(400).body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException ex) {
         return ResponseEntity.status(400).body(Map.of("error", ex.getMessage()));
     }
 
