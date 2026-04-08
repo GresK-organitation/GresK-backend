@@ -1,12 +1,12 @@
 package com.gresk.modules.promoter.domain.model;
 
-import com.gresk.modules.promoter.domain.MusicGenre;
-import com.gresk.modules.promoter.domain.PromoterStatus;
 import com.gresk.modules.promoter.domain.exception.GenreNotFoundException;
 import com.gresk.modules.promoter.domain.exception.PromoterAlreadyActiveException;
 import com.gresk.modules.promoter.domain.exception.PromoterNotActiveException;
-import com.gresk.modules.promoter.domain.model.Promoter;
-import com.gresk.modules.promoter.domain.valueobject.*;
+import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
+import com.gresk.shared.domain.AccountStatus;
+import com.gresk.shared.domain.MusicGenre;
+import com.gresk.shared.domain.valueobject.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,64 +17,64 @@ import static org.assertj.core.api.Assertions.*;
 
 class PromoterTest {
 
+    private PromoterId id;
     private Email email;
-    private Password password;
-    private PromoterName name;
-    private Location location;
+    private Name name;
+    private Address address;
+    private Description description;
 
     @BeforeEach
     void setUp() {
+        id = PromoterId.generate();
         email = new Email("promoter@gresk.com");
-        password = new Password("$2a$10$hashedpassword");
-        name = new PromoterName("Club Nocturno");
-        location = new Location("Madrid", "España", null);
+        name = new Name("Club Nocturno");
+        address = new Address("Calle Principal 123", City.of("Madrid"), "España");
+        description = new Description("Club de música electrónica");
     }
 
     // --- create() ---
 
     @Test
     void create_shouldReturnPromoterWithPendingStatusAndInactive() {
-        Promoter promoter = Promoter.create(email, password, name, location, null);
+        Promoter promoter = Promoter.create(id, email, name, address, null);
 
-        assertThat(promoter.getStatus()).isEqualTo(PromoterStatus.PENDING);
+        assertThat(promoter.getStatus()).isEqualTo(AccountStatus.PENDING);
         assertThat(promoter.isActive()).isFalse();
     }
 
     @Test
-    void create_shouldAssignGeneratedId() {
-        Promoter promoter = Promoter.create(email, password, name, location, null);
+    void create_shouldAssignProvidedId() {
+        Promoter promoter = Promoter.create(id, email, name, address, null);
 
-        assertThat(promoter.getId()).isNotNull();
+        assertThat(promoter.getId()).isEqualTo(id);
     }
 
     @Test
     void create_shouldAssignEmptyMusicGenres() {
-        Promoter promoter = Promoter.create(email, password, name, location, null);
+        Promoter promoter = Promoter.create(id, email, name, address, null);
 
         assertThat(promoter.getMusicalGenres()).isEmpty();
     }
 
     @Test
-    void create_shouldAssignNullDescriptionWhenNotProvided() {
-        Promoter promoter = Promoter.create(email, password, name, location, null);
+    void create_shouldAssignEmptyDescriptionWhenNotProvided() {
+        Promoter promoter = Promoter.create(id, email, name, address, null);
 
-        assertThat(promoter.getDescription().value()).isNull();
+        assertThat(promoter.getDescription().value()).isEmpty();
     }
 
     @Test
     void create_shouldAssignDescriptionWhenProvided() {
-        Description description = new Description("Club de música electrónica");
+        Promoter promoter = Promoter.create(id, email, name, address, description);
 
-        Promoter promoter = Promoter.create(email, password, name, location, description);
-
-        assertThat(promoter.getDescription().value()).isEqualTo("Club de música electrónica");
+        assertThat(promoter.getDescription()).isEqualTo(description);
     }
 
     @Test
     void create_shouldAssignCreatedAtTimestamp() {
         LocalDateTime before = LocalDateTime.now().minusSeconds(1);
 
-        Promoter promoter = Promoter.create(email, password, name, location, null);
+        Promoter promoter = Promoter.create(id, email, name, address, null);
 
         assertThat(promoter.getCreatedAt()).isAfter(before);
         assertThat(promoter.getCreatedAt()).isBefore(LocalDateTime.now().plusSeconds(1));
@@ -82,34 +82,48 @@ class PromoterTest {
 
     @Test
     void create_shouldPersistAllProvidedFields() {
-        Promoter promoter = Promoter.create(email, password, name, location, null);
+        Promoter promoter = Promoter.create(id, email, name, address, description);
 
+        assertThat(promoter.getId()).isEqualTo(id);
         assertThat(promoter.getEmail()).isEqualTo(email);
-        assertThat(promoter.getPassword()).isEqualTo(password);
         assertThat(promoter.getName()).isEqualTo(name);
-        assertThat(promoter.getLocation()).isEqualTo(location);
+        assertThat(promoter.getAddress()).isEqualTo(address);
+        assertThat(promoter.getDescription()).isEqualTo(description);
+    }
+
+    // --- updateBasicInfo() ---
+
+    @Test
+    void updateBasicInfo_shouldUpdateFields() {
+        Promoter promoter = Promoter.create(id, email, name, address, description);
+        Name newName = new Name("Nuevo Nombre");
+        Address newAddress = new Address("Calle Nueva 456", City.of("Barcelona"), "España");
+        Description newDescription = new Description("Nueva Descripción");
+
+        promoter.updateBasicInfo(newName, newAddress, newDescription);
+
+        assertThat(promoter.getName()).isEqualTo(newName);
+        assertThat(promoter.getAddress()).isEqualTo(newAddress);
+        assertThat(promoter.getDescription()).isEqualTo(newDescription);
     }
 
     // --- reconstitute() ---
 
     @Test
     void reconstitute_shouldRestoreAllFields() {
-        PromoterId id = PromoterId.generate();
-        Description description = new Description("Una descripción");
         Set<MusicGenre> genres = Set.of(MusicGenre.ROCK, MusicGenre.POP);
         LocalDateTime createdAt = LocalDateTime.of(2024, 1, 15, 10, 0);
 
-        Promoter promoter = Promoter.reconstitute(id, email, password, name, description,
-                location, genres, PromoterStatus.ACTIVE, createdAt, true);
+        Promoter promoter = Promoter.reconstitute(id, email, name, address, description,
+                genres, AccountStatus.ACTIVE, createdAt);
 
         assertThat(promoter.getId()).isEqualTo(id);
         assertThat(promoter.getEmail()).isEqualTo(email);
-        assertThat(promoter.getPassword()).isEqualTo(password);
         assertThat(promoter.getName()).isEqualTo(name);
         assertThat(promoter.getDescription()).isEqualTo(description);
-        assertThat(promoter.getLocation()).isEqualTo(location);
+        assertThat(promoter.getAddress()).isEqualTo(address);
         assertThat(promoter.getMusicalGenres()).containsExactlyInAnyOrderElementsOf(genres);
-        assertThat(promoter.getStatus()).isEqualTo(PromoterStatus.ACTIVE);
+        assertThat(promoter.getStatus()).isEqualTo(AccountStatus.ACTIVE);
         assertThat(promoter.getCreatedAt()).isEqualTo(createdAt);
         assertThat(promoter.isActive()).isTrue();
     }
@@ -117,18 +131,18 @@ class PromoterTest {
     // --- activate() ---
 
     @Test
-    void activate_shouldSetStatusToActiveAndMarkAsActive() {
-        Promoter promoter = Promoter.create(email, password, name, location, null);
+    void activate_shouldSetStatusToActive() {
+        Promoter promoter = Promoter.create(id, email, name, address, null);
 
         promoter.activate();
 
-        assertThat(promoter.getStatus()).isEqualTo(PromoterStatus.ACTIVE);
+        assertThat(promoter.getStatus()).isEqualTo(AccountStatus.ACTIVE);
         assertThat(promoter.isActive()).isTrue();
     }
 
     @Test
     void activate_shouldThrowPromoterAlreadyActiveExceptionWhenAlreadyActive() {
-        Promoter promoter = Promoter.create(email, password, name, location, null);
+        Promoter promoter = Promoter.create(id, email, name, address, null);
         promoter.activate();
 
         assertThatExceptionOfType(PromoterAlreadyActiveException.class)
@@ -138,19 +152,19 @@ class PromoterTest {
     // --- suspend() ---
 
     @Test
-    void suspend_shouldSetStatusToSuspendedAndMarkAsInactive() {
-        Promoter promoter = Promoter.create(email, password, name, location, null);
+    void suspend_shouldSetStatusToSuspended() {
+        Promoter promoter = Promoter.create(id, email, name, address, null);
         promoter.activate();
 
         promoter.suspend();
 
-        assertThat(promoter.getStatus()).isEqualTo(PromoterStatus.SUSPENDED);
+        assertThat(promoter.getStatus()).isEqualTo(AccountStatus.SUSPENDED);
         assertThat(promoter.isActive()).isFalse();
     }
 
     @Test
     void suspend_shouldThrowPromoterNotActiveExceptionWhenStatusIsPending() {
-        Promoter promoter = Promoter.create(email, password, name, location, null);
+        Promoter promoter = Promoter.create(id, email, name, address, null);
 
         assertThatExceptionOfType(PromoterNotActiveException.class)
                 .isThrownBy(promoter::suspend);
@@ -158,7 +172,7 @@ class PromoterTest {
 
     @Test
     void suspend_shouldThrowPromoterNotActiveExceptionWhenAlreadySuspended() {
-        Promoter promoter = Promoter.create(email, password, name, location, null);
+        Promoter promoter = Promoter.create(id, email, name, address, null);
         promoter.activate();
         promoter.suspend();
 
@@ -169,8 +183,9 @@ class PromoterTest {
     // --- addGenre() ---
 
     @Test
-    void addGenre_shouldAddGenreToPromoter() {
-        Promoter promoter = Promoter.create(email, password, name, location, null);
+    void addGenre_shouldAddGenreToActivePromoter() {
+        Promoter promoter = Promoter.create(id, email, name, address, null);
+        promoter.activate();
 
         promoter.addGenre(MusicGenre.ROCK);
 
@@ -178,20 +193,17 @@ class PromoterTest {
     }
 
     @Test
-    void addGenre_shouldAddMultipleGenres() {
-        Promoter promoter = Promoter.create(email, password, name, location, null);
+    void addGenre_shouldThrowPromoterNotActiveExceptionWhenNotActive() {
+        Promoter promoter = Promoter.create(id, email, name, address, null);
 
-        promoter.addGenre(MusicGenre.ROCK);
-        promoter.addGenre(MusicGenre.JAZZ);
-        promoter.addGenre(MusicGenre.TECHNO);
-
-        assertThat(promoter.getMusicalGenres()).containsExactlyInAnyOrder(
-                MusicGenre.ROCK, MusicGenre.JAZZ, MusicGenre.TECHNO);
+        assertThatExceptionOfType(PromoterNotActiveException.class)
+                .isThrownBy(() -> promoter.addGenre(MusicGenre.ROCK));
     }
 
     @Test
     void addGenre_shouldNotAddDuplicateGenres() {
-        Promoter promoter = Promoter.create(email, password, name, location, null);
+        Promoter promoter = Promoter.create(id, email, name, address, null);
+        promoter.activate();
 
         promoter.addGenre(MusicGenre.ROCK);
         promoter.addGenre(MusicGenre.ROCK);
@@ -201,7 +213,8 @@ class PromoterTest {
 
     @Test
     void addGenre_shouldThrowIllegalArgumentExceptionWhenGenreIsNull() {
-        Promoter promoter = Promoter.create(email, password, name, location, null);
+        Promoter promoter = Promoter.create(id, email, name, address, null);
+        promoter.activate();
 
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> promoter.addGenre(null))
@@ -211,8 +224,9 @@ class PromoterTest {
     // --- deleteGenre() ---
 
     @Test
-    void deleteGenre_shouldRemoveGenreFromPromoter() {
-        Promoter promoter = Promoter.create(email, password, name, location, null);
+    void deleteGenre_shouldRemoveGenreFromActivePromoter() {
+        Promoter promoter = Promoter.create(id, email, name, address, null);
+        promoter.activate();
         promoter.addGenre(MusicGenre.ROCK);
         promoter.addGenre(MusicGenre.JAZZ);
 
@@ -222,8 +236,17 @@ class PromoterTest {
     }
 
     @Test
+    void deleteGenre_shouldThrowPromoterNotActiveExceptionWhenNotActive() {
+        Promoter promoter = Promoter.create(id, email, name, address, null);
+        // Not activated
+        assertThatExceptionOfType(PromoterNotActiveException.class)
+                .isThrownBy(() -> promoter.deleteGenre(MusicGenre.ROCK));
+    }
+
+    @Test
     void deleteGenre_shouldThrowGenreNotFoundExceptionWhenGenreNotPresent() {
-        Promoter promoter = Promoter.create(email, password, name, location, null);
+        Promoter promoter = Promoter.create(id, email, name, address, null);
+        promoter.activate();
 
         assertThatExceptionOfType(GenreNotFoundException.class)
                 .isThrownBy(() -> promoter.deleteGenre(MusicGenre.ROCK));
@@ -233,7 +256,8 @@ class PromoterTest {
 
     @Test
     void getMusicalGenres_shouldReturnUnmodifiableSet() {
-        Promoter promoter = Promoter.create(email, password, name, location, null);
+        Promoter promoter = Promoter.create(id, email, name, address, null);
+        promoter.activate();
         promoter.addGenre(MusicGenre.ROCK);
 
         assertThatExceptionOfType(UnsupportedOperationException.class)

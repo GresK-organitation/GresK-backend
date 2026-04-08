@@ -3,7 +3,7 @@ package com.gresk.modules.event.application.usecase;
 import com.gresk.modules.event.domain.model.Event;
 import com.gresk.modules.event.domain.port.out.EventFilter;
 import com.gresk.modules.event.domain.port.out.EventRepository;
-import com.gresk.modules.promoter.domain.valueobject.PromoterId;
+import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
