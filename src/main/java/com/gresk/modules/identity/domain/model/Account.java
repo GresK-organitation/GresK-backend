@@ -42,6 +42,20 @@ public final class Account {
         return new Account(id, email, passwordHash, roles, status, createdAt);
     }
 
+    public void promoteToPromoter() {
+        if (this.roles.contains(Role.PROMOTER)) {
+            throw new IllegalStateException("The account is already verified as a promoter");
+        }
+
+        if (this.roles.contains(Role.PROMOTER_PENDING)) {
+            this.roles.remove(Role.PROMOTER_PENDING);
+            this.roles.add(Role.PROMOTER);
+            this.status = AccountStatus.ACTIVE;
+        } else {
+            throw new IllegalStateException("The account does not have the PENDING role required for promotion");
+        }
+    }
+
     public AccountId getId() { return id; }
     public Email getEmail() { return email; }
     public String getPasswordHash() { return passwordHash; }
