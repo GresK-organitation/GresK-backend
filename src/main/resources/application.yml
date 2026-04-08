@@ -40,3 +40,13 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME:dzfgoh6hu}
+  api-key: ${CLOUDINARY_API_KEY:}
+  api-secret: ${CLOUDINARY_API_SECRET:}
+
+gresk:
+  images:
+    default-url: "https://res.cloudinary.com/dzfgoh6hu/image/upload/ar_1:1,c_crop,g_auto:face,w_300/r_max/co_rgb:68D2E7,e_outline:outer:15/main-sample.png"
+    asset-url-template: "https://res.cloudinary.com/dzfgoh6hu/image/upload/ar_1:1,c_crop,g_auto:face,w_300/r_max/co_rgb:68D2E7,e_outline:outer:15/{assetId}"

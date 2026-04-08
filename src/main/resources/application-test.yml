@@ -22,6 +22,9 @@ org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
 spring.jpa.hibernate.ddl-auto=none
 spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
 
+gresk.images.default-url=https://res.cloudinary.com/dzfgoh6hu/image/upload/ar_1:1,c_crop,g_auto:face,w_300/r_max/co_rgb:68D2E7,e_outline:outer:15/main-sample.png
+gresk.images.asset-url-template=https://res.cloudinary.com/dzfgoh6hu/image/upload/ar_1:1,c_crop,g_auto:face,w_300/r_max/co_rgb:68D2E7,e_outline:outer:15/{assetId}
+
 # ─────────────────────────────────────────────────────────────────────────────
 # NOTA PARA EL FUTURO (PostgreSQL Real):
 # Cuando quieras conectar a tu base de datos real, COMENTA las líneas de
