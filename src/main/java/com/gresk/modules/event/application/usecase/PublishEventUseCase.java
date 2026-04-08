@@ -5,7 +5,7 @@ import com.gresk.modules.event.domain.exception.ForbiddenOperationException;
 import com.gresk.modules.event.domain.model.Event;
 import com.gresk.modules.event.domain.model.EventId;
 import com.gresk.modules.event.domain.port.out.EventRepository;
-import com.gresk.modules.promoter.domain.valueobject.PromoterId;
+import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -12,7 +12,7 @@ import com.gresk.modules.event.application.usecase.PublishEventUseCase;
 import com.gresk.modules.event.domain.model.EventStatus;
 import com.gresk.modules.event.domain.model.Genre;
 import com.gresk.modules.event.domain.port.out.EventFilter;
-import com.gresk.modules.promoter.domain.valueobject.PromoterId;
+import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;

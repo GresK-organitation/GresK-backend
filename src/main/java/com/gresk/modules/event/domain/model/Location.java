@@ -5,13 +5,13 @@ import java.util.Objects;
 public record Location(String city, String address, String venue) {
 
     public Location {
-        Objects.requireNonNull(city, "Location city must not be null");
-        Objects.requireNonNull(address, "Location address must not be null");
+        Objects.requireNonNull(city, "Address city must not be null");
+        Objects.requireNonNull(address, "Address address must not be null");
         if (city == null || city.isBlank()) {
-            throw new IllegalArgumentException("Location city must not be blank");
+            throw new IllegalArgumentException("Address city must not be blank");
         }
         if (address == null || address.isBlank()) {
-            throw new IllegalArgumentException("Location address must not be blank");
+            throw new IllegalArgumentException("Address address must not be blank");
         }
     }
 }
