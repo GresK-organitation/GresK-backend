@@ -1,4 +1,4 @@
-package com.gresk.modules.promoter.domain.valueobject;
+package com.gresk.modules.promoter.domain.model.valueobject;
 
 import java.util.UUID;
 

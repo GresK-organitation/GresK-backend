@@ -2,16 +2,15 @@ package com.gresk.modules.promoter.application.usecase;
 
 import com.gresk.modules.promoter.application.command.RegisterPromoterCommand;
 import com.gresk.modules.promoter.application.port.in.RegisterPromoterPort;
-import com.gresk.modules.promoter.domain.MusicGenre;
 import com.gresk.modules.promoter.domain.exception.EmailAlreadyExistsException;
-import com.gresk.modules.promoter.domain.exception.InvalidGenreException;
 import com.gresk.modules.promoter.domain.model.Promoter;
-import com.gresk.modules.promoter.domain.port.out.PromoterRepository;
-import com.gresk.modules.promoter.domain.valueobject.Description;
-import com.gresk.modules.promoter.domain.valueobject.Location;
-import com.gresk.modules.promoter.domain.valueobject.PromoterName;
-import com.gresk.modules.promoter.domain.valueobject.PromoterId;
+import com.gresk.modules.promoter.domain.port.out.PromoterRepositoryPort;
+import com.gresk.shared.domain.valueobject.Address;
+import com.gresk.shared.domain.valueobject.City;
+import com.gresk.shared.domain.valueobject.Description;
+import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import com.gresk.shared.domain.valueobject.Email;
+import com.gresk.shared.domain.valueobject.Name;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class RegisterPromoterUseCase implements RegisterPromoterPort {
 
-    private final PromoterRepository promoterRepository;
+    private final PromoterRepositoryPort promoterRepository;
 
     @Transactional
     @Override
@@ -31,21 +30,11 @@ public class RegisterPromoterUseCase implements RegisterPromoterPort {
             throw new EmailAlreadyExistsException(command.email());
         }
 
-        PromoterName name = new PromoterName(command.name());
-        Location location = new Location(command.city(), command.country(), command.address());
+        Name name = new Name(command.name());
+        Address address = new Address(command.street(), City.of(command.city()), command.country());
         Description description = new Description(command.description());
 
-        Promoter promoter = Promoter.create(command.accountId(), email, name, location, description);
-
-        if (command.musicalGenres() != null) {
-            command.musicalGenres().forEach(raw -> {
-                try {
-                    promoter.addGenre(MusicGenre.valueOf(raw));
-                } catch (IllegalArgumentException e) {
-                    throw new InvalidGenreException(raw);
-                }
-            });
-        }
+        Promoter promoter = Promoter.create(PromoterId.generate(), email, name, address, description);
 
         return promoterRepository.save(promoter).getId();
     }
