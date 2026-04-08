@@ -15,14 +15,18 @@ public record EventRecommendedDTO(
         String category
 ) {
 
-    public static EventRecommendedDTO fromDomain(EventRecommendation domain) {
+    public static EventRecommendedDTO fromDomain(EventRecommendation domain, String defaultImageUrl) {
+        String imageUrl = domain.imageUrl();
+        if (imageUrl == null || imageUrl.isBlank()) {
+            imageUrl = defaultImageUrl;
+        }
         return EventRecommendedDTO.builder()
                 .id(domain.eventId())
                 .title(domain.title())
                 .location(domain.location())
                 .date(domain.dateTime().format(DateTimeFormatter.ISO_LOCAL_DATE))
                 .time(domain.dateTime().format(DateTimeFormatter.ofPattern("HH:mm")))
-                .imageUrl(domain.imageUrl())
+                .imageUrl(imageUrl)
                 .category(domain.category())
                 .build();
     }

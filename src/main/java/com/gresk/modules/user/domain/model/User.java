@@ -4,6 +4,8 @@ import com.gresk.modules.user.domain.exception.InvalidPointsException;
 import com.gresk.shared.domain.AccountStatus;
 import com.gresk.shared.domain.MusicGenre;
 import com.gresk.shared.domain.Role;
+import com.gresk.shared.domain.valueobject.AssetId;
+import com.gresk.shared.domain.valueobject.City;
 import com.gresk.shared.domain.valueobject.Description;
 import com.gresk.shared.domain.valueobject.Email;
 import com.gresk.shared.domain.valueobject.Name;
@@ -23,6 +25,7 @@ public final class User {
     private Name name;
     private Description description;
     private City city;
+    private AssetId avatarAssetId;
     private Set<MusicGenre> musicGenres;
     private AccountStatus status;
     private UserTier tier;
@@ -30,13 +33,14 @@ public final class User {
     private final Set<Role> roles;
 
     private User(UserId id, Email email, Name name, Description description, City city,
-                 Set<MusicGenre> musicGenres, AccountStatus status, UserTier tier,
+                 AssetId avatarAssetId, Set<MusicGenre> musicGenres, AccountStatus status, UserTier tier,
                  int loyaltyPoints, Set<Role> roles, Instant createdAt) {
         this.id = Objects.requireNonNull(id);
         this.email = Objects.requireNonNull(email);
         this.name = Objects.requireNonNull(name);
         this.description = description;
         this.city = Objects.requireNonNull(city);
+        this.avatarAssetId = avatarAssetId != null ? avatarAssetId : new AssetId(null);
         this.musicGenres = musicGenres != null ? new HashSet<>(musicGenres) : new HashSet<>();
         this.status = Objects.requireNonNull(status);
         this.tier = Objects.requireNonNull(tier);
@@ -46,14 +50,14 @@ public final class User {
     }
 
     public static User create(UserId id, Email email, Name name, Description description, City city, Set<MusicGenre> musicGenres) {
-        return new User(id, email, name, description, city, musicGenres,
+        return new User(id, email, name, description, city, new AssetId(null), musicGenres,
                 AccountStatus.ACTIVE, UserTier.FREE, 0, Set.of(Role.USER), Instant.now());
     }
 
     public static User reconstitute(UserId id, Email email, Name name, Description description, City city,
-                                    Set<MusicGenre> musicGenres, AccountStatus status, UserTier tier,
+                                    AssetId avatarAssetId, Set<MusicGenre> musicGenres, AccountStatus status, UserTier tier,
                                     int loyaltyPoints, Set<Role> roles, Instant createdAt) {
-        return new User(id, email, name, description, city, musicGenres, status, tier, loyaltyPoints, roles, createdAt);
+        return new User(id, email, name, description, city, avatarAssetId, musicGenres, status, tier, loyaltyPoints, roles, createdAt);
     }
 
     public void updateProfile(Name name, Description description, City city, Set<MusicGenre> genres) {
@@ -99,12 +103,17 @@ public final class User {
         }
     }
 
+    public void updateAvatar(AssetId assetId) {
+        this.avatarAssetId = assetId != null ? assetId : new AssetId(null);
+    }
+
     public City getCity() { return city; }
     public void changeCity(City newCity) { this.city = Objects.requireNonNull(newCity); }
     public UserId getId() { return id; }
     public Email getEmail() { return email; }
     public Name getName() { return name; }
     public Description getDescription() { return description; }
+    public AssetId getAvatarAssetId() { return avatarAssetId; }
     public Set<MusicGenre> getMusicGenres() { return Set.copyOf(musicGenres); }
     public AccountStatus getStatus() { return status; }
     public UserTier getTier() { return tier; }

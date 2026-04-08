@@ -1,6 +1,7 @@
 package com.gresk.modules.user.infrastructure.persistence.mapper;
 
-import com.gresk.modules.user.domain.model.City;
+import com.gresk.shared.domain.valueobject.AssetId;
+import com.gresk.shared.domain.valueobject.City;
 import com.gresk.modules.user.domain.model.User;
 import com.gresk.modules.user.domain.model.UserId;
 import com.gresk.modules.user.infrastructure.persistence.entity.UserEntity;
@@ -18,6 +19,7 @@ public class UserPersistenceMapper {
                 .email(user.getEmail().value())
                 .name(user.getName().value())
                 .description(user.getDescription().value())
+                .avatarAssetId(user.getAvatarAssetId().value())
                 .city(user.getCity().value())
                 .status(user.getStatus())
                 .tier(user.getTier())
@@ -35,6 +37,7 @@ public class UserPersistenceMapper {
                 Name.reconstitute(entity.getName()),
                 Description.of(entity.getDescription()),
                 City.of(entity.getCity()),
+                new AssetId(entity.getAvatarAssetId()),
                 new HashSet<>(entity.getMusicGenres()),
                 entity.getStatus(),
                 entity.getTier(),

@@ -2,7 +2,7 @@ package com.gresk.modules.user.application.usecase;
 
 import com.gresk.modules.user.application.command.UpdateUserCommand;
 import com.gresk.modules.user.domain.exception.UserNotFoundException;
-import com.gresk.modules.user.domain.model.City;
+import com.gresk.shared.domain.valueobject.City;
 import com.gresk.modules.user.domain.model.User;
 import com.gresk.modules.user.domain.model.UserId;
 import com.gresk.modules.user.domain.port.in.UpdateUserUseCase;

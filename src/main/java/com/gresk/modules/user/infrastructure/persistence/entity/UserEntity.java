@@ -33,6 +33,9 @@ public class UserEntity {
     @Column(length = 500)
     private String description;
 
+    @Column(name = "avatar_asset_id", length = 255)
+    private String avatarAssetId;
+
     @Column(nullable = false, length = 100)
     private String city;
 
@@ -88,6 +91,10 @@ public class UserEntity {
         this.description = description;
         this.city = city;
         this.musicGenres = (musicGenres != null) ? new HashSet<>(musicGenres) : new HashSet<>();
+    }
+
+    public void updateAvatar(String avatarAssetId) {
+        this.avatarAssetId = avatarAssetId;
     }
 
     public void updateStatus(AccountStatus status) {

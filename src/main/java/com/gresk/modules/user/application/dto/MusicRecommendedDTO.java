@@ -13,12 +13,16 @@ public record MusicRecommendedDTO(
         MusicGenre genre
 ) {
 
-    public static MusicRecommendedDTO fromDomain(MusicRecommendation domain) {
+    public static MusicRecommendedDTO fromDomain(MusicRecommendation domain, String defaultImageUrl) {
+        String imageUrl = domain.imageUrl();
+        if (imageUrl == null || imageUrl.isBlank()) {
+            imageUrl = defaultImageUrl;
+        }
         return MusicRecommendedDTO.builder()
                 .trackName(domain.trackName())
                 .artistName(domain.artistName())
                 .spotifyUrl(domain.spotifyUrl())
-                .imageUrl(domain.imageUrl())
+                .imageUrl(imageUrl)
                 .genre(domain.genre())
                 .build();
     }
