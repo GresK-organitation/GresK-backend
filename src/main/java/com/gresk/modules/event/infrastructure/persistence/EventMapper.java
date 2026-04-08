@@ -1,7 +1,7 @@
 package com.gresk.modules.event.infrastructure.persistence;
 
 import com.gresk.modules.event.domain.model.*;
-import com.gresk.modules.promoter.domain.valueobject.PromoterId;
+import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

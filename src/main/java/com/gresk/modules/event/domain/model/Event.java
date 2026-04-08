@@ -2,7 +2,7 @@ package com.gresk.modules.event.domain.model;
 
 import com.gresk.modules.event.domain.exception.IncompleteEventException;
 import com.gresk.modules.event.domain.exception.InvalidEventTransitionException;
-import com.gresk.modules.promoter.domain.valueobject.PromoterId;
+import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 
 import java.time.LocalDateTime;
 
