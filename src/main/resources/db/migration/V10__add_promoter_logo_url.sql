@@ -1,0 +1,3 @@
+ALTER TABLE promoters
+    ADD COLUMN IF NOT EXISTS logo_url VARCHAR(1024);
+
