@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class LocationTest {
+class AddressTest {
 
     // --- constructor (valid) ---
 
@@ -31,7 +31,7 @@ class LocationTest {
     void constructor_shouldThrowWhenCityIsNull() {
         assertThatThrownBy(() -> new Location(null, "Calle Mayor 5", "Venue"))
                 .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining("Location city must not be null");
+                .hasMessageContaining("Address city must not be null");
     }
 
     @ParameterizedTest
@@ -39,7 +39,7 @@ class LocationTest {
     void constructor_shouldThrowWhenCityIsBlank(String blankCity) {
         assertThatThrownBy(() -> new Location(blankCity, "Calle Mayor 5", "Venue"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Location city must not be blank");
+                .hasMessageContaining("Address city must not be blank");
     }
 
     // --- address validation ---
@@ -48,7 +48,7 @@ class LocationTest {
     void constructor_shouldThrowWhenAddressIsNull() {
         assertThatThrownBy(() -> new Location("Madrid", null, "Venue"))
                 .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining("Location address must not be null");
+                .hasMessageContaining("Address address must not be null");
     }
 
     @ParameterizedTest
@@ -56,7 +56,7 @@ class LocationTest {
     void constructor_shouldThrowWhenAddressIsBlank(String blankAddress) {
         assertThatThrownBy(() -> new Location("Madrid", blankAddress, "Venue"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Location address must not be blank");
+                .hasMessageContaining("Address address must not be blank");
     }
 
     // --- equality ---

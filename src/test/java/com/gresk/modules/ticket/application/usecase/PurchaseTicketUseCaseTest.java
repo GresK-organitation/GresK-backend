@@ -3,7 +3,7 @@ package com.gresk.modules.ticket.application.usecase;
 import com.gresk.modules.event.domain.exception.EventNotFoundException;
 import com.gresk.modules.event.domain.exception.EventSoldOutException;
 import com.gresk.modules.event.domain.model.*;
-import com.gresk.modules.promoter.domain.valueobject.PromoterId;
+import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import com.gresk.modules.ticket.domain.exception.DuplicateTicketException;
 import com.gresk.modules.ticket.domain.exception.PaymentFailedException;
 import com.gresk.modules.ticket.domain.model.*;

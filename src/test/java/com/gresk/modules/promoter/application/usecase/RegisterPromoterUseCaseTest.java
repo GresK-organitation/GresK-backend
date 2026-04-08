@@ -5,9 +5,9 @@ import com.gresk.modules.promoter.domain.MusicGenre;
 import com.gresk.modules.promoter.domain.exception.EmailAlreadyExistsException;
 import com.gresk.modules.promoter.domain.model.Promoter;
 import com.gresk.modules.promoter.domain.valueobject.Email;
-import com.gresk.modules.promoter.domain.valueobject.PromoterId;
+import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import com.gresk.modules.promoter.application.port.out.PasswordHasher;
-import com.gresk.modules.promoter.domain.port.out.PromoterRepository;
+import com.gresk.modules.promoter.domain.port.out.PromoterRepositoryPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class RegisterPromoterUseCaseTest {
 
-    @Mock private PromoterRepository promoterRepository;
+    @Mock private PromoterRepositoryPort promoterRepository;
     @Mock private PasswordHasher passwordHasher;
     @InjectMocks private RegisterPromoterUseCase registerPromoterUseCase;
 

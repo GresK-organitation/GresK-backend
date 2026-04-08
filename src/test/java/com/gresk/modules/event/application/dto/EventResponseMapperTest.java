@@ -1,7 +1,7 @@
 package com.gresk.modules.event.application.dto;
 
 import com.gresk.modules.event.domain.model.*;
-import com.gresk.modules.promoter.domain.valueobject.PromoterId;
+import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -5,8 +5,9 @@ import com.gresk.modules.promoter.domain.PromoterStatus;
 import com.gresk.modules.promoter.domain.exception.InvalidGenreException;
 import com.gresk.modules.promoter.domain.exception.PromoterNotFoundException;
 import com.gresk.modules.promoter.domain.model.Promoter;
-import com.gresk.modules.promoter.domain.valueobject.*;
-import com.gresk.modules.promoter.domain.port.out.PromoterRepository;
+import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
+import com.gresk.modules.promoter.domain.port.out.PromoterRepositoryPort;
+import com.gresk.shared.domain.valueobject.Address;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,7 +26,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UpdatePromoterProfileUseCaseTest {
 
-    @Mock private PromoterRepository promoterRepository;
+    @Mock private PromoterRepositoryPort promoterRepository;
     @InjectMocks private UpdatePromoterProfileUseCase useCase;
 
     private Promoter buildPromoter() {
@@ -35,7 +36,7 @@ class UpdatePromoterProfileUseCaseTest {
                 new Password("$2a$10$hash"),
                 new PromoterName("Club Nocturno"),
                 new Description("Old description"),
-                new Location("Madrid", "España", null),
+                new Address("Madrid", "España", null),
                 Set.of(),
                 PromoterStatus.ACTIVE,
                 LocalDateTime.now(),

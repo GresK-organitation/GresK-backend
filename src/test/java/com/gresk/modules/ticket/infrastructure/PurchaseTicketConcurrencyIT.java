@@ -2,7 +2,7 @@ package com.gresk.modules.ticket.infrastructure;
 
 import com.gresk.modules.event.domain.model.*;
 import com.gresk.modules.event.domain.port.out.EventRepository;
-import com.gresk.modules.promoter.domain.valueobject.PromoterId;
+import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import com.gresk.modules.ticket.application.usecase.PurchaseTicketCommand;
 import com.gresk.modules.ticket.domain.exception.DuplicateTicketException;
 import com.gresk.modules.event.domain.exception.EventSoldOutException;

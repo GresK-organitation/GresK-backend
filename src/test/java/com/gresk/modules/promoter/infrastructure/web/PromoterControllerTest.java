@@ -9,7 +9,8 @@ import com.gresk.modules.promoter.domain.PromoterStatus;
 import com.gresk.modules.promoter.domain.exception.EmailAlreadyExistsException;
 import com.gresk.modules.promoter.domain.exception.InvalidCredentialsException;
 import com.gresk.modules.promoter.domain.model.Promoter;
-import com.gresk.modules.promoter.domain.valueobject.*;
+import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
+import com.gresk.shared.domain.valueobject.Address;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -213,7 +214,7 @@ class PromoterControllerTest {
                 new Password("$2a$10$hash"),
                 new PromoterName("Club Test"),
                 null,
-                new Location("Madrid", "España", null),
+                new Address("Madrid", "España", null),
                 Set.of(),
                 PromoterStatus.ACTIVE,
                 LocalDateTime.now(),

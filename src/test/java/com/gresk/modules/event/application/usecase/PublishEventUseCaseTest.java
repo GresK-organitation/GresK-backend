@@ -5,7 +5,7 @@ import com.gresk.modules.event.domain.exception.ForbiddenOperationException;
 import com.gresk.modules.event.domain.exception.IncompleteEventException;
 import com.gresk.modules.event.domain.model.*;
 import com.gresk.modules.event.domain.port.out.EventRepository;
-import com.gresk.modules.promoter.domain.valueobject.PromoterId;
+import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
