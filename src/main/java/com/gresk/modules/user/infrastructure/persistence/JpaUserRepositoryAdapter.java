@@ -34,7 +34,7 @@ public class JpaUserRepositoryAdapter implements UserRepositoryPort {
                             user.getCity().value(),
                             new HashSet<>(user.getMusicGenres())
                     );
-
+                    existing.updateAvatar(user.getAvatarAssetId().value());
                     existing.updateTier(user.getTier());
                     existing.updateLoyaltyPoints(user.getLoyaltyPoints());
                     existing.updateStatus(user.getStatus());

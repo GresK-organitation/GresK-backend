@@ -1,14 +1,12 @@
 package com.gresk.modules.user.infrastructure.in.external;
 
-import com.gresk.modules.user.domain.model.City;
+import com.gresk.shared.domain.valueobject.City;
 import com.gresk.modules.user.domain.model.EventRecommendation;
-import com.gresk.modules.user.domain.model.UserId;
 import com.gresk.modules.user.domain.port.out.EventRecommendationProvider;
 import com.gresk.shared.domain.MusicGenre;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;

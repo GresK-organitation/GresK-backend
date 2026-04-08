@@ -1,7 +1,7 @@
 package com.gresk.modules.user.application.usecase;
 
 import com.gresk.modules.user.application.command.RegisterUserCommand;
-import com.gresk.modules.user.domain.model.City;
+import com.gresk.shared.domain.valueobject.City;
 import com.gresk.modules.user.domain.model.User;
 import com.gresk.modules.user.domain.model.UserId;
 import com.gresk.modules.user.domain.port.in.RegisterUserUseCase;

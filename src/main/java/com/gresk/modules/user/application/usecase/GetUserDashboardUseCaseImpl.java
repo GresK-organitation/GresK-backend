@@ -11,6 +11,7 @@ import com.gresk.modules.user.domain.port.out.MusicRecommendationProvider;
 import com.gresk.modules.user.domain.port.out.EventRecommendationProvider;
 import com.gresk.modules.user.domain.port.out.UserRepositoryPort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,9 @@ public class GetUserDashboardUseCaseImpl implements GetUserDashboardUseCase {
     private final EventRecommendationProvider eventRecommendationProvider;
     private final MusicRecommendationProvider musicRecommendationProvider;
 
+    @Value("${gresk.images.default-url}")
+    private String defaultImageUrl;
+
     @Override
     public UserDashboardDTO execute(UUID id) {
         UserId userId = UserId.of(id);
@@ -36,13 +40,13 @@ public class GetUserDashboardUseCaseImpl implements GetUserDashboardUseCase {
         Set<EventRecommendedDTO> topEvents = eventRecommendationProvider
                 .getTopEvents(user.getCity(), user.getMusicGenres())
                 .stream()
-                .map(EventRecommendedDTO::fromDomain)
+                .map(domain -> EventRecommendedDTO.fromDomain(domain, defaultImageUrl))
                 .collect(Collectors.toSet());
 
         Set<MusicRecommendedDTO> topTracks = musicRecommendationProvider
                 .getSpotifyTopTracks(user.getMusicGenres())
                 .stream()
-                .map(MusicRecommendedDTO::fromDomain)
+                .map(domain -> MusicRecommendedDTO.fromDomain(domain, defaultImageUrl))
                 .collect(Collectors.toSet());
 
         return new UserDashboardDTO(

@@ -1,6 +1,6 @@
 package com.gresk.modules.user.domain.port.out;
 
-import com.gresk.modules.user.domain.model.City;
+import com.gresk.shared.domain.valueobject.City;
 import com.gresk.modules.user.domain.model.EventRecommendation;
 import com.gresk.shared.domain.MusicGenre;
 
