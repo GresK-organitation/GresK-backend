@@ -45,8 +45,8 @@ public final class User {
         this.createdAt = Objects.requireNonNull(createdAt);
     }
 
-    public static User create(Email email, Name name, Description description, City city, Set<MusicGenre> musicGenres) {
-        return new User(UserId.generate(), email, name, description, city, musicGenres,
+    public static User create(UserId id, Email email, Name name, Description description, City city, Set<MusicGenre> musicGenres) {
+        return new User(id, email, name, description, city, musicGenres,
                 AccountStatus.ACTIVE, UserTier.FREE, 0, Set.of(Role.USER), Instant.now());
     }
 

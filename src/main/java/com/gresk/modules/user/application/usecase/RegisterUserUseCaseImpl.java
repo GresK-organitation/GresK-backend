@@ -33,6 +33,7 @@ public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
                 : Set.of();
 
         User user = User.create(
+                UserId.of(command.userId()),
                 email,
                 Name.of(command.name()),
                 Description.of(command.description()),
