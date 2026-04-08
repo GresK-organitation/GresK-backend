@@ -110,7 +110,7 @@ GresK adopta el modelo de dominio rico. Las reglas de negocio que afectan a un
    Un test que verifica `event.publish()` con `genre == null` falla en milisegundos.
 
 3. **Prevención de regresiones.** Si la regla cambia (e.g., se añade que
-   `location` es obligatoria para publicar), se cambia en un único lugar (`Event.publish()`)
+   `address` es obligatoria para publicar), se cambia en un único lugar (`Event.publish()`)
    y todos los use cases heredan el cambio automáticamente.
 
 4. **El use case es el orquestador, no el validador.** El use case se ocupa de
@@ -153,11 +153,11 @@ public static Event create(String title, PromoterId promoterId) {
 // 2. Reconstitución desde persistencia — acepta cualquier estado guardado
 public static Event reconstitute(EventId id, String title, PromoterId promoterId,
                                  Genre genre, Price price, Capacity capacity,
-                                 LocalDateTime eventDate, Location location,
+                                 LocalDateTime eventDate, Location address,
                                  LocalDateTime revealAt, EventStatus status,
                                  LocalDateTime createdAt) {
     return new Event(id, title, promoterId, genre, price, capacity,
-            eventDate, location, revealAt, status, createdAt);
+            eventDate, address, revealAt, status, createdAt);
 }
 ```
 
