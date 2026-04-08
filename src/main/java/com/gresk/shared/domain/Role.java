@@ -1,5 +1,5 @@
 package com.gresk.shared.domain;
 
 public enum Role {
-    USER, ARTIST, PROMOTER
+    USER, ARTIST, PROMOTER, PROMOTER_PENDING
 }
