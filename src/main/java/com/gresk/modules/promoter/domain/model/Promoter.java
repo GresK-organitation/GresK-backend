@@ -1,106 +1,122 @@
 package com.gresk.modules.promoter.domain.model;
 
-import com.gresk.modules.promoter.domain.MusicGenre;
-import com.gresk.modules.promoter.domain.PromoterStatus;
 import com.gresk.modules.promoter.domain.exception.GenreNotFoundException;
 import com.gresk.modules.promoter.domain.exception.PromoterAlreadyActiveException;
 import com.gresk.modules.promoter.domain.exception.PromoterNotActiveException;
-import com.gresk.modules.promoter.domain.valueobject.Description;
-import com.gresk.modules.promoter.domain.valueobject.Location;
-import com.gresk.modules.promoter.domain.valueobject.PromoterName;
-import com.gresk.modules.promoter.domain.valueobject.PromoterId;
+import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
+import com.gresk.shared.domain.AccountStatus;
+import com.gresk.shared.domain.MusicGenre;
+import com.gresk.shared.domain.valueobject.Address;
+import com.gresk.shared.domain.valueobject.AssetId;
+import com.gresk.shared.domain.valueobject.Description;
 import com.gresk.shared.domain.valueobject.Email;
+import com.gresk.shared.domain.valueobject.Name;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 
 public final class Promoter {
 
     private final PromoterId id;
-    private final UUID accountId;
-    private final Email email;
-    private final PromoterName name;
-    private final Description description;
-    private final Location location;
-    private final Set<MusicGenre> musicalGenres;
-    private PromoterStatus status;
-    private final LocalDateTime createdAt;
-    private boolean active;
+    private Email email;
+    private Name name;
+    private Description description;
+    private Address address;
+    private AssetId logoAssetId;
+    private Set<MusicGenre> musicalGenres;
+    private AccountStatus status;
+    private Instant createdAt;
 
-    private Promoter(PromoterId id, UUID accountId, Email email, PromoterName name, Description description,
-                     Location location, Set<MusicGenre> musicalGenres, PromoterStatus status,
-                     LocalDateTime createdAt, boolean active) {
+    private Promoter(PromoterId id, AssetId logoAssetId, Email email, Name name, Address address, Description description,
+                     Set<MusicGenre> musicalGenres, AccountStatus status, Instant createdAt) {
         this.id = id;
-        this.accountId = accountId;
-        this.email = email;
-        this.name = name;
-        this.description = description;
-        this.location = location;
-        this.musicalGenres = new LinkedHashSet<>(musicalGenres);
-        this.status = status;
-        this.createdAt = createdAt;
-        this.active = active;
+        this.email = Objects.requireNonNull(email);
+        this.name = Objects.requireNonNull(name);
+        this.address = Objects.requireNonNull(address);
+        this.description = Objects.requireNonNull(description);
+        this.logoAssetId = logoAssetId != null ? logoAssetId : new AssetId(null);
+        this.musicalGenres = musicalGenres != null ? new LinkedHashSet<>(musicalGenres) : new LinkedHashSet<>();
+        this.status = Objects.requireNonNull(status);
+        this.createdAt = Objects.requireNonNull(createdAt);
     }
 
-    public static Promoter create(UUID accountId, Email email, PromoterName name,
-                                  Location location, Description description) {
+    public static Promoter create(PromoterId id, Email email, Name name, Address address, Description description) {
         return new Promoter(
-                PromoterId.generate(), accountId, email, name,
-                description != null ? description : new Description(null),
-                location,
+                id,
+                new AssetId(null),
+                email,
+                name,
+                address,
+                Objects.requireNonNull(description),
                 new LinkedHashSet<>(),
-                PromoterStatus.PENDING,
-                LocalDateTime.now(),
-                false
+                AccountStatus.PENDING,
+                Instant.now()
         );
     }
 
-    public static Promoter reconstitute(PromoterId id, UUID accountId, Email email,
-                                        PromoterName name, Description description,
-                                        Location location, Set<MusicGenre> musicalGenres,
-                                        PromoterStatus status, LocalDateTime createdAt,
-                                        boolean active) {
-        return new Promoter(id, accountId, email, name, description,
-                location, musicalGenres, status, createdAt, active);
+    public static Promoter reconstitute(PromoterId id, AssetId logoAssetId, Email email, Name name, Address address, Description description,
+                                        Set<MusicGenre> musicalGenres, AccountStatus status, Instant createdAt) {
+        return new Promoter(id, logoAssetId, email, name, address, description, musicalGenres, status, createdAt);
     }
 
     public void activate() {
-        if (this.status == PromoterStatus.ACTIVE)
+        if (this.status == AccountStatus.ACTIVE)
             throw new PromoterAlreadyActiveException("Promoter is already active: " + id);
-        this.status = PromoterStatus.ACTIVE;
-        this.active = true;
+        this.status = AccountStatus.ACTIVE;
     }
 
     public void suspend() {
-        if (this.status != PromoterStatus.ACTIVE)
+        if (this.status != AccountStatus.ACTIVE)
             throw new PromoterNotActiveException(
                     "Only active Promoters can be suspended. Status: " + status);
-        this.status = PromoterStatus.SUSPENDED;
-        this.active = false;
+        this.status = AccountStatus.SUSPENDED;
     }
 
     public void addGenre(MusicGenre genre) {
+        if (this.status != AccountStatus.ACTIVE) {
+            throw new PromoterNotActiveException("Genres can only be added to active promoters");
+        }
         if (genre == null) throw new IllegalArgumentException("Genre can't be null");
         musicalGenres.add(genre);
     }
 
     public void deleteGenre(MusicGenre genre) {
+        if (this.status != AccountStatus.ACTIVE) {
+            throw new PromoterNotActiveException("Genres can only be deleted from active promoters");
+        }
         if (!musicalGenres.contains(genre))
             throw new GenreNotFoundException("This genre is not on the list:" + genre);
         musicalGenres.remove(genre);
     }
 
+    public void updateBasicInfo(Name name, Address address, Description description) {
+        this.name = name;
+        this.address = address;
+        this.description = description;
+    }
+
+    public void updateLogo(AssetId assetId) {
+        this.logoAssetId = assetId != null ? assetId : new AssetId(null);
+    }
+
+    public void replaceGenres(Set<MusicGenre> genres) {
+        if (this.status != AccountStatus.ACTIVE) {
+            throw new PromoterNotActiveException("Genres can only be updated on active promoters");
+        }
+        this.musicalGenres = genres != null ? new LinkedHashSet<>(genres) : new LinkedHashSet<>();
+    }
+
     public PromoterId getId() { return id; }
-    public UUID getAccountId() { return accountId; }
     public Email getEmail() { return email; }
-    public PromoterName getName() { return name; }
+    public Name getName() { return name; }
     public Description getDescription() { return description; }
-    public Location getLocation() { return location; }
-    public PromoterStatus getStatus() { return status; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public boolean isActive() { return active; }
+    public Address getAddress() { return address; }
+    public AccountStatus getStatus() { return status; }
+    public AssetId getLogoAssetId() { return logoAssetId; }
+    public Instant getCreatedAt() { return createdAt; }
+    public boolean isActive() { return status == AccountStatus.ACTIVE; }
     public Set<MusicGenre> getMusicalGenres() { return Collections.unmodifiableSet(musicalGenres); }
 }

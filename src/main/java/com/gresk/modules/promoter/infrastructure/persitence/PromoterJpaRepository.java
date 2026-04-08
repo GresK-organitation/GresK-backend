@@ -1,7 +1,10 @@
 package com.gresk.modules.promoter.infrastructure.persitence;
 
-import com.gresk.modules.promoter.domain.MusicGenre;
+import com.gresk.shared.domain.AccountStatus;
+import com.gresk.shared.domain.MusicGenre;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,11 +14,11 @@ public interface PromoterJpaRepository extends JpaRepository<PromoterEntity, UUI
 
     Optional<PromoterEntity> findByEmail(String email);
 
-    Optional<PromoterEntity> findByAccountId(UUID accountId);
-
     boolean existsByEmail(String email);
 
-    List<PromoterEntity> findByActiveTrue();
+    @Query("SELECT p FROM PromoterEntity p WHERE p.status = 'ACTIVE'")
+    List<PromoterEntity> findAllActive();
 
-    List<PromoterEntity> findByGenresContaining(MusicGenre genre);
+    @Query("SELECT p FROM PromoterEntity p JOIN p.genres g WHERE g = :genre")
+    List<PromoterEntity> findByGenresContaining(@Param("genre") MusicGenre genre);
 }

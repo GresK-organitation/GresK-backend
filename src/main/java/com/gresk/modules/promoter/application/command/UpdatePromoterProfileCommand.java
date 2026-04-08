@@ -1,14 +1,11 @@
 package com.gresk.modules.promoter.application.command;
 
-import java.util.List;
-import java.util.Set;
-
 public record UpdatePromoterProfileCommand(
         String promoterId,
         String name,
+        String street,
         String city,
         String country,
-        String address,
         String description,
-        Set<String> musicalGenres
+        java.util.Set<String> musicalGenres
 ) {}
