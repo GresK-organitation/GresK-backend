@@ -3,7 +3,7 @@ package com.gresk.modules.identity.infrastructure.web.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-import java.util.List;
+import java.util.Set;
 
 public record RegisterPromoterAuthRequest(
         @NotBlank @Email String email,
@@ -13,5 +13,5 @@ public record RegisterPromoterAuthRequest(
         @NotBlank String country,
         String address,
         String description,
-        List<String> musicalGenres
+        Set<String> musicalGenres
 ) {}
