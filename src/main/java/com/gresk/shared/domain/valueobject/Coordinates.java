@@ -1,0 +1,12 @@
+package com.gresk.shared.domain.valueobject;
+
+public record Coordinates(double latitude, double longitude) {
+    public Coordinates {
+        if (latitude < -90 || latitude > 90) throw new IllegalArgumentException("Invalid latitude");
+        if (longitude < -180 || longitude > 180) throw new IllegalArgumentException("Invalid longitude");
+    }
+
+    public static Coordinates of(double lat, double lon) {
+        return new Coordinates(lat, lon);
+    }
+}

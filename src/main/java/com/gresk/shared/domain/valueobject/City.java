@@ -1,4 +1,4 @@
-package com.gresk.modules.user.domain.model;
+package com.gresk.shared.domain.valueobject;
 
 import com.gresk.modules.user.domain.exception.InvalidCityException;
 
