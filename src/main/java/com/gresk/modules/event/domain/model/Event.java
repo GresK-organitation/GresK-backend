@@ -132,4 +132,7 @@ public final class Event {
     public LocalDateTime getEventDate() { return eventDate; }
     public Location getLocation() { return location; }
     public LocalDateTime getRevealAt() { return revealAt; }
+
+    public void decrementCapacity() {
+    }
 }

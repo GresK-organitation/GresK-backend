@@ -6,7 +6,7 @@ import com.gresk.modules.promoter.domain.exception.PromoterNotFoundException;
 import com.gresk.modules.promoter.domain.model.Promoter;
 import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import com.gresk.modules.promoter.domain.port.out.PromoterRepositoryPort;
-import com.gresk.shared.domain.valueobject.Address;
+import com.gresk.shared.domain.valueobject.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,7 +33,7 @@ class GetPromoterUseCaseTest {
                 PromoterId.generate(),
                 new Email("promoter@gresk.com"),
                 new Password("$2a$10$hash"),
-                new PromoterName("Club Nocturno"),
+                new Name("Club Nocturno"),
                 new Description("A club"),
                 new Address("Madrid", "España", null),
                 Set.of(),

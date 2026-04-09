@@ -34,6 +34,11 @@ public class JpaEventAdapter implements EventRepository {
     }
 
     @Override
+    public <T> ScopedValue<T> findByIdWithLock(EventId eventId) {
+        return null;
+    }
+
+    @Override
     public long count(EventFilter filter) {
         return repo.count(EventSpecifications.fromFilter(filter));
     }

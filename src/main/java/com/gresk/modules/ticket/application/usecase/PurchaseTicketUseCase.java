@@ -41,7 +41,7 @@ public class PurchaseTicketUseCase {
                     "User already has a ticket for this event");
         }
 
-        Event event = eventRepository.findByIdWithLock(eventId)
+        Event event = (Event) eventRepository.findByIdWithLock(eventId)
                 .orElseThrow(() -> new EventNotFoundException("Event not found: " + command.eventId()));
 
         event.decrementCapacity();
