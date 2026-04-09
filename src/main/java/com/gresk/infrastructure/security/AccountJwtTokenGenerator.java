@@ -1,8 +1,8 @@
-package com.gresk.modules.identity.infrastructure.security;
+package com.gresk.infrastructure.security;
 
 import com.gresk.infrastructure.port.AuthToken;
-import com.gresk.modules.identity.application.port.out.JwtTokenGeneratorPort;
-import com.gresk.modules.identity.domain.model.AccountId;
+import com.gresk.modules.account.application.port.out.JwtTokenGeneratorPort;
+import com.gresk.modules.account.domain.model.AccountId;
 import com.gresk.shared.domain.Role;
 import com.gresk.shared.domain.valueobject.Email;
 import io.jsonwebtoken.Jwts;
@@ -17,14 +17,14 @@ import java.util.List;
 import java.util.Set;
 
 @Component
-public class IdentityJwtTokenGenerator implements JwtTokenGeneratorPort {
+public class AccountJwtTokenGenerator implements JwtTokenGeneratorPort {
 
     private final String secret;
     private final long expirationMs;
 
-    public IdentityJwtTokenGenerator(
-            @Value("${jwt.secret:esta_es_una_clave_secreta_muy_larga_de_al_menos_32_caracteres}") String secret,
-            @Value("${jwt.expiration-ms:86400000}") long expirationMs
+    public AccountJwtTokenGenerator(
+            @Value("${jwt.secret}") String secret,
+            @Value("${jwt.expiration-ms}") long expirationMs
     ) {
         this.secret = secret;
         this.expirationMs = expirationMs;

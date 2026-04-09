@@ -1,4 +1,4 @@
-package com.gresk.modules.identity.application.port.out;
+package com.gresk.modules.account.application.port.out;
 
 public interface PasswordHasherPort {
 

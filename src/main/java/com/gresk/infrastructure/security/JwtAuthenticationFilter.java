@@ -1,4 +1,4 @@
-package com.gresk.modules.identity.infrastructure.security;
+package com.gresk.infrastructure.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -27,7 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final String secret;
 
     public JwtAuthenticationFilter(
-            @Value("${jwt.secret:esta_es_una_clave_secreta_muy_larga_de_al_menos_32_caracteres}") String secret
+            @Value("${jwt.secret}") String secret
     ) {
         this.secret = secret;
     }
