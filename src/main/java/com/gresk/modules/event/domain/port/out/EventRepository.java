@@ -13,4 +13,5 @@ public interface EventRepository {
     List<Event> findAll(EventFilter filter, PageRequest pageRequest);
     long count(EventFilter filter);
     boolean existsById(EventId id);
+    Optional<Event> findByIdWithLock(EventId id);
 }
