@@ -22,6 +22,7 @@ public class UserModuleEventListener {
                 .description(event.description())
                 .city(event.city())
                 .musicGenres(event.musicGenres())
+                .avatarAssetId(event.avatarAssetId())
                 .build()
         );
     }

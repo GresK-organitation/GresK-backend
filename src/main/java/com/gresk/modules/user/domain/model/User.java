@@ -54,6 +54,12 @@ public final class User {
                 AccountStatus.ACTIVE, UserTier.FREE, 0, Set.of(Role.USER), Instant.now());
     }
 
+    public static User create(UserId id, Email email, Name name, Description description, City city,
+                               AssetId avatarAssetId, Set<MusicGenre> musicGenres) {
+        return new User(id, email, name, description, city, avatarAssetId, musicGenres,
+                AccountStatus.ACTIVE, UserTier.FREE, 0, Set.of(Role.USER), Instant.now());
+    }
+
     public static User reconstitute(UserId id, Email email, Name name, Description description, City city,
                                     AssetId avatarAssetId, Set<MusicGenre> musicGenres, AccountStatus status, UserTier tier,
                                     int loyaltyPoints, Set<Role> roles, Instant createdAt) {
