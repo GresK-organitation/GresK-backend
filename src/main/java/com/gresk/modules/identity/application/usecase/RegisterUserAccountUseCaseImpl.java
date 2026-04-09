@@ -8,8 +8,9 @@ import com.gresk.modules.identity.domain.model.Account;
 import com.gresk.modules.identity.domain.model.AccountId;
 import com.gresk.modules.identity.domain.port.out.AccountRepositoryPort;
 import com.gresk.shared.domain.AccountStatus;
-import com.gresk.shared.domain.Role;
 import com.gresk.shared.domain.event.UserRegisteredEvent;
+import com.gresk.shared.domain.port.out.ImageStoragePort;
+import com.gresk.shared.domain.valueobject.AssetId;
 import com.gresk.shared.domain.valueobject.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -22,6 +23,7 @@ public class RegisterUserAccountUseCaseImpl implements RegisterUserAccountUseCas
 
     private final AccountRepositoryPort accountRepositoryPort;
     private final PasswordHasherPort passwordHasherPort;
+    private final ImageStoragePort imageStorage;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
@@ -37,13 +39,20 @@ public class RegisterUserAccountUseCaseImpl implements RegisterUserAccountUseCas
 
         Account account = Account.create(email, passwordHash, command.roles(), AccountStatus.ACTIVE);
 
+        String avatarAssetId = null;
+        if (command.avatar() != null && !command.avatar().isEmpty()) {
+            AssetId assetId = imageStorage.upload(command.avatar(), "users/avatars");
+            avatarAssetId = assetId.value();
+        }
+
         eventPublisher.publishEvent(new UserRegisteredEvent(
                 account.getId().value(),
                 account.getEmail().value(),
                 command.name(),
                 command.description(),
                 command.city(),
-                command.musicGenres()
+                command.musicGenres(),
+                avatarAssetId
         ));
 
         return accountRepositoryPort.save(account);
