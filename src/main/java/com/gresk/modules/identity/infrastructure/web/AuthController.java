@@ -15,9 +15,11 @@ import com.gresk.modules.identity.infrastructure.web.dto.RegisterPromoterAuthReq
 import com.gresk.modules.identity.infrastructure.web.dto.RegisterUserAuthRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -31,10 +33,11 @@ public class AuthController {
     private final GetEmailUseCase getEmailUseCase;
     private final LoginUseCase loginUseCase;
 
-    @PostMapping("/register/user")
+    @PostMapping(value = "/register/user", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Transactional
     public ResponseEntity<Map<String, String>> registerUser(
-            @Valid @RequestBody RegisterUserAuthRequest request) {
+            @Valid @RequestPart("data") RegisterUserAuthRequest request,
+            @RequestPart(value = "avatar", required = false) MultipartFile avatar) {
 
         AccountId accountId = registerUserAccountUseCase.execute(
                 RegisterUserAccountCommand.builder()
@@ -44,6 +47,7 @@ public class AuthController {
                         .description(request.description())
                         .city(request.city())
                         .musicGenres(request.musicGenres())
+                        .avatar(avatar)
                         .build()
         );
         return ResponseEntity.status(201).body(Map.of(
@@ -51,10 +55,11 @@ public class AuthController {
         ));
     }
 
-    @PostMapping("/register/promoter")
+    @PostMapping(value = "/register/promoter", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Transactional
     public ResponseEntity<Map<String, String>> registerPromoter(
-            @Valid @RequestBody RegisterPromoterAuthRequest request) {
+            @Valid @RequestPart("data") RegisterPromoterAuthRequest request,
+            @RequestPart(value = "logo", required = false) MultipartFile logo) {
 
         AccountId accountId = registerPromoterAccountUseCase.execute(
                 RegisterPromoterAccountCommand.builder()
@@ -66,6 +71,7 @@ public class AuthController {
                         .address(request.address())
                         .description(request.description())
                         .musicalGenres(request.musicalGenres())
+                        .logo(logo)
                         .build()
         );
 
