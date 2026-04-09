@@ -29,6 +29,8 @@ public class JpaPromoterRepositoryAdapter implements PromoterRepositoryPort {
                             promoter.getAddress().city().value(),
                             promoter.getAddress().country(),
                             promoter.getAddress().street(),
+                            promoter.getPhone(),
+                            promoter.getWebsite(),
                             promoter.getMusicalGenres()
                     );
                     existing.updateLogo(promoter.getLogoAssetId().value());

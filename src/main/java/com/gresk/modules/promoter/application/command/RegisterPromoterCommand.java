@@ -12,5 +12,7 @@ public record RegisterPromoterCommand(
         String country,
         String description,
         Set<String> musicalGenres,
-        String logoAssetId
+        String logoAssetId,
+        String phone,
+        String website
 ) {}

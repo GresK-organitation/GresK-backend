@@ -33,10 +33,6 @@ public class JpaEventAdapter implements EventRepository {
         return repo.existsById(id.value());
     }
 
-    @Override
-    public Optional<Event> findByIdWithLock(EventId id) {
-        return repo.findByIdWithLock(id.value()).map(mapper::toDomain);
-    }
 
     @Override
     public long count(EventFilter filter) {

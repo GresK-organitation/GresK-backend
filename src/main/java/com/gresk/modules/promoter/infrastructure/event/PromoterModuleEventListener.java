@@ -24,7 +24,9 @@ public class PromoterModuleEventListener {
                 event.country(),
                 event.description(),
                 event.musicalGenres(),
-                event.logoAssetId()
+                event.logoAssetId(),
+                event.phone(),
+                event.website()
         ));
     }
 }
