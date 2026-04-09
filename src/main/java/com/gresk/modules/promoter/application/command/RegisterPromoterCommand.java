@@ -1,10 +1,16 @@
 package com.gresk.modules.promoter.application.command;
 
+import java.util.Set;
+import java.util.UUID;
+
 public record RegisterPromoterCommand(
+        UUID promoterId,
         String email,
         String name,
         String street,
         String city,
         String country,
-        String description
+        String description,
+        Set<String> musicalGenres,
+        String logoAssetId
 ) {}

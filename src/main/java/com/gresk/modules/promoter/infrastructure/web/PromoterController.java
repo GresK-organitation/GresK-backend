@@ -7,8 +7,6 @@ import com.gresk.modules.promoter.application.port.in.GetPromoterByAccountIdPort
 import com.gresk.modules.promoter.application.port.in.GetPromoterDashboardPort;
 import com.gresk.modules.promoter.application.port.in.UpdatePromoterLogoPort;
 import com.gresk.modules.promoter.application.port.in.UpdatePromoterProfilePort;
-import com.gresk.modules.promoter.domain.model.Promoter;
-import com.gresk.shared.domain.port.out.ImageUrlResolverPort;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -27,15 +25,12 @@ public class PromoterController {
     private final GetPromoterDashboardPort getDashboardUseCase;
     private final UpdatePromoterProfilePort updateUseCase;
     private final UpdatePromoterLogoPort updateLogoUseCase;
-    private final ImageUrlResolverPort imageUrlResolver;
     private final SecurityContextService securityContextService;
 
     @GetMapping("/me")
     public ResponseEntity<PromoterResponse> getMe() {
         UUID accountId = securityContextService.currentUserId();
-        Promoter promoter = getByAccountIdUseCase.execute(accountId);
-        String logoUrl = imageUrlResolver.resolveOrDefault(promoter.getLogoAssetId());
-        return ResponseEntity.ok(PromoterResponse.from(promoter, logoUrl));
+        return ResponseEntity.ok(PromoterResponse.from(getByAccountIdUseCase.execute(accountId)));
     }
 
     @GetMapping("/me/dashboard")
@@ -47,9 +42,8 @@ public class PromoterController {
     @PutMapping("/me")
     public ResponseEntity<Void> updateMe(@Valid @RequestBody UpdatePromoterProfileRequest request) {
         UUID accountId = securityContextService.currentUserId();
-        Promoter promoter = getByAccountIdUseCase.execute(accountId);
         UpdatePromoterProfileCommand command = new UpdatePromoterProfileCommand(
-                promoter.getId().value().toString(),
+                accountId.toString(),
                 request.name(),
                 request.address(),
                 request.city(),
