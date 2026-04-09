@@ -1,4 +1,4 @@
-package com.gresk.modules.identity.application.command;
+package com.gresk.modules.account.application.command;
 
 public record LoginCommand(
         String email,

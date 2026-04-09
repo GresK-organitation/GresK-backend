@@ -1,4 +1,4 @@
-package com.gresk.modules.identity.infrastructure.persistence;
+package com.gresk.modules.account.infrastructure.persistence;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

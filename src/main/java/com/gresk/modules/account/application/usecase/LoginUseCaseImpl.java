@@ -1,12 +1,12 @@
-package com.gresk.modules.identity.application.usecase;
+package com.gresk.modules.account.application.usecase;
 
 import com.gresk.infrastructure.port.AuthToken;
-import com.gresk.modules.identity.application.command.LoginCommand;
-import com.gresk.modules.identity.application.port.in.LoginUseCase;
-import com.gresk.modules.identity.application.port.out.JwtTokenGeneratorPort;
-import com.gresk.modules.identity.application.port.out.PasswordHasherPort;
-import com.gresk.modules.identity.domain.exception.InvalidAccountCredentialsException;
-import com.gresk.modules.identity.domain.port.out.AccountRepositoryPort;
+import com.gresk.modules.account.application.command.LoginCommand;
+import com.gresk.modules.account.application.port.in.LoginUseCase;
+import com.gresk.modules.account.application.port.out.JwtTokenGeneratorPort;
+import com.gresk.modules.account.application.port.out.PasswordHasherPort;
+import com.gresk.modules.account.domain.exception.InvalidAccountCredentialsException;
+import com.gresk.modules.account.domain.port.out.AccountRepositoryPort;
 import com.gresk.shared.domain.AccountStatus;
 import com.gresk.shared.domain.valueobject.Email;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
-package com.gresk.modules.identity.infrastructure.persistence;
+package com.gresk.modules.account.infrastructure.persistence;
 
-import com.gresk.modules.identity.domain.model.Account;
-import com.gresk.modules.identity.domain.model.AccountId;
+import com.gresk.modules.account.domain.model.Account;
+import com.gresk.modules.account.domain.model.AccountId;
 import com.gresk.shared.domain.valueobject.Email;
 import org.springframework.stereotype.Component;
 

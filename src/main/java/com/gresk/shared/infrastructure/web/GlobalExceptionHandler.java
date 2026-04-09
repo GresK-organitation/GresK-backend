@@ -1,7 +1,7 @@
 package com.gresk.shared.infrastructure.web;
 
-import com.gresk.modules.identity.domain.exception.AccountAlreadyExistsException;
-import com.gresk.modules.identity.domain.exception.InvalidAccountCredentialsException;
+import com.gresk.modules.account.domain.exception.AccountAlreadyExistsException;
+import com.gresk.modules.account.domain.exception.InvalidAccountCredentialsException;
 import com.gresk.modules.promoter.domain.exception.*;
 import com.gresk.modules.user.domain.exception.UserNotFoundException;
 import org.springframework.http.ResponseEntity;

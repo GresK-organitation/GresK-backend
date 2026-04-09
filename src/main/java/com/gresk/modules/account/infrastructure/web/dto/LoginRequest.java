@@ -1,4 +1,4 @@
-package com.gresk.modules.identity.infrastructure.web.dto;
+package com.gresk.modules.account.infrastructure.web.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

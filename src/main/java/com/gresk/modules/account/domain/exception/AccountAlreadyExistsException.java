@@ -1,4 +1,4 @@
-package com.gresk.modules.identity.domain.exception;
+package com.gresk.modules.account.domain.exception;
 
 public class AccountAlreadyExistsException extends RuntimeException {
 

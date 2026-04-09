@@ -1,7 +1,7 @@
-package com.gresk.modules.identity.domain.port.out;
+package com.gresk.modules.account.domain.port.out;
 
-import com.gresk.modules.identity.domain.model.Account;
-import com.gresk.modules.identity.domain.model.AccountId;
+import com.gresk.modules.account.domain.model.Account;
+import com.gresk.modules.account.domain.model.AccountId;
 import com.gresk.shared.domain.valueobject.Email;
 
 import java.util.Optional;

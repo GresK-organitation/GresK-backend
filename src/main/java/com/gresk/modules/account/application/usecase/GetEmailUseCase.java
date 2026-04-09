@@ -1,6 +1,6 @@
-package com.gresk.modules.identity.application.usecase;
+package com.gresk.modules.account.application.usecase;
 
-import com.gresk.modules.identity.domain.port.out.AccountRepositoryPort;
+import com.gresk.modules.account.domain.port.out.AccountRepositoryPort;
 import com.gresk.shared.domain.valueobject.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

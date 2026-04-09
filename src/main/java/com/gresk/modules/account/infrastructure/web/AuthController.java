@@ -1,18 +1,18 @@
-package com.gresk.modules.identity.infrastructure.web;
+package com.gresk.modules.account.infrastructure.web;
 
 import com.gresk.infrastructure.port.AuthToken;
-import com.gresk.modules.identity.application.command.LoginCommand;
-import com.gresk.modules.identity.application.command.RegisterPromoterAccountCommand;
-import com.gresk.modules.identity.application.command.RegisterUserAccountCommand;
-import com.gresk.modules.identity.application.port.in.LoginUseCase;
-import com.gresk.modules.identity.application.port.in.RegisterUserAccountUseCase;
-import com.gresk.modules.identity.application.usecase.GetEmailUseCase;
-import com.gresk.modules.identity.application.usecase.RegisterPromoterAccountUseCase;
-import com.gresk.modules.identity.domain.model.AccountId;
-import com.gresk.modules.identity.infrastructure.web.dto.AuthResponse;
-import com.gresk.modules.identity.infrastructure.web.dto.LoginRequest;
-import com.gresk.modules.identity.infrastructure.web.dto.RegisterPromoterAuthRequest;
-import com.gresk.modules.identity.infrastructure.web.dto.RegisterUserAuthRequest;
+import com.gresk.modules.account.application.command.LoginCommand;
+import com.gresk.modules.account.application.command.RegisterPromoterAccountCommand;
+import com.gresk.modules.account.application.command.RegisterUserAccountCommand;
+import com.gresk.modules.account.application.port.in.LoginUseCase;
+import com.gresk.modules.account.application.port.in.RegisterUserAccountUseCase;
+import com.gresk.modules.account.application.usecase.GetEmailUseCase;
+import com.gresk.modules.account.application.usecase.RegisterPromoterAccountUseCase;
+import com.gresk.modules.account.domain.model.AccountId;
+import com.gresk.modules.account.infrastructure.web.dto.AuthResponse;
+import com.gresk.modules.account.infrastructure.web.dto.LoginRequest;
+import com.gresk.modules.account.infrastructure.web.dto.RegisterPromoterAuthRequest;
+import com.gresk.modules.account.infrastructure.web.dto.RegisterUserAuthRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -66,12 +66,14 @@ public class AuthController {
                         .email(request.email())
                         .rawPassword(request.password())
                         .companyName(request.name())
+                        .street(request.street())
                         .city(request.city())
                         .country(request.country())
-                        .address(request.address())
                         .description(request.description())
                         .musicalGenres(request.musicalGenres())
                         .logo(logo)
+                        .phone(request.phone())
+                        .website(request.website())
                         .build()
         );
 

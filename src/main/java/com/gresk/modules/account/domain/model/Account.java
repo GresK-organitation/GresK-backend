@@ -1,4 +1,4 @@
-package com.gresk.modules.identity.domain.model;
+package com.gresk.modules.account.domain.model;
 
 import com.gresk.shared.domain.AccountStatus;
 import com.gresk.shared.domain.Role;

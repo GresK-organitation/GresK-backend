@@ -1,4 +1,4 @@
-package com.gresk.modules.identity.domain.model;
+package com.gresk.modules.account.domain.model;
 
 import java.util.UUID;
 
