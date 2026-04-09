@@ -11,5 +11,6 @@ public record RegisterUserCommand(
         String name,
         String description,
         String city,
-        Set<String> musicGenres
+        Set<String> musicGenres,
+        String avatarAssetId
 ) {}

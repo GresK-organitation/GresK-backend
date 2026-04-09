@@ -1,6 +1,7 @@
 package com.gresk.modules.user.application.usecase;
 
 import com.gresk.modules.user.application.command.RegisterUserCommand;
+import com.gresk.shared.domain.valueobject.AssetId;
 import com.gresk.shared.domain.valueobject.City;
 import com.gresk.modules.user.domain.model.User;
 import com.gresk.modules.user.domain.model.UserId;
@@ -32,12 +33,15 @@ public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
                 ? command.musicGenres().stream().map(MusicGenre::valueOf).collect(Collectors.toSet())
                 : Set.of();
 
+        AssetId avatarAssetId = AssetId.of(command.avatarAssetId());
+
         User user = User.create(
                 UserId.of(command.userId()),
                 email,
                 Name.of(command.name()),
                 Description.of(command.description()),
                 City.of(command.city()),
+                avatarAssetId,
                 genres
         );
 

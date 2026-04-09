@@ -44,17 +44,16 @@ public final class Promoter {
     }
 
     public static Promoter create(PromoterId id, Email email, Name name, Address address, Description description) {
-        return new Promoter(
-                id,
-                new AssetId(null),
-                email,
-                name,
-                address,
+        return new Promoter(id, new AssetId(null), email, name, address,
+                Objects.requireNonNull(description), new LinkedHashSet<>(), AccountStatus.PENDING, Instant.now());
+    }
+
+    public static Promoter create(PromoterId id, AssetId logoAssetId, Email email, Name name,
+                                   Address address, Description description, Set<MusicGenre> musicalGenres) {
+        return new Promoter(id, logoAssetId != null ? logoAssetId : new AssetId(null), email, name, address,
                 Objects.requireNonNull(description),
-                new LinkedHashSet<>(),
-                AccountStatus.PENDING,
-                Instant.now()
-        );
+                musicalGenres != null ? new LinkedHashSet<>(musicalGenres) : new LinkedHashSet<>(),
+                AccountStatus.PENDING, Instant.now());
     }
 
     public static Promoter reconstitute(PromoterId id, AssetId logoAssetId, Email email, Name name, Address address, Description description,

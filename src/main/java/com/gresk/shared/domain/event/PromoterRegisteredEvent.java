@@ -1,16 +1,16 @@
-package com.gresk.modules.promoter.application.command;
+package com.gresk.shared.domain.event;
 
 import java.util.Set;
 import java.util.UUID;
 
-public record RegisterPromoterCommand(
+public record PromoterRegisteredEvent(
         UUID promoterId,
         String email,
-        String name,
+        String companyName,
+        String description,
         String street,
         String city,
         String country,
-        String description,
         Set<String> musicalGenres,
         String logoAssetId
 ) {}

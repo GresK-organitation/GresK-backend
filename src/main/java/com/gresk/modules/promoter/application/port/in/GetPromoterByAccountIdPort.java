@@ -1,10 +1,10 @@
 package com.gresk.modules.promoter.application.port.in;
 
-import com.gresk.modules.promoter.domain.model.Promoter;
+import com.gresk.modules.promoter.application.dto.PromoterProfileDTO;
 
 import java.util.UUID;
 
 public interface GetPromoterByAccountIdPort {
 
-    Promoter execute(UUID accountId);
+    PromoterProfileDTO execute(UUID accountId);
 }
