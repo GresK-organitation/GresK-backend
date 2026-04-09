@@ -12,5 +12,7 @@ public record PromoterRegisteredEvent(
         String city,
         String country,
         Set<String> musicalGenres,
-        String logoAssetId
+        String logoAssetId,
+        String phone,
+        String website
 ) {}

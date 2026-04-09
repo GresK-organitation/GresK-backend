@@ -1,4 +1,4 @@
-package com.gresk.modules.identity.application.command;
+package com.gresk.modules.account.application.command;
 
 import com.gresk.shared.domain.Role;
 import lombok.Builder;

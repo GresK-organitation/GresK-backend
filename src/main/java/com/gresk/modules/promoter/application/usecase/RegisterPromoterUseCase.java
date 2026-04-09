@@ -54,7 +54,9 @@ public class RegisterPromoterUseCase implements RegisterPromoterPort {
                 name,
                 address,
                 description,
-                genres
+                genres,
+                command.phone(),
+                command.website()
         );
 
         return promoterRepository.save(promoter).getId();

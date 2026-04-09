@@ -43,6 +43,12 @@ public class PromoterEntity {
     @Column(length = 255)
     private String street;
 
+    @Column(length = 50)
+    private String phone;
+
+    @Column(length = 255)
+    private String website;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private AccountStatus status;
@@ -77,12 +83,15 @@ public class PromoterEntity {
 
     public void updateProfile(String name, String description,
                                String city, String country, String street,
+                               String phone, String website,
                                Set<MusicGenre> genres) {
         this.name = name;
         this.description = description;
         this.city = city;
         this.country = country;
         this.street = street;
+        this.phone = phone;
+        this.website = website;
         this.genres = new HashSet<>(genres);
     }
 

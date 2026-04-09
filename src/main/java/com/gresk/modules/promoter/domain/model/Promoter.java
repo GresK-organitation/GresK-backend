@@ -29,9 +29,12 @@ public final class Promoter {
     private Set<MusicGenre> musicalGenres;
     private AccountStatus status;
     private Instant createdAt;
+    private String phone;
+    private String website;
 
     private Promoter(PromoterId id, AssetId logoAssetId, Email email, Name name, Address address, Description description,
-                     Set<MusicGenre> musicalGenres, AccountStatus status, Instant createdAt) {
+                     Set<MusicGenre> musicalGenres, AccountStatus status, Instant createdAt,
+                     String phone, String website) {
         this.id = id;
         this.email = Objects.requireNonNull(email);
         this.name = Objects.requireNonNull(name);
@@ -41,24 +44,30 @@ public final class Promoter {
         this.musicalGenres = musicalGenres != null ? new LinkedHashSet<>(musicalGenres) : new LinkedHashSet<>();
         this.status = Objects.requireNonNull(status);
         this.createdAt = Objects.requireNonNull(createdAt);
+        this.phone = phone;
+        this.website = website;
     }
 
     public static Promoter create(PromoterId id, Email email, Name name, Address address, Description description) {
         return new Promoter(id, new AssetId(null), email, name, address,
-                Objects.requireNonNull(description), new LinkedHashSet<>(), AccountStatus.PENDING, Instant.now());
+                Objects.requireNonNull(description), new LinkedHashSet<>(), AccountStatus.PENDING, Instant.now(),
+                null, null);
     }
 
     public static Promoter create(PromoterId id, AssetId logoAssetId, Email email, Name name,
-                                   Address address, Description description, Set<MusicGenre> musicalGenres) {
+                                   Address address, Description description, Set<MusicGenre> musicalGenres,
+                                   String phone, String website) {
         return new Promoter(id, logoAssetId != null ? logoAssetId : new AssetId(null), email, name, address,
                 Objects.requireNonNull(description),
                 musicalGenres != null ? new LinkedHashSet<>(musicalGenres) : new LinkedHashSet<>(),
-                AccountStatus.PENDING, Instant.now());
+                AccountStatus.PENDING, Instant.now(), phone, website);
     }
 
     public static Promoter reconstitute(PromoterId id, AssetId logoAssetId, Email email, Name name, Address address, Description description,
-                                        Set<MusicGenre> musicalGenres, AccountStatus status, Instant createdAt) {
-        return new Promoter(id, logoAssetId, email, name, address, description, musicalGenres, status, createdAt);
+                                        Set<MusicGenre> musicalGenres, AccountStatus status, Instant createdAt,
+                                        String phone, String website) {
+        return new Promoter(id, logoAssetId, email, name, address, description, musicalGenres, status, createdAt,
+                phone, website);
     }
 
     public void activate() {
@@ -116,6 +125,8 @@ public final class Promoter {
     public AccountStatus getStatus() { return status; }
     public AssetId getLogoAssetId() { return logoAssetId; }
     public Instant getCreatedAt() { return createdAt; }
+    public String getPhone() { return phone; }
+    public String getWebsite() { return website; }
     public boolean isActive() { return status == AccountStatus.ACTIVE; }
     public Set<MusicGenre> getMusicalGenres() { return Collections.unmodifiableSet(musicalGenres); }
 }

@@ -25,7 +25,9 @@ public class PromoterMapper {
                 new Description(entity.getDescription()),
                 entity.getGenres(),
                 entity.getStatus(),
-                entity.getCreatedAt()
+                entity.getCreatedAt(),
+                entity.getPhone(),
+                entity.getWebsite()
         );
     }
 
@@ -39,6 +41,8 @@ public class PromoterMapper {
                 .street(promoter.getAddress().street())
                 .city(promoter.getAddress().city().value())
                 .country(promoter.getAddress().country())
+                .phone(promoter.getPhone())
+                .website(promoter.getWebsite())
                 .status(promoter.getStatus())
                 .createdAt(promoter.getCreatedAt())
                 .updatedAt(Instant.now())

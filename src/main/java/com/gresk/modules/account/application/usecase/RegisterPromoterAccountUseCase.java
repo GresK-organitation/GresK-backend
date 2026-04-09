@@ -1,11 +1,11 @@
-package com.gresk.modules.identity.application.usecase;
+package com.gresk.modules.account.application.usecase;
 
-import com.gresk.modules.identity.application.command.RegisterPromoterAccountCommand;
-import com.gresk.modules.identity.application.port.out.PasswordHasherPort;
-import com.gresk.modules.identity.domain.exception.AccountAlreadyExistsException;
-import com.gresk.modules.identity.domain.model.Account;
-import com.gresk.modules.identity.domain.model.AccountId;
-import com.gresk.modules.identity.domain.port.out.AccountRepositoryPort;
+import com.gresk.modules.account.application.command.RegisterPromoterAccountCommand;
+import com.gresk.modules.account.application.port.out.PasswordHasherPort;
+import com.gresk.modules.account.domain.exception.AccountAlreadyExistsException;
+import com.gresk.modules.account.domain.model.Account;
+import com.gresk.modules.account.domain.model.AccountId;
+import com.gresk.modules.account.domain.port.out.AccountRepositoryPort;
 import com.gresk.shared.domain.AccountStatus;
 import com.gresk.shared.domain.event.PromoterRegisteredEvent;
 import com.gresk.shared.domain.port.out.ImageStoragePort;
@@ -47,11 +47,13 @@ public class RegisterPromoterAccountUseCase {
                 account.getEmail().value(),
                 command.companyName(),
                 command.description(),
-                command.address(),
+                command.street(),
                 command.city(),
                 command.country(),
                 command.musicalGenres(),
-                logoAssetId
+                logoAssetId,
+                command.phone(),
+                command.website()
         ));
 
         return accountRepository.save(account);

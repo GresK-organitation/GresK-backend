@@ -1,4 +1,4 @@
-package com.gresk.modules.identity.application.command;
+package com.gresk.modules.account.application.command;
 
 import com.gresk.shared.domain.Role;
 import lombok.Builder;
@@ -12,11 +12,13 @@ public record RegisterPromoterAccountCommand(
         String rawPassword,
         String companyName,
         String country,
-        String address,
+        String street,
         String city,
         String description,
         Set<String> musicalGenres,
-        MultipartFile logo
+        MultipartFile logo,
+        String phone,
+        String website
 ) {
     public Set<Role> roles() {
         return Set.of(Role.PROMOTER_PENDING);

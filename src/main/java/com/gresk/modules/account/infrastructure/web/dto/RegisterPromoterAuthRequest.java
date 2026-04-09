@@ -1,4 +1,4 @@
-package com.gresk.modules.identity.infrastructure.web.dto;
+package com.gresk.modules.account.infrastructure.web.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -9,9 +9,11 @@ public record RegisterPromoterAuthRequest(
         @NotBlank @Email String email,
         @NotBlank String password,
         @NotBlank String name,
+        @NotBlank String street,
         @NotBlank String city,
         @NotBlank String country,
-        String address,
         String description,
-        Set<String> musicalGenres
+        Set<String> musicalGenres,
+        String phone,
+        String website
 ) {}
