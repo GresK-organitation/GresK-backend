@@ -91,6 +91,13 @@ public final class Event {
         this.status = EventStatus.CANCELLED;
     }
 
+    public void decrementCapacity() {
+        if (capacity == null) {
+            throw new IllegalStateException("Event has no capacity set");
+        }
+        this.capacity = capacity.reserve(1);
+    }
+
     public Event withGenre(Genre genre) {
         this.genre = genre;
         return this;
@@ -132,7 +139,4 @@ public final class Event {
     public LocalDateTime getEventDate() { return eventDate; }
     public Location getLocation() { return location; }
     public LocalDateTime getRevealAt() { return revealAt; }
-
-    public void decrementCapacity() {
-    }
 }
