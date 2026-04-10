@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS promoters(
+3CREATE TABLE IF NOT EXISTS promoters(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
@@ -7,6 +7,10 @@ CREATE TABLE IF NOT EXISTS promoters(
     city VARCHAR(100) NOT NULL,
     country VARCHAR(100) NOT NULL,
     address VARCHAR(255),
+    logo_asset_id UUID,
+    phone VARCHAR(50),
+    website VARCHAR(255),
+    street VARCHAR(255),
     status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
     active BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
