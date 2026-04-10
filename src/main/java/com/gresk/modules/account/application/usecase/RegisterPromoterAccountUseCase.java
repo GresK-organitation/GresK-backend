@@ -38,8 +38,12 @@ public class RegisterPromoterAccountUseCase {
 
         String logoAssetId = null;
         if (command.logo() != null && !command.logo().isEmpty()) {
-            AssetId assetId = imageStorage.upload(command.logo(), "promoters/logos");
-            logoAssetId = assetId.value();
+            try {
+                AssetId assetId = imageStorage.upload(command.logo(), "promoters/logos");
+                logoAssetId = assetId.value();
+            } catch (Exception ignored) {
+                // Upload failed (e.g. Cloudinary not configured) — logo is optional
+            }
         }
 
         eventPublisher.publishEvent(new PromoterRegisteredEvent(

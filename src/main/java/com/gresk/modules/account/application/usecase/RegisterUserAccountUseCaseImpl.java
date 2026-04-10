@@ -41,8 +41,12 @@ public class RegisterUserAccountUseCaseImpl implements RegisterUserAccountUseCas
 
         String avatarAssetId = null;
         if (command.avatar() != null && !command.avatar().isEmpty()) {
-            AssetId assetId = imageStorage.upload(command.avatar(), "users/avatars");
-            avatarAssetId = assetId.value();
+            try {
+                AssetId assetId = imageStorage.upload(command.avatar(), "users/avatars");
+                avatarAssetId = assetId.value();
+            } catch (Exception ignored) {
+                // Upload failed (e.g. Cloudinary not configured) — avatar is optional
+            }
         }
 
         eventPublisher.publishEvent(new UserRegisteredEvent(
