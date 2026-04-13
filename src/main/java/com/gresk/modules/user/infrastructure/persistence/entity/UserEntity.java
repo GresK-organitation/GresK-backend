@@ -30,7 +30,7 @@ public class UserEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(length = 500)
+    @Column(length = 600)
     private String description;
 
     @Column(name = "avatar_asset_id", length = 255)
