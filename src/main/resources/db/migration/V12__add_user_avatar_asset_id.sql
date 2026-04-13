@@ -1,2 +1,0 @@
-ALTER TABLE users
-    ADD COLUMN IF NOT EXISTS avatar_asset_id VARCHAR(255);
