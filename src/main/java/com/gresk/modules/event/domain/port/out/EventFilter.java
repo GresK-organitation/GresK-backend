@@ -1,20 +1,27 @@
 package com.gresk.modules.event.domain.port.out;
 
 import com.gresk.modules.event.domain.model.EventStatus;
-import com.gresk.modules.event.domain.model.Genre;
+import com.gresk.shared.domain.MusicGenre;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Optional;
 
 public record EventFilter(
-        Optional<Genre>       genre,
+        Optional<MusicGenre>  genre,
         Optional<String>      city,
-        Optional<LocalDate>   dateFrom,
-        Optional<LocalDate>   dateTo,
+        Optional<Instant>     dateFrom,
+        Optional<Instant>     dateTo,
+        Optional<BigDecimal>  minPrice,
+        Optional<BigDecimal>  maxPrice,
+        Optional<String>      artistName,
         Optional<EventStatus> status
 ) {
     public static EventFilter empty() {
         return new EventFilter(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),

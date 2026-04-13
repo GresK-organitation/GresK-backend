@@ -3,57 +3,75 @@ package com.gresk.modules.event.domain.model;
 import com.gresk.modules.event.domain.exception.IncompleteEventException;
 import com.gresk.modules.event.domain.exception.InvalidEventTransitionException;
 import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
+import com.gresk.shared.domain.MusicGenre;
+import com.gresk.shared.domain.valueobject.ImageUrl;
+import com.gresk.shared.domain.valueobject.Percentage;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.time.Instant;
 
 public final class Event {
 
-    private final EventId id;
-    private final String title;
-    private final PromoterId promoterId;
-    private final LocalDateTime createdAt;
+    private final EventId      id;
+    private final String       title;
+    private final PromoterId   promoterId;
+    private final Instant      createdAt;
 
     private EventStatus status;
-    private Genre genre;
-    private Price price;
-    private Capacity capacity;
-    private LocalDateTime eventDate;
-    private Location location;
-    private LocalDateTime revealAt;
+    private MusicGenre  genre;
+    private Price       price;
+    private Price       discountedPrice;   // null mientras no se aplique descuento
+    private Capacity    capacity;
+    private Instant     eventDate;
+    private Location    location;
+    private Instant     revealAt;
+    private ImageUrl    coverImage;
+    private Artist      artist;
 
-    private Event(EventId id, String title, PromoterId promoterId, Genre genre,
-                  Price price, Capacity capacity, LocalDateTime eventDate,
-                  Location location, LocalDateTime revealAt,
-                  EventStatus status, LocalDateTime createdAt) {
-        this.id = id;
-        this.title = title;
-        this.promoterId = promoterId;
-        this.genre = genre;
-        this.price = price;
-        this.capacity = capacity;
-        this.eventDate = eventDate;
-        this.location = location;
-        this.revealAt = revealAt;
-        this.status = status;
-        this.createdAt = createdAt;
+    private Event(EventId id, String title, PromoterId promoterId,
+                  MusicGenre genre, Price price, Price discountedPrice,
+                  Capacity capacity, Instant eventDate,
+                  Location location, Instant revealAt,
+                  ImageUrl coverImage, Artist artist,
+                  EventStatus status, Instant createdAt) {
+        this.id              = id;
+        this.title           = title;
+        this.promoterId      = promoterId;
+        this.genre           = genre;
+        this.price           = price;
+        this.discountedPrice = discountedPrice;
+        this.capacity        = capacity;
+        this.eventDate       = eventDate;
+        this.location        = location;
+        this.revealAt        = revealAt;
+        this.coverImage      = coverImage;
+        this.artist          = artist;
+        this.status          = status;
+        this.createdAt       = createdAt;
     }
+
+    // ── Factorías ────────────────────────────────────────────────────────────
 
     public static Event create(String title, PromoterId promoterId) {
         return new Event(
                 EventId.generate(), title, promoterId,
-                null, null, null, null, null, null,
-                EventStatus.DRAFT, LocalDateTime.now()
+                null, null, null, null, null, null, null, null, null,
+                EventStatus.DRAFT, Instant.now()
         );
     }
 
     public static Event reconstitute(EventId id, String title, PromoterId promoterId,
-                               Genre genre, Price price, Capacity capacity,
-                               LocalDateTime eventDate, Location location,
-                               LocalDateTime revealAt, EventStatus status,
-                               LocalDateTime createdAt) {
-        return new Event(id, title, promoterId, genre, price, capacity,
-                eventDate, location, revealAt, status, createdAt);
+                                     MusicGenre genre, Price price, Price discountedPrice,
+                                     Capacity capacity, Instant eventDate,
+                                     Location location, Instant revealAt,
+                                     ImageUrl coverImage, Artist artist,
+                                     EventStatus status, Instant createdAt) {
+        return new Event(id, title, promoterId, genre, price, discountedPrice,
+                capacity, eventDate, location, revealAt,
+                coverImage, artist, status, createdAt);
     }
+
+    // ── Comportamientos ──────────────────────────────────────────────────────
 
     public void publish() {
         if (genre == null) {
@@ -98,7 +116,24 @@ public final class Event {
         this.capacity = capacity.reserve(1);
     }
 
-    public Event withGenre(Genre genre) {
+    /**
+     * Aplica un descuento al precio original de forma inmutable.
+     * El precio original se conserva; discountedPrice refleja el precio con descuento.
+     *
+     * @param percent porcentaje entre 0 y 100
+     */
+    public void applyDiscount(Percentage percent) {
+        if (price == null) {
+            throw new IllegalStateException("Cannot apply discount: event has no price set");
+        }
+        BigDecimal reduction = price.amount().multiply(percent.asFraction());
+        BigDecimal newAmount = price.amount().subtract(reduction);
+        this.discountedPrice = new Price(newAmount, price.currency());
+    }
+
+    // ── Builder de estado (fluent setters) ───────────────────────────────────
+
+    public Event withGenre(MusicGenre genre) {
         this.genre = genre;
         return this;
     }
@@ -113,7 +148,7 @@ public final class Event {
         return this;
     }
 
-    public Event withEventDate(LocalDateTime eventDate) {
+    public Event withEventDate(Instant eventDate) {
         this.eventDate = eventDate;
         return this;
     }
@@ -123,20 +158,40 @@ public final class Event {
         return this;
     }
 
-    public Event withRevealAt(LocalDateTime revealAt) {
+    public Event withRevealAt(Instant revealAt) {
         this.revealAt = revealAt;
         return this;
     }
 
-    public EventId getId() { return id; }
-    public String getTitle() { return title; }
-    public PromoterId getPromoterId() { return promoterId; }
-    public EventStatus getStatus() { return status; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public Genre getGenre() { return genre; }
-    public Price getPrice() { return price; }
-    public Capacity getCapacity() { return capacity; }
-    public LocalDateTime getEventDate() { return eventDate; }
-    public Location getLocation() { return location; }
-    public LocalDateTime getRevealAt() { return revealAt; }
+    public Event withCoverImage(ImageUrl coverImage) {
+        this.coverImage = coverImage;
+        return this;
+    }
+
+    public Event withArtist(Artist artist) {
+        this.artist = artist;
+        return this;
+    }
+
+    // ── Getters ──────────────────────────────────────────────────────────────
+
+    public EventId    getId()              { return id; }
+    public String     getTitle()           { return title; }
+    public PromoterId getPromoterId()      { return promoterId; }
+    public EventStatus getStatus()         { return status; }
+    public Instant    getCreatedAt()       { return createdAt; }
+    public MusicGenre getGenre()           { return genre; }
+    public Price      getPrice()           { return price; }
+    public Price      getDiscountedPrice() { return discountedPrice; }
+    public Capacity   getCapacity()        { return capacity; }
+    public Instant    getEventDate()       { return eventDate; }
+    public Location   getLocation()        { return location; }
+    public Instant    getRevealAt()        { return revealAt; }
+    public ImageUrl   getCoverImage()      { return coverImage; }
+    public Artist     getArtist()          { return artist; }
+
+    /** Precio efectivo: usa discountedPrice si existe, si no el original. */
+    public Price effectivePrice() {
+        return discountedPrice != null ? discountedPrice : price;
+    }
 }

@@ -1,22 +1,40 @@
 package com.gresk.modules.event.infrastructure.web;
 
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public record CreateEventRequest(
-        @NotBlank String title,
-        @NotNull  String genre,
+        @NotBlank String  title,
+        @NotNull  String  genre,            // nombre del enum MusicGenre
+
+        // precio
         @NotNull @DecimalMin("0.01") BigDecimal price,
-        @NotBlank String currency,
+        @NotBlank String  currency,
+
+        // aforo
         @NotNull @Min(1) Integer totalCapacity,
-        @NotBlank String city,
-        @NotBlank String address,
-        String venue,
-        @Future LocalDateTime eventDate
+
+        // fechas (ISO-8601 con zona horaria)
+        @NotNull Instant eventDate,
+        Instant          revealAt,          // opcional
+
+        // ubicación
+        @NotBlank String  street,
+        @NotBlank String  city,
+        @NotBlank String  country,
+        String            venue,            // opcional
+        @NotNull Double   latitude,
+        @NotNull Double   longitude,
+
+        // imagen de portada (opcional)
+        String            coverImageUrl,
+
+        // artista (opcional)
+        String            artistName,
+        String            artistImageUrl
 ) {}

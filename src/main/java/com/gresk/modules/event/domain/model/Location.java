@@ -1,17 +1,15 @@
 package com.gresk.modules.event.domain.model;
 
+import com.gresk.shared.domain.valueobject.Address;
+import com.gresk.shared.domain.valueobject.Coordinates;
+
 import java.util.Objects;
 
-public record Location(String city, String address, String venue) {
+public record Location(Address address, Coordinates coordinates, String venue) {
 
     public Location {
-        Objects.requireNonNull(city, "Address city must not be null");
-        Objects.requireNonNull(address, "Address address must not be null");
-        if (city == null || city.isBlank()) {
-            throw new IllegalArgumentException("Address city must not be blank");
-        }
-        if (address == null || address.isBlank()) {
-            throw new IllegalArgumentException("Address address must not be blank");
-        }
+        Objects.requireNonNull(address, "Location address must not be null");
+        Objects.requireNonNull(coordinates, "Location coordinates must not be null");
+        // venue es opcional (puede ser null)
     }
 }
