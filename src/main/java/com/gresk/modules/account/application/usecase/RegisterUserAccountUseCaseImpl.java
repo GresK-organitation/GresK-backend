@@ -48,8 +48,10 @@ public class RegisterUserAccountUseCaseImpl implements RegisterUserAccountUseCas
             avatarAssetId = assetId.value();
         }
 
+        AccountId accountId = accountRepositoryPort.save(account).getId();
+
         eventPublisher.publishEvent(new UserRegisteredEvent(
-                account.getId().value(),
+                accountId.value(),
                 account.getEmail().value(),
                 command.name(),
                 command.description(),
@@ -58,6 +60,6 @@ public class RegisterUserAccountUseCaseImpl implements RegisterUserAccountUseCas
                 avatarAssetId
         ));
 
-        return accountRepositoryPort.save(account).getId();
+        return accountId;
     }
 }

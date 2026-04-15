@@ -32,6 +32,7 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
+    clean-on-validation-error: true
 
 gresk:
   images:
@@ -50,12 +51,10 @@ management:
       # Muestra el estado del DataSource JDBC y el espacio en disco.
 
 # ─── Logging ──────────────────────────────────────────────────────────────────
-  logging:
-    level:
-      root: INFO
-      com.gresk: DEBUG
-      # Logs de seguridad para Spring Security (filtros de Servlet)
-      org.springframework.security: DEBUG
-      # Muestra las queries SQL generadas por Hibernate
-      org.hibernate.SQL: DEBUG
-      org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+logging:
+  level:
+    root: INFO
+    com.gresk: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

@@ -17,7 +17,9 @@ public class GetAccountsForAdminUseCase {
     private final AccountRepositoryPort accountRepositoryPort;
 
     public List<AccountAdminSummary> execute(Role role, String city, String status) {
-        AccountStatus accountStatus = status.isBlank() ? null : AccountStatus.valueOf(status);
+        AccountStatus accountStatus = (status == null || status.isBlank())
+                ? null
+                : AccountStatus.valueOf(status.toUpperCase());
         City cityFilter = (city != null && !city.isBlank()) ? City.of(city.trim()) : null;
         return switch (role) {
             case USER -> accountRepositoryPort.findUsersForAdmin(accountStatus, cityFilter).stream()

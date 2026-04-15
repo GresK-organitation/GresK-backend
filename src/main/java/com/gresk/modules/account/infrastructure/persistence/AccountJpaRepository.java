@@ -29,7 +29,7 @@ public interface AccountJpaRepository extends JpaRepository<AccountEntity, UUID>
             """)
     List<UserEntity> findUsersForAdmin(
             @Param("status") AccountStatus status,
-            @Param("city") City city
+            @Param("city") String city
 
     );
 
@@ -41,6 +41,6 @@ public interface AccountJpaRepository extends JpaRepository<AccountEntity, UUID>
             """)
     List<PromoterEntity> findPromotersForAdmin(
             @Param("status") AccountStatus status,
-            @Param("city") City city
+            @Param("city") String city
     );
 }

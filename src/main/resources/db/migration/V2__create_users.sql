@@ -39,7 +39,7 @@ CREATE TABLE user_roles (
 
     CONSTRAINT pk_user_roles        PRIMARY KEY (user_id, role),
     CONSTRAINT fk_user_roles_user   FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-    CONSTRAINT chk_user_roles_role  CHECK (role IN ('USER', 'ARTIST', 'PROMOTER', 'PROMOTER_PENDING', 'ADMIN'))
+    CONSTRAINT chk_user_roles_role  CHECK (role IN ('USER', 'ARTIST', 'PROMOTER', 'ADMIN'))
 );
 
 CREATE TABLE user_genres (
