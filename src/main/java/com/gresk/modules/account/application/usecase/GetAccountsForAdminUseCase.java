@@ -1,11 +1,12 @@
 package com.gresk.modules.account.application.usecase;
 
 import com.gresk.modules.account.application.dto.AccountAdminSummary;
-import com.gresk.modules.account.domain.port.out.AccountRepositoryPort;
+import com.gresk.modules.account.infrastructure.persistence.AdminPromoterQueryRepository;
+import com.gresk.modules.account.infrastructure.persistence.AdminUserQueryRepository;
 import com.gresk.shared.domain.AccountStatus;
 import com.gresk.shared.domain.Role;
-import com.gresk.shared.domain.valueobject.City;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,36 +15,24 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GetAccountsForAdminUseCase {
 
-    private final AccountRepositoryPort accountRepositoryPort;
+    private final AdminUserQueryRepository adminUserQueryRepository;
+    private final AdminPromoterQueryRepository adminPromoterQueryRepository;
 
-    public List<AccountAdminSummary> execute(Role role, String city, String status) {
+    public List<AccountAdminSummary> execute(Role role, String city, String status, Pageable pageable) {
         AccountStatus accountStatus = (status == null || status.isBlank())
                 ? null
                 : AccountStatus.valueOf(status.toUpperCase());
-        City cityFilter = (city != null && !city.isBlank()) ? City.of(city.trim()) : null;
-        return switch (role) {
-            case USER -> accountRepositoryPort.findUsersForAdmin(accountStatus, cityFilter).stream()
-                    .map(user -> AccountAdminSummary.builder()
-                            .id(user.getId().value())
-                            .name(user.getName().value())
-                            .email(user.getEmail().value())
-                            .city(user.getCity().value())
-                            .status(accountStatus)
-                            .createdAt(user.getCreatedAt())
-                            .build())
-                    .toList();
 
-            case PROMOTER -> accountRepositoryPort.findPromotersForAdmin(accountStatus, cityFilter).stream()
-                    .map(promoter -> AccountAdminSummary.builder()
-                            .id(promoter.getId().value())
-                            .name(promoter.getName().value())
-                            .email(promoter.getEmail().value())
-                            .city(promoter.getAddress().city().value())
-                            .status(accountStatus)
-                            .createdAt(promoter.getCreatedAt())
-                            .build())
-                    .toList();
-            default -> throw new IllegalArgumentException("Unsupported role: " + role);
+        String cityFilter = (city != null && !city.isBlank()) ? city.trim() : null;
+
+        return switch (role) {
+            case USER -> adminUserQueryRepository
+                    .findForAdmin(accountStatus, cityFilter, pageable)
+                    .getContent();
+            case PROMOTER -> adminPromoterQueryRepository
+                    .findForAdmin(accountStatus, cityFilter, pageable)
+                    .getContent();
+            default -> throw new IllegalArgumentException("El rol " + role + " no tiene un listado administrativo.");
         };
     }
 }
