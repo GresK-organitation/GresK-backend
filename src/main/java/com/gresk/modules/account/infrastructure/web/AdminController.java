@@ -2,9 +2,10 @@ package com.gresk.modules.account.infrastructure.web;
 
 import com.gresk.modules.account.application.dto.AccountAdminSummary;
 import com.gresk.modules.account.application.usecase.*;
-import com.gresk.shared.domain.AccountStatus;
 import com.gresk.shared.domain.Role;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +15,7 @@ import java.util.UUID;
 
 @RestController
 @PreAuthorize("hasRole('ADMIN')")
-@RequestMapping("/admin")
+@RequestMapping("/api/v1/admin")
 @RequiredArgsConstructor
 public class AdminController {
     private final ActivateAccountUseCase activateAccountUseCase;
@@ -25,18 +26,20 @@ public class AdminController {
     @GetMapping("/promoters")
     public ResponseEntity<List<AccountAdminSummary>> getPromoters(
             @RequestParam(required = false) String city,
-            @RequestParam(required = false) String status) {
+            @RequestParam(required = false) String status,
+            Pageable pageable) {
 
-        var result = getAccountsUseCase.execute(Role.PROMOTER, city, status);
+        List<AccountAdminSummary> result = getAccountsUseCase.execute(Role.PROMOTER, city, status, pageable);
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/users")
     public ResponseEntity<List<AccountAdminSummary>> getUsers(
             @RequestParam(required = false) String city,
-            @RequestParam(required = false) String status) {
+            @RequestParam(required = false) String status,
+            Pageable pageable) {
 
-        var result = getAccountsUseCase.execute(Role.USER, city, status);
+        List<AccountAdminSummary> result = getAccountsUseCase.execute(Role.USER, city, status, pageable);
         return ResponseEntity.ok(result);
     }
 
