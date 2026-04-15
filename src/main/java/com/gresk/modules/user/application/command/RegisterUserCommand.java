@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 @Builder
 public record RegisterUserCommand(
-        UUID userId,
+        UUID accountId,
         String email,
         String name,
         String description,

@@ -1,5 +1,6 @@
 package com.gresk.modules.user.application.usecase;
 
+import com.gresk.modules.account.domain.model.AccountId;
 import com.gresk.modules.user.application.command.RegisterUserCommand;
 import com.gresk.shared.domain.valueobject.AssetId;
 import com.gresk.shared.domain.valueobject.City;
@@ -36,7 +37,8 @@ public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
         AssetId avatarAssetId = AssetId.of(command.avatarAssetId());
 
         User user = User.create(
-                UserId.of(command.userId()),
+                AccountId.of(command.accountId()),
+                UserId.of(command.accountId()),
                 email,
                 Name.of(command.name()),
                 Description.of(command.description()),

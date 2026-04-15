@@ -17,11 +17,12 @@ import java.util.Optional;
 public class JpaUserRepositoryAdapter implements UserRepositoryPort {
 
     private final JpaUserRepository jpaRepository;
+    private final UserPersistenceMapper mapper;
 
     @Override
     public Optional<User> findById(UserId id) {
         return jpaRepository.findById(id.value())
-                .map(UserPersistenceMapper::toDomain);
+                .map(mapper::toDomain);
     }
 
     @Override
@@ -37,12 +38,11 @@ public class JpaUserRepositoryAdapter implements UserRepositoryPort {
                     existing.updateAvatar(user.getAvatarAssetId().value());
                     existing.updateTier(user.getTier());
                     existing.updateLoyaltyPoints(user.getLoyaltyPoints());
-                    existing.updateStatus(user.getStatus());
                     return existing;
                 })
-                .orElseGet(() -> UserPersistenceMapper.toEntity(user));
+                .orElseGet(() -> mapper.toEntity(user));
 
         UserEntity savedEntity = jpaRepository.save(entity);
-        return UserPersistenceMapper.toDomain(savedEntity);
+        return mapper.toDomain(savedEntity);
     }
 }

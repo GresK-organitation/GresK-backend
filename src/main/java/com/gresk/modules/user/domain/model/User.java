@@ -1,7 +1,7 @@
 package com.gresk.modules.user.domain.model;
 
+import com.gresk.modules.account.domain.model.AccountId;
 import com.gresk.modules.user.domain.exception.InvalidPointsException;
-import com.gresk.shared.domain.AccountStatus;
 import com.gresk.shared.domain.MusicGenre;
 import com.gresk.shared.domain.Role;
 import com.gresk.shared.domain.valueobject.AssetId;
@@ -18,6 +18,7 @@ import java.util.Set;
 public final class User {
     private static final int PREMIUM_THRESHOLD = 500;
 
+    private final AccountId accountId;
     private final UserId id;
     private final Email email;
     private final Instant createdAt;
@@ -27,14 +28,12 @@ public final class User {
     private City city;
     private AssetId avatarAssetId;
     private Set<MusicGenre> musicGenres;
-    private AccountStatus status;
     private UserTier tier;
     private int loyaltyPoints;
     private final Set<Role> roles;
 
-    private User(UserId id, Email email, Name name, Description description, City city,
-                 AssetId avatarAssetId, Set<MusicGenre> musicGenres, AccountStatus status, UserTier tier,
-                 int loyaltyPoints, Set<Role> roles, Instant createdAt) {
+    private User(AccountId accountId, UserId id, Email email, Name name, Description description, City city, AssetId avatarAssetId, Set<MusicGenre> musicGenres, UserTier tier, int loyaltyPoints, Set<Role> roles, Instant createdAt) {
+        this.accountId = Objects.requireNonNull(accountId);
         this.id = Objects.requireNonNull(id);
         this.email = Objects.requireNonNull(email);
         this.name = Objects.requireNonNull(name);
@@ -42,28 +41,22 @@ public final class User {
         this.city = Objects.requireNonNull(city);
         this.avatarAssetId = avatarAssetId != null ? avatarAssetId : new AssetId(null);
         this.musicGenres = musicGenres != null ? new HashSet<>(musicGenres) : new HashSet<>();
-        this.status = Objects.requireNonNull(status);
         this.tier = Objects.requireNonNull(tier);
         this.loyaltyPoints = loyaltyPoints;
         this.roles = roles != null ? Set.copyOf(roles) : Set.of(Role.USER);
         this.createdAt = Objects.requireNonNull(createdAt);
     }
 
-    public static User create(UserId id, Email email, Name name, Description description, City city, Set<MusicGenre> musicGenres) {
-        return new User(id, email, name, description, city, new AssetId(null), musicGenres,
-                AccountStatus.ACTIVE, UserTier.FREE, 0, Set.of(Role.USER), Instant.now());
+    public static User create(AccountId accountId, UserId id, Email email, Name name, Description description, City city, Set<MusicGenre> musicGenres) {
+        return new User(accountId, id, email, name, description, city, new AssetId(null), musicGenres, UserTier.FREE, 0, Set.of(Role.USER), Instant.now());
     }
 
-    public static User create(UserId id, Email email, Name name, Description description, City city,
-                               AssetId avatarAssetId, Set<MusicGenre> musicGenres) {
-        return new User(id, email, name, description, city, avatarAssetId, musicGenres,
-                AccountStatus.ACTIVE, UserTier.FREE, 0, Set.of(Role.USER), Instant.now());
+    public static User create(AccountId accountId, UserId id, Email email, Name name, Description description, City city, AssetId avatarAssetId, Set<MusicGenre> musicGenres) {
+        return new User(accountId, id, email, name, description, city, avatarAssetId, musicGenres, UserTier.FREE, 0, Set.of(Role.USER), Instant.now());
     }
 
-    public static User reconstitute(UserId id, Email email, Name name, Description description, City city,
-                                    AssetId avatarAssetId, Set<MusicGenre> musicGenres, AccountStatus status, UserTier tier,
-                                    int loyaltyPoints, Set<Role> roles, Instant createdAt) {
-        return new User(id, email, name, description, city, avatarAssetId, musicGenres, status, tier, loyaltyPoints, roles, createdAt);
+    public static User reconstitute(AccountId accountId, UserId id, Email email, Name name, Description description, City city, AssetId avatarAssetId, Set<MusicGenre> musicGenres, UserTier tier, int loyaltyPoints, Set<Role> roles, Instant createdAt) {
+        return new User(accountId, id, email, name, description, city, avatarAssetId, musicGenres, tier, loyaltyPoints, roles, createdAt);
     }
 
     public void updateProfile(Name name, Description description, City city, Set<MusicGenre> genres) {
@@ -74,33 +67,9 @@ public final class User {
     }
 
     public void addPoints(int points) {
-        if (this.status == AccountStatus.SUSPENDED) {
-            throw new IllegalStateException("Suspended users cannot earn points");
-        }
         if (points <= 0) throw new InvalidPointsException("Points must be positive");
         this.loyaltyPoints += points;
         checkTierUpgrade();
-    }
-
-    public void suspendAccount() {
-        if (this.status == AccountStatus.DELETED) {
-            throw new IllegalStateException("Cannot suspend a deleted user");
-        }
-        if (this.status == AccountStatus.SUSPENDED) {
-            throw new IllegalStateException("User is already suspended");
-        }
-        this.status = AccountStatus.SUSPENDED;
-    }
-
-    public void reactivateAccount() {
-        if (this.status != AccountStatus.SUSPENDED) {
-            throw new IllegalStateException("Only suspended users can be reactivated");
-        }
-        this.status = AccountStatus.ACTIVE;
-    }
-
-    public void deleteAccount() {
-        this.status = AccountStatus.DELETED;
     }
 
     private void checkTierUpgrade() {
@@ -113,17 +82,55 @@ public final class User {
         this.avatarAssetId = assetId != null ? assetId : new AssetId(null);
     }
 
-    public City getCity() { return city; }
-    public void changeCity(City newCity) { this.city = Objects.requireNonNull(newCity); }
-    public UserId getId() { return id; }
-    public Email getEmail() { return email; }
-    public Name getName() { return name; }
-    public Description getDescription() { return description; }
-    public AssetId getAvatarAssetId() { return avatarAssetId; }
-    public Set<MusicGenre> getMusicGenres() { return Set.copyOf(musicGenres); }
-    public AccountStatus getStatus() { return status; }
-    public UserTier getTier() { return tier; }
-    public int getLoyaltyPoints() { return loyaltyPoints; }
-    public Set<Role> getRoles() { return roles; }
-    public Instant getCreatedAt() { return createdAt; }
+    public void changeCity(City newCity) {
+        this.city = Objects.requireNonNull(newCity);
+    }
+
+    public AccountId getAccountId() {
+        return accountId;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public UserId getId() {
+        return id;
+    }
+
+    public Email getEmail() {
+        return email;
+    }
+
+    public Name getName() {
+        return name;
+    }
+
+    public Description getDescription() {
+        return description;
+    }
+
+    public AssetId getAvatarAssetId() {
+        return avatarAssetId;
+    }
+
+    public Set<MusicGenre> getMusicGenres() {
+        return Set.copyOf(musicGenres);
+    }
+
+    public UserTier getTier() {
+        return tier;
+    }
+
+    public int getLoyaltyPoints() {
+        return loyaltyPoints;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
 }
