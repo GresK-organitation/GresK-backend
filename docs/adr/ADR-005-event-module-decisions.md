@@ -464,7 +464,7 @@ dentro de la cadena reactiva:
 ```java
 public Mono<Event> execute(CreateEventCommand command) {
     return Mono.defer(() -> {
-        // Si PromoterId.of(command.promoterId()) lanza IllegalArgumentException,
+        // Si PromoterId.of(command.accountId()) lanza IllegalArgumentException,
         // el error queda capturado en el Mono, no se propaga síncronamente.
         PromoterId promoterId = PromoterId.of(command.promoterId());
         return Mono.fromCallable(() -> Event.create(...))
