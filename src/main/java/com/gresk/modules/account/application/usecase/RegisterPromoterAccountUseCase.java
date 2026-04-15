@@ -45,8 +45,10 @@ public class RegisterPromoterAccountUseCase {
             logoAssetId = assetId.value();
         }
 
+        AccountId accountId = accountRepository.save(account).getId();
+
         eventPublisher.publishEvent(new PromoterRegisteredEvent(
-                account.getId().value(),
+                accountId.value(),
                 account.getEmail().value(),
                 command.companyName(),
                 command.description(),
@@ -59,6 +61,6 @@ public class RegisterPromoterAccountUseCase {
                 command.website()
         ));
 
-        return accountRepository.save(account).getId();
+        return accountId;
     }
 }
