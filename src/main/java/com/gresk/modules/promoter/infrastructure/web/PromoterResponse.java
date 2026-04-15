@@ -13,7 +13,6 @@ public record PromoterResponse(
         String country,
         String logoUrl,
         String description,
-        String status,
         Set<String> musicalGenres,
         String createdAt
 ) {
@@ -27,7 +26,6 @@ public record PromoterResponse(
                 dto.country(),
                 dto.logoUrl(),
                 dto.description(),
-                dto.status(),
                 dto.musicalGenres(),
                 dto.createdAt()
         );

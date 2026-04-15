@@ -14,6 +14,5 @@ public interface PromoterRepositoryPort {
     Optional<Promoter> findById(PromoterId id);
     Optional<Promoter> findByEmail(Email email);
     boolean existsByEmail(Email email);
-    List<Promoter> findAllActive();
     List<Promoter> findByGenre(MusicGenre genre);
 }

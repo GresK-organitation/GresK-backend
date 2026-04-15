@@ -34,7 +34,6 @@ public class JpaPromoterRepositoryAdapter implements PromoterRepositoryPort {
                             promoter.getMusicalGenres()
                     );
                     existing.updateLogo(promoter.getLogoAssetId().value());
-                    existing.updateStatus(promoter.getStatus());
                     return existing;
                 })
                 .orElseGet(() -> mapper.toEntity(promoter));
@@ -56,12 +55,6 @@ public class JpaPromoterRepositoryAdapter implements PromoterRepositoryPort {
         return repository.existsByEmail(email.value());
     }
 
-    @Override
-    public List<Promoter> findAllActive() {
-        return repository.findAllActive().stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
-    }
 
     @Override
     public List<Promoter> findByGenre(MusicGenre genre) {
