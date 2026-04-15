@@ -2,7 +2,7 @@
 -- V4: events
 --
 -- Event aggregate:
---   id, title, promoterId (FK→promoters),
+--   id, title, accountId (FK→promoters),
 --   status, genre (MusicGenre),
 --   price (amount + currency), discountedPrice (discounted_amount),
 --   capacity (total_capacity + available_capacity),
