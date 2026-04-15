@@ -42,7 +42,14 @@ public class GetPromoterDashboardUseCase implements GetPromoterDashboardPort {
                 promoter.getMusicalGenres().stream()
                         .map(Enum::name)
                         .collect(Collectors.toSet()),
-                stats.averageRating()
+                stats.totalRevenue(),
+                stats.totalEvents(),
+                stats.averageRating(),
+                stats.totalAttendees(),
+                stats.sellThrough(),
+                stats.activeEvents(),
+                stats.pendingEvents(),
+                stats.avgTicketPrice()
         );
     }
 }

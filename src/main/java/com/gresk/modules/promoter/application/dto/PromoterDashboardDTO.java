@@ -1,5 +1,6 @@
 package com.gresk.modules.promoter.application.dto;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 public record PromoterDashboardDTO(
@@ -10,5 +11,13 @@ public record PromoterDashboardDTO(
         String city,
         String country,
         Set<String> musicalGenres,
-        double averageRating
+        // ── Stats agregadas ──────────────────────────────────────────────────
+        BigDecimal totalRevenue,
+        long totalEvents,
+        double averageRating,
+        long totalAttendees,
+        double sellThrough,
+        long activeEvents,
+        long pendingEvents,
+        BigDecimal avgTicketPrice
 ) {}
