@@ -20,7 +20,4 @@ public record RegisterPromoterAccountCommand(
         String phone,
         String website
 ) {
-    public Set<Role> roles() {
-        return Set.of(Role.PROMOTER_PENDING);
-    }
 }

@@ -8,7 +8,8 @@ import com.gresk.modules.account.domain.model.Account;
 import com.gresk.modules.account.domain.model.AccountId;
 import com.gresk.modules.account.domain.port.out.AccountRepositoryPort;
 import com.gresk.shared.domain.AccountStatus;
-import com.gresk.shared.domain.event.UserRegisteredEvent;
+import com.gresk.modules.account.infrastructure.event.UserRegisteredEvent;
+import com.gresk.shared.domain.Role;
 import com.gresk.shared.domain.port.out.ImageStoragePort;
 import com.gresk.shared.domain.valueobject.AssetId;
 import com.gresk.shared.domain.valueobject.Email;
@@ -16,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +40,7 @@ public class RegisterUserAccountUseCaseImpl implements RegisterUserAccountUseCas
 
         String passwordHash = passwordHasherPort.hash(command.rawPassword());
 
-        Account account = Account.create(email, passwordHash, command.roles(), AccountStatus.ACTIVE);
+        Account account = Account.create(email, passwordHash, Set.of(Role.USER), AccountStatus.ACTIVE);
 
         String avatarAssetId = null;
         if (command.avatar() != null && !command.avatar().isEmpty()) {
@@ -55,6 +58,6 @@ public class RegisterUserAccountUseCaseImpl implements RegisterUserAccountUseCas
                 avatarAssetId
         ));
 
-        return accountRepositoryPort.save(account);
+        return accountRepositoryPort.save(account).getId();
     }
 }
