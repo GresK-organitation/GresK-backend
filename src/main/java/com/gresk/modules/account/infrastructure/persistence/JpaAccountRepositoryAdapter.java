@@ -53,17 +53,4 @@ public class JpaAccountRepositoryAdapter implements AccountRepositoryPort {
         return jpaRepository.findById(accountId.value())
                 .map(mapper::toDomain);
     }
-
-    @Override
-    public List<User> findUsersForAdmin(AccountStatus status, City cityFilter) {
-        return jpaRepository.findUsersForAdmin(status, cityFilter != null ? cityFilter.value() : null)
-                .stream().map(userMapper::toDomain).toList();
-    }
-
-    @Override
-    public List<Promoter> findPromotersForAdmin(AccountStatus status, City cityFilter) {
-        return jpaRepository.findPromotersForAdmin(status, cityFilter != null ? cityFilter.value() : null)
-                .stream().map(promoterMapper::toDomain).toList();
-    }
-
 }
