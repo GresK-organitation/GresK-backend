@@ -1,4 +1,4 @@
-package com.gresk.shared.domain.event;
+package com.gresk.modules.account.infrastructure.event;
 
 import java.util.Set;
 import java.util.UUID;

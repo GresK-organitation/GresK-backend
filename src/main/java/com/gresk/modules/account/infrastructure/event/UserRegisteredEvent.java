@@ -1,10 +1,10 @@
-package com.gresk.shared.domain.event;
+package com.gresk.modules.account.infrastructure.event;
 
 import java.util.Set;
 import java.util.UUID;
 
 public record UserRegisteredEvent(
-        UUID userId,
+        UUID accountId,
         String email,
         String name,
         String description,
