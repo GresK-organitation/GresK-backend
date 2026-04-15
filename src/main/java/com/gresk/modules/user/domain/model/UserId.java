@@ -18,8 +18,8 @@ public record UserId(UUID value) {
     public static UserId from(String value) {
         try {
             return new UserId(UUID.fromString(value));
-        } catch (IllegalArgumentException | NullPointerException e) {
-            throw new InvalidIdException("Invalid UUID format: " + value);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidIdException("Invalid UUID format for UserId: " + value);
         }
     }
 

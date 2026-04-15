@@ -2,7 +2,7 @@ package com.gresk.modules.user.infrastructure.event;
 
 import com.gresk.modules.user.application.command.RegisterUserCommand;
 import com.gresk.modules.user.domain.port.in.RegisterUserUseCase;
-import com.gresk.shared.domain.event.UserRegisteredEvent;
+import com.gresk.modules.account.infrastructure.event.UserRegisteredEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -16,7 +16,7 @@ public class UserModuleEventListener {
     @EventListener
     public void on(UserRegisteredEvent event) {
         registerUserUseCase.execute(RegisterUserCommand.builder()
-                .userId(event.userId())
+                .accountId(event.accountId())
                 .email(event.email())
                 .name(event.name())
                 .description(event.description())

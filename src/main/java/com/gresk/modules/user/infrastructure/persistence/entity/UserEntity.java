@@ -1,7 +1,7 @@
 package com.gresk.modules.user.infrastructure.persistence.entity;
 
+import com.gresk.modules.account.domain.model.AccountId;
 import com.gresk.modules.user.domain.model.UserTier;
-import com.gresk.shared.domain.AccountStatus;
 import com.gresk.shared.domain.MusicGenre;
 import com.gresk.shared.domain.Role;
 import jakarta.persistence.*;
@@ -21,8 +21,11 @@ import java.util.UUID;
 public class UserEntity {
 
     @Id
-    @Column(columnDefinition = "UUID", updatable = false)
+    @Column(columnDefinition = "UUID", updatable = false,  nullable = false)
     private UUID id;
+
+    @Column(name = "account_id", nullable = false, unique = true)
+    private UUID accountId;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -38,10 +41,6 @@ public class UserEntity {
 
     @Column(nullable = false, length = 100)
     private String city;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private AccountStatus status;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -95,10 +94,6 @@ public class UserEntity {
 
     public void updateAvatar(String avatarAssetId) {
         this.avatarAssetId = avatarAssetId;
-    }
-
-    public void updateStatus(AccountStatus status) {
-        this.status = status;
     }
 
     public void updateTier(UserTier tier) {
