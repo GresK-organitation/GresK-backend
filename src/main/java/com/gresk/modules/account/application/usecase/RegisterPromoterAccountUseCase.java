@@ -7,7 +7,8 @@ import com.gresk.modules.account.domain.model.Account;
 import com.gresk.modules.account.domain.model.AccountId;
 import com.gresk.modules.account.domain.port.out.AccountRepositoryPort;
 import com.gresk.shared.domain.AccountStatus;
-import com.gresk.shared.domain.event.PromoterRegisteredEvent;
+import com.gresk.modules.account.infrastructure.event.PromoterRegisteredEvent;
+import com.gresk.shared.domain.Role;
 import com.gresk.shared.domain.port.out.ImageStoragePort;
 import com.gresk.shared.domain.valueobject.AssetId;
 import com.gresk.shared.domain.valueobject.Email;
@@ -15,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +37,7 @@ public class RegisterPromoterAccountUseCase {
         }
 
         String passwordHash = passwordHasher.hash(command.rawPassword());
-        Account account = Account.create(email, passwordHash, command.roles(), AccountStatus.PENDING);
+        Account account = Account.create(email, passwordHash, Set.of(Role.PROMOTER) , AccountStatus.PENDING);
 
         String logoAssetId = null;
         if (command.logo() != null && !command.logo().isEmpty()) {
@@ -56,6 +59,6 @@ public class RegisterPromoterAccountUseCase {
                 command.website()
         ));
 
-        return accountRepository.save(account);
+        return accountRepository.save(account).getId();
     }
 }
