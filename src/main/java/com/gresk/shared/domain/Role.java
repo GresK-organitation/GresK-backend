@@ -4,6 +4,5 @@ public enum Role {
     USER,
     ARTIST,
     PROMOTER,
-    PROMOTER_PENDING,
     ADMIN
 }
