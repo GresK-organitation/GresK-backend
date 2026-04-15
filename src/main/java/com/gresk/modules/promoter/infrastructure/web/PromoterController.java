@@ -3,8 +3,10 @@ package com.gresk.modules.promoter.infrastructure.web;
 import com.gresk.infrastructure.security.SecurityContextService;
 import com.gresk.modules.promoter.application.command.UpdatePromoterProfileCommand;
 import com.gresk.modules.promoter.application.dto.PromoterDashboardDTO;
+import com.gresk.modules.promoter.application.dto.PromoterEventDTO;
 import com.gresk.modules.promoter.application.port.in.GetPromoterByAccountIdPort;
 import com.gresk.modules.promoter.application.port.in.GetPromoterDashboardPort;
+import com.gresk.modules.promoter.application.port.in.GetPromoterEventsPort;
 import com.gresk.modules.promoter.application.port.in.UpdatePromoterLogoPort;
 import com.gresk.modules.promoter.application.port.in.UpdatePromoterProfilePort;
 import jakarta.validation.Valid;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -23,6 +26,7 @@ public class PromoterController {
 
     private final GetPromoterByAccountIdPort getByAccountIdUseCase;
     private final GetPromoterDashboardPort getDashboardUseCase;
+    private final GetPromoterEventsPort getEventsUseCase;
     private final UpdatePromoterProfilePort updateUseCase;
     private final UpdatePromoterLogoPort updateLogoUseCase;
     private final SecurityContextService securityContextService;
@@ -37,6 +41,12 @@ public class PromoterController {
     public ResponseEntity<PromoterDashboardDTO> getDashboard() {
         UUID accountId = securityContextService.currentUserId();
         return ResponseEntity.ok(getDashboardUseCase.execute(accountId));
+    }
+
+    @GetMapping("/me/events")
+    public ResponseEntity<List<PromoterEventDTO>> getMyEvents() {
+        UUID accountId = securityContextService.currentUserId();
+        return ResponseEntity.ok(getEventsUseCase.execute(accountId));
     }
 
     @PutMapping("/me")

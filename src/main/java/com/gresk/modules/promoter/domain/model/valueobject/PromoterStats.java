@@ -5,5 +5,10 @@ import java.math.BigDecimal;
 public record PromoterStats(
         BigDecimal totalRevenue,
         long totalEvents,
-        double averageRating
+        double averageRating,
+        long totalAttendees,
+        double sellThrough,
+        long activeEvents,
+        long pendingEvents,
+        BigDecimal avgTicketPrice
 ) {}
