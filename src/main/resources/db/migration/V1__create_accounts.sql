@@ -29,7 +29,7 @@ CREATE TABLE account_roles (
 
     CONSTRAINT pk_account_roles            PRIMARY KEY (account_id, role),
     CONSTRAINT fk_account_roles_account    FOREIGN KEY (account_id) REFERENCES accounts (id) ON DELETE CASCADE,
-    CONSTRAINT chk_account_roles_role      CHECK (role IN ('USER', 'ARTIST', 'PROMOTER', 'PROMOTER_PENDING', 'ADMIN'))
+    CONSTRAINT chk_account_roles_role      CHECK (role IN ('USER', 'ARTIST', 'PROMOTER', 'ADMIN'))
 );
 
 CREATE INDEX idx_accounts_email  ON accounts (email);
