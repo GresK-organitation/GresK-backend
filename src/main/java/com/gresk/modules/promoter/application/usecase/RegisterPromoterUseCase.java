@@ -1,5 +1,6 @@
 package com.gresk.modules.promoter.application.usecase;
 
+import com.gresk.modules.account.domain.model.AccountId;
 import com.gresk.modules.promoter.application.command.RegisterPromoterCommand;
 import com.gresk.modules.promoter.application.port.in.RegisterPromoterPort;
 import com.gresk.modules.promoter.domain.exception.EmailAlreadyExistsException;
@@ -48,7 +49,8 @@ public class RegisterPromoterUseCase implements RegisterPromoterPort {
                 : new LinkedHashSet<>();
 
         Promoter promoter = Promoter.create(
-                PromoterId.of(command.promoterId().toString()),
+                PromoterId.of(command.accountId()),
+                AccountId.of(command.accountId()),
                 logoAssetId,
                 email,
                 name,

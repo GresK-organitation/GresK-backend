@@ -4,7 +4,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public record RegisterPromoterCommand(
-        UUID promoterId,
+        UUID accountId,
         String email,
         String name,
         String street,

@@ -11,7 +11,6 @@ public record PromoterProfileDTO(
         String country,
         String logoUrl,
         String description,
-        String status,
         Set<String> musicalGenres,
         String createdAt
 ) {}

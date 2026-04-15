@@ -38,7 +38,6 @@ public class GetPromoterByAccountIdUseCase implements GetPromoterByAccountIdPort
                 promoter.getAddress().country(),
                 logoUrl,
                 promoter.getDescription().value(),
-                promoter.getStatus().name(),
                 promoter.getMusicalGenres().stream()
                         .map(Enum::name)
                         .collect(Collectors.toSet()),
