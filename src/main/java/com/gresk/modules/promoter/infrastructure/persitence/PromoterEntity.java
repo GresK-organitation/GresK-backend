@@ -1,6 +1,5 @@
 package com.gresk.modules.promoter.infrastructure.persitence;
 
-import com.gresk.shared.domain.AccountStatus;
 import com.gresk.shared.domain.MusicGenre;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,8 +18,11 @@ import java.util.UUID;
 public class PromoterEntity {
 
     @Id
-    @Column(columnDefinition = "UUID", updatable = false)
+    @Column(columnDefinition = "UUID", updatable = false, nullable = false)
     private UUID id;
+
+    @Column(name = "account_id", nullable = false, unique = true)
+    private UUID accountId;
 
     @Column(nullable = false, unique = true, length = 255)
     private String email;
@@ -48,10 +50,6 @@ public class PromoterEntity {
 
     @Column(length = 255)
     private String website;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private AccountStatus status;
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "promoter_genres", joinColumns = @JoinColumn(name = "promoter_id"))
@@ -83,23 +81,18 @@ public class PromoterEntity {
 
     public void updateProfile(String name, String description,
                                String city, String country, String street,
-                               String phone, String website,
-                               Set<MusicGenre> genres) {
-        this.name = name;
+                               String phone, String website, Set<MusicGenre> genres) {
+        this.name        = name;
         this.description = description;
-        this.city = city;
-        this.country = country;
-        this.street = street;
-        this.phone = phone;
-        this.website = website;
-        this.genres = new HashSet<>(genres);
+        this.city        = city;
+        this.country     = country;
+        this.street      = street;
+        this.phone       = phone;
+        this.website     = website;
+        this.genres      = new HashSet<>(genres);
     }
 
     public void updateLogo(String logoAssetId) {
         this.logoAssetId = logoAssetId;
-    }
-
-    public void updateStatus(AccountStatus status) {
-        this.status = status;
     }
 }

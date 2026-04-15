@@ -2,7 +2,7 @@ package com.gresk.modules.promoter.domain.model.valueobject;
 
 import java.util.UUID;
 
-public record PromoterId (UUID value){
+public record PromoterId(UUID value) {
     public PromoterId {
         if (value == null) throw new IllegalArgumentException("PromoterId cannot be null");
     }
@@ -17,6 +17,10 @@ public record PromoterId (UUID value){
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid PromoterId format: " + value, e);
         }
+    }
+
+    public static PromoterId of(UUID value) {
+        return new PromoterId(value);
     }
 
     @Override

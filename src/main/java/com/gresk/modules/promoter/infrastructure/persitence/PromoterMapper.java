@@ -1,5 +1,6 @@
 package com.gresk.modules.promoter.infrastructure.persitence;
 
+import com.gresk.modules.account.domain.model.AccountId;
 import com.gresk.modules.promoter.domain.model.Promoter;
 import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import com.gresk.shared.domain.valueobject.Address;
@@ -18,13 +19,13 @@ public class PromoterMapper {
     public Promoter toDomain(PromoterEntity entity) {
         return Promoter.reconstitute(
                 PromoterId.of(entity.getId().toString()),
+                new AccountId(entity.getAccountId()),
                 new AssetId(entity.getLogoAssetId()),
                 new Email(entity.getEmail()),
                 new Name(entity.getName()),
                 new Address(entity.getStreet(), City.of(entity.getCity()), entity.getCountry()),
                 new Description(entity.getDescription()),
                 entity.getGenres(),
-                entity.getStatus(),
                 entity.getCreatedAt(),
                 entity.getPhone(),
                 entity.getWebsite()
@@ -34,6 +35,7 @@ public class PromoterMapper {
     public PromoterEntity toEntity(Promoter promoter) {
         return PromoterEntity.builder()
                 .id(promoter.getId().value())
+                .accountId(promoter.getAccountId().value())
                 .email(promoter.getEmail().value())
                 .name(promoter.getName().value())
                 .description(promoter.getDescription().value())
@@ -43,7 +45,6 @@ public class PromoterMapper {
                 .country(promoter.getAddress().country())
                 .phone(promoter.getPhone())
                 .website(promoter.getWebsite())
-                .status(promoter.getStatus())
                 .createdAt(promoter.getCreatedAt())
                 .updatedAt(Instant.now())
                 .genres(promoter.getMusicalGenres())
