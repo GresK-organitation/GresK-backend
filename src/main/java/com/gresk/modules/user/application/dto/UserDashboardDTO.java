@@ -12,6 +12,7 @@ public record UserDashboardDTO(
         String currentTier,
         String city,
         int loyaltyPoints,
+        List<String> musicGenres,
         Set<EventRecommendedDTO> recommendedEvents,
         Set<MusicRecommendedDTO> recommendedMusic
 ) {

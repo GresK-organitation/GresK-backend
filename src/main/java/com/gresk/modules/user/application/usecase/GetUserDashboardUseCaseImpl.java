@@ -31,6 +31,7 @@ public class GetUserDashboardUseCaseImpl implements GetUserDashboardUseCase {
     @Value("${gresk.images.default-url}")
     private String defaultImageUrl;
 
+    @Transactional(readOnly = true)
     @Override
     public UserDashboardDTO execute(UUID id) {
         UserId userId = UserId.of(id);
@@ -55,6 +56,7 @@ public class GetUserDashboardUseCaseImpl implements GetUserDashboardUseCase {
                 user.getTier().name(),
                 user.getCity().value(),
                 user.getLoyaltyPoints(),
+                user.getMusicGenres().stream().map(Enum::name).toList(),
                 topEvents,
                 topTracks
         );
