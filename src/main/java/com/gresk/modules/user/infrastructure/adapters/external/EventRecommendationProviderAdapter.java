@@ -1,4 +1,4 @@
-package com.gresk.modules.user.infrastructure.in.external;
+package com.gresk.modules.user.infrastructure.adapters.external;
 
 import com.gresk.shared.domain.valueobject.City;
 import com.gresk.modules.user.domain.model.EventRecommendation;
