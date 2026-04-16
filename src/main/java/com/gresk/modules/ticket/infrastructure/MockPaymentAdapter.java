@@ -7,11 +7,13 @@ import com.gresk.modules.event.domain.model.Price;
 import com.gresk.modules.ticket.domain.model.PaymentResult;
 import com.gresk.modules.ticket.domain.port.out.PaymentGateway;
 import com.gresk.modules.user.domain.model.UserId;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
 @Component
+@Profile("prod")
 public class MockPaymentAdapter implements PaymentGateway {
 
     @Override

@@ -1,5 +1,7 @@
 package com.gresk.modules.event.domain.model;
 
+import com.gresk.modules.event.domain.exception.EventSoldOutException;
+
 public record Capacity(int total, int available) {
 
     public Capacity {
@@ -20,7 +22,7 @@ public record Capacity(int total, int available) {
 
     public Capacity reserve(int seats) {
         if (seats > available)
-            throw new IllegalArgumentException("Not enough available seats");
+            throw new EventSoldOutException("available=" + available + ", requested=" + seats);
         return new Capacity(total, available - seats);
     }
 }

@@ -9,15 +9,35 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Repositorio de solo lectura para obtener los eventos de un promotor.
- * Vive en el módulo Promoter para evitar dependencias inversas hacia
- * el módulo Event. Reutiliza EventEntity directamente sobre la tabla events.
+ * Read-only repository in the Promoter module.
+ * Uses a native SQL LEFT JOIN to fetch event data together with real ticket
+ * sales metrics in a single query (avoids N+1).
  */
 public interface PromoterEventQueryRepository extends Repository<EventEntity, UUID> {
 
-    /**
-     * Devuelve todos los eventos de un promotor ordenados por fecha descendente.
-     */
-    @Query("SELECT e FROM EventEntity e WHERE e.promoterId = :promoterId ORDER BY e.eventDate DESC")
-    List<EventEntity> findAllByPromoterId(@Param("promoterId") UUID promoterId);
+    @Query(value = """
+            SELECT e.id,
+                   e.title,
+                   e.event_date,
+                   e.venue,
+                   e.city,
+                   e.status::text          AS status,
+                   e.total_capacity,
+                   e.amount,
+                   e.discounted_amount,
+                   e.genre::text           AS genre,
+                   e.cover_image_url,
+                   COUNT(t.id)             AS tickets_sold
+            FROM   events e
+            LEFT JOIN tickets t
+                   ON t.event_id = e.id
+                  AND t.status IN ('PURCHASED', 'USED')
+            WHERE  e.promoter_id = :promoterId
+            GROUP  BY e.id
+            ORDER  BY e.event_date DESC
+            """,
+            nativeQuery = true)
+    List<PromoterEventSummary> findAllWithMetricsByPromoterId(
+            @Param("promoterId") UUID promoterId
+    );
 }
