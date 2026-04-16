@@ -12,6 +12,6 @@ public interface EventRepository {
     Optional<Event> findById(EventId id);
     List<Event> findAll(EventFilter filter, PageRequest pageRequest);
     long count(EventFilter filter);
-    boolean existsById(EventId id);
-
+    boolean     existsById(EventId id);
+    List<Event> findLastMinute();
 }

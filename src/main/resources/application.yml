@@ -4,7 +4,7 @@ spring:
 
   # CONFIGURACIÓN CRUCIAL: Debe estar al mismo nivel que 'application'
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/gresk_db}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/gresk_db}
     username: ${SPRING_DATASOURCE_USERNAME:admin}
     password: ${SPRING_DATASOURCE_PASSWORD:secretpass}
     driver-class-name: org.postgresql.Driver

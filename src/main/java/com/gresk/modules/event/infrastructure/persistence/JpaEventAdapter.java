@@ -47,4 +47,12 @@ public class JpaEventAdapter implements EventRepository {
                 .map(mapper::toDomain)
                 .toList();
     }
+
+    @Override
+    public List<Event> findLastMinute() {
+        return repo.findLastMinuteEvents()
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
 }

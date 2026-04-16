@@ -7,6 +7,7 @@ import com.gresk.modules.event.application.query.GetEventQuery;
 import com.gresk.modules.event.application.usecase.CreateEventCommand;
 import com.gresk.modules.event.application.usecase.CreateEventUseCase;
 import com.gresk.modules.event.application.usecase.GetEventUseCase;
+import com.gresk.modules.event.application.usecase.GetLastMinuteEventsUseCase;
 import com.gresk.modules.event.application.usecase.ListEventsUseCase;
 import com.gresk.modules.event.application.usecase.PublishEventUseCase;
 import com.gresk.modules.event.domain.model.EventStatus;
@@ -31,11 +32,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class EventController {
 
-    private final CreateEventUseCase  createUseCase;
-    private final PublishEventUseCase publishUseCase;
-    private final GetEventUseCase     getUseCase;
-    private final ListEventsUseCase   listUseCase;
-    private final EventResponseMapper mapper;
+    private final CreateEventUseCase         createUseCase;
+    private final PublishEventUseCase        publishUseCase;
+    private final GetEventUseCase            getUseCase;
+    private final ListEventsUseCase          listUseCase;
+    private final GetLastMinuteEventsUseCase getLastMinuteUseCase;
+    private final EventResponseMapper        mapper;
 
     // ── POST /api/v1/events ──────────────────────────────────────────────────
     @PostMapping
@@ -114,5 +116,16 @@ public class EventController {
         long total = listUseCase.count(filter);
 
         return ResponseEntity.ok(PageResponse.of(content, total, pageRequest));
+    }
+
+    // ── GET /api/v1/events/last-minute ───────────────────────────────────────
+    @GetMapping("/last-minute")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<EventResponse>> getLastMinute() {
+        List<EventResponse> result = getLastMinuteUseCase.execute()
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
+        return ResponseEntity.ok(result);
     }
 }
