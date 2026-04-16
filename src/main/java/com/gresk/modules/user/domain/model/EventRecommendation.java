@@ -1,15 +1,17 @@
 package com.gresk.modules.user.domain.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 public record EventRecommendation(
-        String eventId,
-        String title,
-        String location,
+        String        eventId,
+        String        title,
+        String        location,
         LocalDateTime dateTime,
-        String imageUrl,
-        String category
+        String        imageUrl,
+        String        category,
+        BigDecimal    price        // precio efectivo del evento (discountedAmount ?? amount)
 ) {
     public EventRecommendation {
         Objects.requireNonNull(eventId, "Event ID is required");

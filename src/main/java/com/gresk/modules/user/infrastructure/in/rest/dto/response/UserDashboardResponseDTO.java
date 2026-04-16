@@ -21,12 +21,14 @@ public record UserDashboardResponseDTO(
             String date,
             String time,
             String imageUrl,
-            String category
+            String category,
+            String price          // precio efectivo del evento
     ) {
         public static EventResponseDTO from(EventRecommendedDTO dto) {
             return new EventResponseDTO(
                     dto.id(), dto.title(), dto.location(),
-                    dto.date(), dto.time(), dto.imageUrl(), dto.category()
+                    dto.date(), dto.time(), dto.imageUrl(),
+                    dto.category(), dto.price()
             );
         }
     }
