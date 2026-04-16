@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-@Profile({"dev", "test"})
+@Profile({"dev", "test", "default"})
 public class StubPaymentGateway implements PaymentGateway {
 
     private static final Logger log = LoggerFactory.getLogger(StubPaymentGateway.class);

@@ -1,10 +1,7 @@
 package com.gresk.modules.event.domain.exception;
 
-import com.gresk.shared.domain.exception.DomainException;
-
-public class EventSoldOutException extends DomainException {
-
-    public EventSoldOutException(String message) {
-        super(message);
+public class EventSoldOutException extends RuntimeException {
+    public EventSoldOutException(String eventId) {
+        super("No hay entradas disponibles para el evento: " + eventId);
     }
 }
