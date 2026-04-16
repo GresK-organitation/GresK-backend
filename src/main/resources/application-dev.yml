@@ -55,6 +55,9 @@ logging:
   level:
     root: INFO
     com.gresk: DEBUG
+    # Activado para rastrear por qué ocurren los errores 403
     org.springframework.security: DEBUG
+    org.springframework.security.web.FilterChainProxy: DEBUG
+    # Activado para ver el SQL y los valores de los parámetros (:city)
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE

@@ -50,3 +50,9 @@ gresk:
   images:
     default-url: "https://res.cloudinary.com/dzfgoh6hu/image/upload/ar_1:1,c_crop,g_auto:face,w_300/r_max/co_rgb:68D2E7,e_outline:outer:15/main-sample.png"
     asset-url-template: "https://res.cloudinary.com/dzfgoh6hu/image/upload/ar_1:1,c_crop,g_auto:face,w_300/r_max/co_rgb:68D2E7,e_outline:outer:15/{assetId}"
+
+spotify:
+  client-id: ${SPOTIFY_CLIENT_ID}
+  client-secret: ${SPOTIFY_CLIENT_SECRET}
+  auth-url: https://accounts.spotify.com
+  api-url: https://api.spotify.com
