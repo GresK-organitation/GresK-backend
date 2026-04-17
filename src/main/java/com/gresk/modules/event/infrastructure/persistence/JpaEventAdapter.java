@@ -7,18 +7,21 @@ import com.gresk.modules.event.domain.port.out.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class JpaEventAdapter implements EventRepository {
 
     private final EventJpaRepository repo;
     private final EventMapper mapper;
 
     @Override
+    @Transactional
     public Event save(Event event) {
         return mapper.toDomain(repo.save(mapper.toEntity(event)));
     }

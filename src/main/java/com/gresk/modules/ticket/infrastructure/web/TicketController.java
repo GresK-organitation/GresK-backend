@@ -9,7 +9,6 @@ import com.gresk.modules.ticket.domain.model.Ticket;
 import com.gresk.modules.ticket.infrastructure.TransactionalPurchaseTicketService;
 import com.gresk.modules.ticket.infrastructure.web.dto.PurchaseTicketRequest;
 import com.gresk.modules.ticket.infrastructure.web.dto.TicketResponse;
-import com.gresk.modules.user.domain.model.UserId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,9 +40,9 @@ public class TicketController {
     @ApiResponse(responseCode = "422", description = "Event is sold out or not published")
     public ResponseEntity<TicketResponse> purchase(
             @Valid @RequestBody PurchaseTicketRequest request,
-            @AuthenticationPrincipal UserId userId) {
+            @AuthenticationPrincipal String userId) {
         Ticket ticket = purchaseTicketService.execute(
-                new PurchaseTicketCommand(userId.value().toString(), request.eventId()));
+                new PurchaseTicketCommand(userId, request.eventId()));
         return ResponseEntity.status(201).body(toResponse(ticket));
     }
 
@@ -52,9 +51,9 @@ public class TicketController {
     @Operation(summary = "List authenticated user's tickets")
     @ApiResponse(responseCode = "200", description = "List of tickets")
     public ResponseEntity<List<TicketResponse>> listMyTickets(
-            @AuthenticationPrincipal UserId userId) {
+            @AuthenticationPrincipal String userId) {
         List<TicketResponse> responses = getUserTicketsUseCase
-                .execute(new GetUserTicketsQuery(userId.value().toString()))
+                .execute(new GetUserTicketsQuery(userId))
                 .stream()
                 .map(this::toResponse)
                 .toList();
@@ -69,9 +68,9 @@ public class TicketController {
     @ApiResponse(responseCode = "404", description = "Ticket not found")
     public ResponseEntity<byte[]> getQr(
             @PathVariable String id,
-            @AuthenticationPrincipal UserId userId) {
+            @AuthenticationPrincipal String userId) {
         byte[] image = getTicketQrUseCase.execute(
-                new GetTicketQrQuery(id, userId.value().toString()));
+                new GetTicketQrQuery(id, userId));
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_PNG)
                 .body(image);
