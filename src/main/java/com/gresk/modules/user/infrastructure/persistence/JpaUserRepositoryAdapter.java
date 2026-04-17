@@ -8,12 +8,14 @@ import com.gresk.modules.user.infrastructure.persistence.mapper.UserPersistenceM
 import com.gresk.modules.user.infrastructure.persistence.repository.JpaUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class JpaUserRepositoryAdapter implements UserRepositoryPort {
 
     private final JpaUserRepository jpaRepository;
@@ -26,6 +28,7 @@ public class JpaUserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
+    @Transactional
     public User save(User user) {
         UserEntity entity = jpaRepository.findById(user.getId().value())
                 .map(existing -> {

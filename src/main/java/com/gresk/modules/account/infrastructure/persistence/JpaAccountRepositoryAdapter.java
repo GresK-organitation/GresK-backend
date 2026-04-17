@@ -12,12 +12,14 @@ import com.gresk.shared.domain.valueobject.City;
 import com.gresk.shared.domain.valueobject.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class JpaAccountRepositoryAdapter implements AccountRepositoryPort {
 
     private final AccountJpaRepository jpaRepository;
@@ -26,6 +28,7 @@ public class JpaAccountRepositoryAdapter implements AccountRepositoryPort {
     private final UserPersistenceMapper userMapper;
 
     @Override
+    @Transactional
     public Account save(Account account) {
         AccountEntity entity = jpaRepository.findById(account.getId().value())
                 .map(existing -> {

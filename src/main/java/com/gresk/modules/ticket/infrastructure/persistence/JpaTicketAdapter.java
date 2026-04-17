@@ -7,18 +7,21 @@ import com.gresk.modules.ticket.domain.port.out.TicketRepository;
 import com.gresk.modules.user.domain.model.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class JpaTicketAdapter implements TicketRepository {
 
     private final SpringDataTicketRepository repo;
     private final TicketMapper mapper;
 
     @Override
+    @Transactional
     public Ticket save(Ticket ticket) {
         return mapper.toDomain(repo.save(mapper.toEntity(ticket)));
     }
