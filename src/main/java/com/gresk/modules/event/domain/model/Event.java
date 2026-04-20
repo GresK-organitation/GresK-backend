@@ -219,5 +219,15 @@ public final class Event {
                 artist, sound, ambience, venue, setlist, overall);
     }
 
+    /** Reemplaza las stats con un conjunto recalculado (usado tras editar una review). */
+    public void replaceRatingStats(int reviewCount,
+                                   double avgOverall, double avgArtist,
+                                   double avgSound, double avgAmbience,
+                                   double avgVenue, double avgSetlist) {
+        this.ratingStats = new EventRatingStats(
+                reviewCount, avgOverall, avgArtist,
+                avgSound, avgAmbience, avgVenue, avgSetlist);
+    }
+
     public EventRatingStats getRatingStats() { return ratingStats; }
 }

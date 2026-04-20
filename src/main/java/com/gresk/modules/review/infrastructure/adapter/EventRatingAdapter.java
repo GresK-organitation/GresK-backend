@@ -25,4 +25,16 @@ public class EventRatingAdapter implements EventRatingPort {
         event.addRating(artist, sound, ambience, venue, setlist, overall);
         eventRepository.save(event);
     }
+
+    @Override
+    public void setStats(EventId eventId, int reviewCount,
+                         double avgOverall, double avgArtist, double avgSound,
+                         double avgAmbience, double avgVenue, double avgSetlist) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventNotFoundException(
+                        "Event not found: " + eventId.value()));
+        event.replaceRatingStats(reviewCount, avgOverall, avgArtist,
+                avgSound, avgAmbience, avgVenue, avgSetlist);
+        eventRepository.save(event);
+    }
 }
