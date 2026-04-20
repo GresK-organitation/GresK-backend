@@ -1,10 +1,9 @@
 package com.gresk.modules.artist.application.command;
 
 import java.util.Set;
-import java.util.UUID;
 
 public record CreateArtistCommand(
-        UUID        promoterId,
+        String      promoterId,
         String      name,
         String      origin,
         Set<String> genres,
