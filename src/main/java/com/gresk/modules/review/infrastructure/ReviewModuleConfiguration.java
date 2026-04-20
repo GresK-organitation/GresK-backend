@@ -1,6 +1,7 @@
 package com.gresk.modules.review.infrastructure;
 
 import com.gresk.modules.review.application.usecase.SubmitReviewUseCase;
+import com.gresk.modules.review.application.usecase.UpdateReviewUseCase;
 import com.gresk.modules.review.domain.port.out.EventRatingPort;
 import com.gresk.modules.review.domain.port.out.ReviewRepository;
 import com.gresk.modules.review.domain.port.out.UserPointsPort;
@@ -19,5 +20,11 @@ public class ReviewModuleConfiguration {
         return new SubmitReviewUseCase(
                 reviewRepository, ticketRepository,
                 userPointsPort, eventRatingPort);
+    }
+
+    @Bean
+    public UpdateReviewUseCase updateReviewUseCase(ReviewRepository reviewRepository,
+                                                   EventRatingPort eventRatingPort) {
+        return new UpdateReviewUseCase(reviewRepository, eventRatingPort);
     }
 }

@@ -12,4 +12,12 @@ public interface EventRatingPort {
     void addRating(EventId eventId,
                    int artist, int sound, int ambience,
                    int venue, int setlist, int overall);
+
+    /**
+     * Replaces the event's rating stats with a freshly computed set.
+     * Used after a review is edited to recalculate from all current reviews.
+     */
+    void setStats(EventId eventId, int reviewCount,
+                  double avgOverall, double avgArtist, double avgSound,
+                  double avgAmbience, double avgVenue, double avgSetlist);
 }
