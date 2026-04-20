@@ -11,6 +11,8 @@ public record UserDashboardResponseDTO(
         String name,
         String tier,
         int points,
+        String avatarUrl,
+        List<String> musicGenres,
         List<EventResponseDTO> events,
         List<MusicResponseDTO> music
 ) {
@@ -54,6 +56,8 @@ public record UserDashboardResponseDTO(
                 dto.userName(),
                 dto.currentTier(),
                 dto.loyaltyPoints(),
+                dto.avatarUrl(),
+                dto.musicGenres(),
                 dto.recommendedEvents().stream().map(EventResponseDTO::from).toList(),
                 dto.recommendedMusic().stream().map(MusicResponseDTO::from).toList()
         );
