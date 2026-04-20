@@ -42,6 +42,17 @@ public class EventMapper {
             artist = Artist.of(e.getArtistName(), artistImg);
         }
 
+        EventRatingStats ratingStats = (e.getReviewCount() != null && e.getReviewCount() > 0)
+                ? new EventRatingStats(
+                        e.getReviewCount(),
+                        e.getAvgOverallRating()  != null ? e.getAvgOverallRating()  : 0.0,
+                        e.getAvgArtistRating()   != null ? e.getAvgArtistRating()   : 0.0,
+                        e.getAvgSoundRating()    != null ? e.getAvgSoundRating()    : 0.0,
+                        e.getAvgAmbienceRating() != null ? e.getAvgAmbienceRating() : 0.0,
+                        e.getAvgVenueRating()    != null ? e.getAvgVenueRating()    : 0.0,
+                        e.getAvgSetlistRating()  != null ? e.getAvgSetlistRating()  : 0.0)
+                : EventRatingStats.empty();
+
         return Event.reconstitute(
                 EventId.of(e.getId().toString()),
                 e.getTitle(),
@@ -56,7 +67,8 @@ public class EventMapper {
                 coverImage,
                 artist,
                 e.getStatus(),
-                e.getCreatedAt()
+                e.getCreatedAt(),
+                ratingStats
         );
     }
 
@@ -96,6 +108,14 @@ public class EventMapper {
                 .artistName(event.getArtist() != null ? event.getArtist().name() : null)
                 .artistImageUrl(event.getArtist() != null && event.getArtist().imageUrl() != null
                         ? event.getArtist().imageUrl().value() : null)
+                // rating stats
+                .reviewCount(event.getRatingStats().reviewCount())
+                .avgOverallRating(event.getRatingStats().avgOverallRating())
+                .avgArtistRating(event.getRatingStats().avgArtistRating())
+                .avgSoundRating(event.getRatingStats().avgSoundRating())
+                .avgAmbienceRating(event.getRatingStats().avgAmbienceRating())
+                .avgVenueRating(event.getRatingStats().avgVenueRating())
+                .avgSetlistRating(event.getRatingStats().avgSetlistRating())
                 .build();
     }
 }

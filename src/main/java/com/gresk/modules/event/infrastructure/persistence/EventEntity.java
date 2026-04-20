@@ -95,4 +95,26 @@ public class EventEntity {
 
     @Column(name = "artist_image_url", length = 512)
     private String artistImageUrl;
+
+    // ── Rating stats (denormalized community averages) ───────────────────────
+    @Column(name = "review_count")
+    private Integer reviewCount;
+
+    @Column(name = "avg_overall_rating")
+    private Double avgOverallRating;
+
+    @Column(name = "avg_artist_rating")
+    private Double avgArtistRating;
+
+    @Column(name = "avg_sound_rating")
+    private Double avgSoundRating;
+
+    @Column(name = "avg_ambience_rating")
+    private Double avgAmbienceRating;
+
+    @Column(name = "avg_venue_rating")
+    private Double avgVenueRating;
+
+    @Column(name = "avg_setlist_rating")
+    private Double avgSetlistRating;
 }
