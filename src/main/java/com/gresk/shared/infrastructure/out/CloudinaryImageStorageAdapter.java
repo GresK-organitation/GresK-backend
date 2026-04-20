@@ -2,6 +2,7 @@ package com.gresk.shared.infrastructure.out;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.gresk.shared.domain.exception.ImageStorageException;
 import com.gresk.shared.domain.port.out.ImageStoragePort;
 import com.gresk.shared.domain.valueobject.AssetId;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +28,7 @@ public class CloudinaryImageStorageAdapter implements ImageStoragePort {
             String publicId = (String) result.get("public_id");
             return AssetId.of(publicId);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to upload image to Cloudinary", e);
-        }
+            throw new ImageStorageException("Failed to upload image", e);        }
     }
 
     @Override
@@ -37,7 +37,7 @@ public class CloudinaryImageStorageAdapter implements ImageStoragePort {
         try {
             cloudinary.uploader().destroy(assetId.value(), ObjectUtils.emptyMap());
         } catch (IOException e) {
-            throw new RuntimeException("Failed to delete image from Cloudinary", e);
+            throw new ImageStorageException("Failed to delete image from Cloudinary", e);
         }
     }
 }
