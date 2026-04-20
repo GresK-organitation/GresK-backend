@@ -4,9 +4,9 @@ spring:
 
   # CONFIGURACIÓN CRUCIAL: Debe estar al mismo nivel que 'application'
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/gresk_db}
-    username: ${SPRING_DATASOURCE_USERNAME:admin}
-    password: ${SPRING_DATASOURCE_PASSWORD:secretpass}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:${POSTGRES_PORT}/gresk_db}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   flyway:
@@ -32,8 +32,8 @@ management:
         include: health,info,metrics
 
 jwt:
-  secret: ${JWT_SECRET:Z3Jlc2stYmFja2VuZC1zZWNyZXQta2V5LXdpdGgtZW5vdWdoLWxlbmd0aC1mb3Itc2VjdXJpdHktMjAyNi1nZW1pbmk=}
-  expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  secret: ${JWT_SECRET}
+  expiration-ms: ${JWT_EXPIRATION_MS}
 
 springdoc:
   api-docs:
@@ -42,11 +42,17 @@ springdoc:
     path: /swagger-ui.html
 
 cloudinary:
-  cloud-name: ${CLOUDINARY_CLOUD_NAME:dzfgoh6hu}
-  api-key: ${CLOUDINARY_API_KEY:}
-  api-secret: ${CLOUDINARY_API_SECRET:}
+  cloud-name: ${CLOUDINARY_CLOUD_NAME}
+  api-key: ${CLOUDINARY_API_KEY}
+  api-secret: ${CLOUDINARY_API_SECRET}
 
 gresk:
   images:
     default-url: "https://res.cloudinary.com/dzfgoh6hu/image/upload/ar_1:1,c_crop,g_auto:face,w_300/r_max/co_rgb:68D2E7,e_outline:outer:15/main-sample.png"
     asset-url-template: "https://res.cloudinary.com/dzfgoh6hu/image/upload/ar_1:1,c_crop,g_auto:face,w_300/r_max/co_rgb:68D2E7,e_outline:outer:15/{assetId}"
+
+spotify:
+  client-id: ${SPOTIFY_CLIENT_ID}
+  client-secret: ${SPOTIFY_CLIENT_SECRET}
+  auth-url: https://accounts.spotify.com/api/token
+  api-url: https://api.spotify.com/v1
