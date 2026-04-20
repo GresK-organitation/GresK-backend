@@ -6,5 +6,5 @@ import com.gresk.shared.domain.MusicGenre;
 import java.util.Set;
 
 public interface MusicRecommendationProvider {
-    Set<MusicRecommendation> getSpotifyTopTracks(Set<MusicGenre> musicGenreSet);
+    Set<MusicRecommendation> getSpotifyTopTracks(Set<MusicGenre> musicGenreSet, String city);
 }
