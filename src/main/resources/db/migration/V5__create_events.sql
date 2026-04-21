@@ -55,11 +55,11 @@ CREATE TABLE events (
     longitude           DOUBLE PRECISION,
 
     -- imagen de portada
-    cover_image_url     VARCHAR(512),
+    cover_image_asset_id     VARCHAR(512),
 
     -- artista
     artist_name         VARCHAR(255),
-    artist_image_url    VARCHAR(512),
+    artist_image_asset_id    VARCHAR(512),
 
     CONSTRAINT pk_events              PRIMARY KEY (id),
     CONSTRAINT fk_events_promoter     FOREIGN KEY (promoter_id) REFERENCES promoters (id) ON DELETE RESTRICT,
