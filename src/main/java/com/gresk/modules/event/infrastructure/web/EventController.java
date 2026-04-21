@@ -12,21 +12,24 @@ import com.gresk.modules.event.application.usecase.ListEventsUseCase;
 import com.gresk.modules.event.application.usecase.PublishEventUseCase;
 import com.gresk.modules.event.domain.model.EventStatus;
 import com.gresk.modules.event.domain.port.out.EventFilter;
-import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import com.gresk.shared.domain.MusicGenre;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/events")
 @RequiredArgsConstructor
@@ -40,10 +43,12 @@ public class EventController {
     private final EventResponseMapper        mapper;
 
     // ── POST /api/v1/events ──────────────────────────────────────────────────
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('PROMOTER')")
     public ResponseEntity<EventResponse> create(
-            @Valid @RequestBody CreateEventRequest request,
+            @RequestPart("data") @Valid CreateEventRequest request,
+            @RequestPart(value = "coverImage", required = false) MultipartFile coverImage,
+            @RequestPart(value = "artistImage", required = false) MultipartFile artistImage,
             @AuthenticationPrincipal String promoterId) {
 
         CreateEventCommand command = new CreateEventCommand(
@@ -61,9 +66,9 @@ public class EventController {
                 request.venue(),
                 request.latitude(),
                 request.longitude(),
-                request.coverImageUrl(),
+                coverImage,
                 request.artistName(),
-                request.artistImageUrl()
+                artistImage
         );
         return ResponseEntity.status(201).body(mapper.toResponse(createUseCase.execute(command)));
     }
@@ -79,14 +84,12 @@ public class EventController {
 
     // ── GET /api/v1/events/{id} ──────────────────────────────────────────────
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<EventResponse> getById(@PathVariable String id) {
         return ResponseEntity.ok(mapper.toResponse(getUseCase.execute(new GetEventQuery(id))));
     }
 
     // ── GET /api/v1/events ───────────────────────────────────────────────────
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PageResponse<EventResponse>> list(
             @RequestParam(required = false) String     genre,
             @RequestParam(required = false) String     city,
@@ -120,7 +123,6 @@ public class EventController {
 
     // ── GET /api/v1/events/last-minute ───────────────────────────────────────
     @GetMapping("/last-minute")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<EventResponse>> getLastMinute() {
         List<EventResponse> result = getLastMinuteUseCase.execute()
                 .stream()

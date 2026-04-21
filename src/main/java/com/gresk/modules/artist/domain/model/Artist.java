@@ -10,7 +10,7 @@ import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import com.gresk.shared.domain.MusicGenre;
 import com.gresk.shared.domain.valueobject.City;
 import com.gresk.shared.domain.valueobject.Description;
-import com.gresk.shared.domain.valueobject.ImageUrl;
+import com.gresk.shared.domain.valueobject.AssetId;
 import com.gresk.shared.domain.valueobject.Name;
 
 import java.time.Instant;
@@ -26,7 +26,7 @@ public final class Artist {
     private Name                 name;
     private City                 origin;
     private Set<MusicGenre>      genres;
-    private ImageUrl             imageUrl;
+    private AssetId              imageAssetId;
     private Description          bio;
     private ArtistStatus         status;
     private ArtistFee            fee;
@@ -39,7 +39,7 @@ public final class Artist {
     private final Instant        createdAt;
 
     private Artist(ArtistId id, PromoterId promoterId, Name name, City origin,
-                   Set<MusicGenre> genres, ImageUrl imageUrl, Description bio,
+                   Set<MusicGenre> genres, AssetId imageAssetId, Description bio,
                    ArtistStatus status, ArtistFee fee, FollowerCount followers,
                    Set<String> tags, ArtistContact contact, SocialLinks socialLinks,
                    int eventsPlayed, double avgRating, Instant createdAt) {
@@ -52,7 +52,7 @@ public final class Artist {
         this.contact      = Objects.requireNonNull(contact,    "Contact is required");
         this.createdAt    = Objects.requireNonNull(createdAt,  "CreatedAt is required");
         this.genres       = genres      != null ? new LinkedHashSet<>(genres)    : new LinkedHashSet<>();
-        this.imageUrl     = imageUrl    != null ? imageUrl    : new ImageUrl("");
+        this.imageAssetId = imageAssetId != null ? imageAssetId : new AssetId("");
         this.fee          = fee         != null ? fee         : ArtistFee.empty();
         this.followers    = followers   != null ? followers   : FollowerCount.empty();
         this.tags         = tags        != null ? new LinkedHashSet<>(tags)      : new LinkedHashSet<>();
@@ -64,11 +64,11 @@ public final class Artist {
     // ── Factoría: creación por la promotora ──────────────────────────────────
 
     public static Artist create(PromoterId promoterId, Name name, City origin,
-                                Set<MusicGenre> genres, ImageUrl imageUrl, Description bio,
+                                Set<MusicGenre> genres, AssetId imageAssetId, Description bio,
                                 ArtistStatus status, ArtistFee fee, FollowerCount followers,
                                 Set<String> tags, ArtistContact contact, SocialLinks socialLinks) {
         return new Artist(
-                ArtistId.generate(), promoterId, name, origin, genres, imageUrl, bio,
+                ArtistId.generate(), promoterId, name, origin, genres, imageAssetId, bio,
                 status, fee, followers, tags, contact, socialLinks,
                 0, 0.0, Instant.now()
         );
@@ -77,11 +77,11 @@ public final class Artist {
     // ── Factoría: reconstitución desde persistencia ──────────────────────────
 
     public static Artist reconstitute(ArtistId id, PromoterId promoterId, Name name, City origin,
-                                      Set<MusicGenre> genres, ImageUrl imageUrl, Description bio,
+                                      Set<MusicGenre> genres, AssetId imageAssetId, Description bio,
                                       ArtistStatus status, ArtistFee fee, FollowerCount followers,
                                       Set<String> tags, ArtistContact contact, SocialLinks socialLinks,
                                       int eventsPlayed, double avgRating, Instant createdAt) {
-        return new Artist(id, promoterId, name, origin, genres, imageUrl, bio,
+        return new Artist(id, promoterId, name, origin, genres, imageAssetId, bio,
                 status, fee, followers, tags, contact, socialLinks,
                 eventsPlayed, avgRating, createdAt);
     }
@@ -89,12 +89,12 @@ public final class Artist {
     // ── Comportamientos ──────────────────────────────────────────────────────
 
     public void updateProfile(Name name, City origin, Set<MusicGenre> genres,
-                               ImageUrl imageUrl, Description bio) {
-        this.name     = Objects.requireNonNull(name);
-        this.origin   = Objects.requireNonNull(origin);
-        this.genres   = genres != null ? new LinkedHashSet<>(genres) : new LinkedHashSet<>();
-        this.imageUrl = imageUrl != null ? imageUrl : new ImageUrl("");
-        this.bio      = Objects.requireNonNull(bio);
+                               AssetId imageAssetId, Description bio) {
+        this.name         = Objects.requireNonNull(name);
+        this.origin       = Objects.requireNonNull(origin);
+        this.genres       = genres != null ? new LinkedHashSet<>(genres) : new LinkedHashSet<>();
+        this.imageAssetId = imageAssetId != null ? imageAssetId : new AssetId("");
+        this.bio          = Objects.requireNonNull(bio);
     }
 
     public void updateProfessionalInfo(ArtistStatus status, ArtistFee fee,
@@ -127,7 +127,7 @@ public final class Artist {
     public Name              getName()         { return name; }
     public City              getOrigin()       { return origin; }
     public Set<MusicGenre>   getGenres()       { return Collections.unmodifiableSet(genres); }
-    public ImageUrl          getImageUrl()     { return imageUrl; }
+    public AssetId           getImageAssetId() { return imageAssetId; }
     public Description       getBio()          { return bio; }
     public ArtistStatus      getStatus()       { return status; }
     public ArtistFee         getFee()          { return fee; }

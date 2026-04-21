@@ -1,5 +1,7 @@
 package com.gresk.modules.artist.application.command;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.Set;
 
 public record CreateArtistCommand(
@@ -7,7 +9,7 @@ public record CreateArtistCommand(
         String      name,
         String      origin,
         Set<String> genres,
-        String      imageUrl,
+        MultipartFile imageAssetId,
         String      bio,
         String      status,
         String      fee,

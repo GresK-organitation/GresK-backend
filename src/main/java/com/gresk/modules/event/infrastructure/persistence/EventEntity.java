@@ -86,8 +86,8 @@ public class EventEntity {
     private Double longitude;
 
     // ── Imagen de portada ────────────────────────────────────────────────────
-    @Column(name = "cover_image_url", length = 512)
-    private String coverImageUrl;
+    @Column(name = "cover_image_asset_id", length = 512)
+    private String coverImageAssetId;
 
     // ── Artista ──────────────────────────────────────────────────────────────
     @Column(name = "artist_name", length = 255)

@@ -1,5 +1,7 @@
 package com.gresk.modules.event.application.usecase;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 
@@ -23,9 +25,9 @@ public record CreateEventCommand(
         String     venue,
         Double     latitude,
         Double     longitude,
-        // imagen
-        String     coverImageUrl,
+        // imagen (Cloudinary public_id)
+        MultipartFile coverImageAssetId,
         // artista
         String     artistName,
-        String     artistImageUrl
+        MultipartFile     artistImageUrl
 ) {}

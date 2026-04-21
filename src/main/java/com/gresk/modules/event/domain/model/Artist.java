@@ -1,13 +1,13 @@
 package com.gresk.modules.event.domain.model;
 
-import com.gresk.shared.domain.valueobject.ImageUrl;
+import com.gresk.shared.domain.valueobject.AssetId;
 
 import java.util.Objects;
 
 /**
  * VO temporal dentro de Event hasta que Artist tenga su propio módulo.
  */
-public record Artist(String name, ImageUrl imageUrl) {
+public record Artist(String name, AssetId imageAssetId) {
 
     public Artist {
         Objects.requireNonNull(name, "Artist name must not be null");
@@ -15,11 +15,11 @@ public record Artist(String name, ImageUrl imageUrl) {
         if (name.isBlank()) {
             throw new IllegalArgumentException("Artist name must not be blank");
         }
-        // imageUrl puede ser null (artista sin foto)
+        // imageAssetId puede ser null (artista sin foto)
     }
 
-    public static Artist of(String name, ImageUrl imageUrl) {
-        return new Artist(name, imageUrl);
+    public static Artist of(String name, AssetId imageAssetId) {
+        return new Artist(name, imageAssetId);
     }
 
     public static Artist of(String name) {

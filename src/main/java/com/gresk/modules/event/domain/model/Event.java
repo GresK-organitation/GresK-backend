@@ -4,7 +4,7 @@ import com.gresk.modules.event.domain.exception.IncompleteEventException;
 import com.gresk.modules.event.domain.exception.InvalidEventTransitionException;
 import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import com.gresk.shared.domain.MusicGenre;
-import com.gresk.shared.domain.valueobject.ImageUrl;
+import com.gresk.shared.domain.valueobject.AssetId;
 import com.gresk.shared.domain.valueobject.Percentage;
 
 import java.math.BigDecimal;
@@ -17,25 +17,23 @@ public final class Event {
     private final PromoterId   promoterId;
     private final Instant      createdAt;
 
-    private EventStatus      status;
-    private MusicGenre       genre;
-    private Price            price;
-    private Price            discountedPrice;   // null mientras no se aplique descuento
-    private Capacity         capacity;
-    private Instant          eventDate;
-    private Location         location;
-    private Instant          revealAt;
-    private ImageUrl         coverImage;
-    private Artist           artist;
-    private EventRatingStats ratingStats;
+    private EventStatus status;
+    private MusicGenre  genre;
+    private Price       price;
+    private Price       discountedPrice;   // null mientras no se aplique descuento
+    private Capacity    capacity;
+    private Instant     eventDate;
+    private Location    location;
+    private Instant     revealAt;
+    private AssetId     coverImage;
+    private Artist      artist;
 
     private Event(EventId id, String title, PromoterId promoterId,
                   MusicGenre genre, Price price, Price discountedPrice,
                   Capacity capacity, Instant eventDate,
                   Location location, Instant revealAt,
-                  ImageUrl coverImage, Artist artist,
-                  EventStatus status, Instant createdAt,
-                  EventRatingStats ratingStats) {
+                  AssetId coverImage, Artist artist,
+                  EventStatus status, Instant createdAt) {
         this.id              = id;
         this.title           = title;
         this.promoterId      = promoterId;
@@ -59,33 +57,19 @@ public final class Event {
         return new Event(
                 EventId.generate(), title, promoterId,
                 null, null, null, null, null, null, null, null, null,
-                EventStatus.DRAFT, Instant.now(), EventRatingStats.empty()
+                EventStatus.DRAFT, Instant.now()
         );
     }
 
-    /** Reconstitución sin stats (backward-compat para el mapper actual). */
     public static Event reconstitute(EventId id, String title, PromoterId promoterId,
                                      MusicGenre genre, Price price, Price discountedPrice,
                                      Capacity capacity, Instant eventDate,
                                      Location location, Instant revealAt,
-                                     ImageUrl coverImage, Artist artist,
+                                     AssetId coverImage, Artist artist,
                                      EventStatus status, Instant createdAt) {
         return new Event(id, title, promoterId, genre, price, discountedPrice,
                 capacity, eventDate, location, revealAt,
-                coverImage, artist, status, createdAt, EventRatingStats.empty());
-    }
-
-    /** Reconstitución completa incluyendo stats de valoración. */
-    public static Event reconstitute(EventId id, String title, PromoterId promoterId,
-                                     MusicGenre genre, Price price, Price discountedPrice,
-                                     Capacity capacity, Instant eventDate,
-                                     Location location, Instant revealAt,
-                                     ImageUrl coverImage, Artist artist,
-                                     EventStatus status, Instant createdAt,
-                                     EventRatingStats ratingStats) {
-        return new Event(id, title, promoterId, genre, price, discountedPrice,
-                capacity, eventDate, location, revealAt,
-                coverImage, artist, status, createdAt, ratingStats);
+                coverImage, artist, status, createdAt);
     }
 
     // ── Comportamientos ──────────────────────────────────────────────────────
@@ -180,7 +164,7 @@ public final class Event {
         return this;
     }
 
-    public Event withCoverImage(ImageUrl coverImage) {
+    public Event withCoverImage(AssetId coverImage) {
         this.coverImage = coverImage;
         return this;
     }
@@ -204,7 +188,7 @@ public final class Event {
     public Instant    getEventDate()       { return eventDate; }
     public Location   getLocation()        { return location; }
     public Instant    getRevealAt()        { return revealAt; }
-    public ImageUrl   getCoverImage()      { return coverImage; }
+    public AssetId    getCoverImage()      { return coverImage; }
     public Artist     getArtist()          { return artist; }
 
     /** Precio efectivo: usa discountedPrice si existe, si no el original. */
