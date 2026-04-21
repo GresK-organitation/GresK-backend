@@ -18,7 +18,7 @@ CREATE TABLE artists (
     promoter_id     UUID             NOT NULL,
     name            VARCHAR(100)     NOT NULL,
     origin          VARCHAR(150)     NOT NULL,
-    image_url       VARCHAR(2048),
+    image_asset_id  VARCHAR(2048),
     bio             VARCHAR(600),
     status          VARCHAR(20)      NOT NULL DEFAULT 'AVAILABLE',
     fee             VARCHAR(100),
