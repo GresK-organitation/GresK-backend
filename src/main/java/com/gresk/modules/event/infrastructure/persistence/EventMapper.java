@@ -3,9 +3,9 @@ package com.gresk.modules.event.infrastructure.persistence;
 import com.gresk.modules.event.domain.model.*;
 import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import com.gresk.shared.domain.valueobject.Address;
+import com.gresk.shared.domain.valueobject.AssetId;
 import com.gresk.shared.domain.valueobject.City;
 import com.gresk.shared.domain.valueobject.Coordinates;
-import com.gresk.shared.domain.valueobject.ImageUrl;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -32,14 +32,14 @@ public class EventMapper {
             location = new Location(address, coords, e.getVenue());
         }
 
-        ImageUrl coverImage = (e.getCoverImageUrl() != null && !e.getCoverImageUrl().isBlank())
-                ? ImageUrl.reconstitute(e.getCoverImageUrl()) : null;
+        AssetId coverImage = (e.getCoverImageAssetId() != null && !e.getCoverImageAssetId().isBlank())
+                ? AssetId.reconstitute(e.getCoverImageAssetId()) : null;
 
         Artist artist = null;
         if (e.getArtistName() != null && !e.getArtistName().isBlank()) {
-            ImageUrl artistImg = (e.getArtistImageUrl() != null && !e.getArtistImageUrl().isBlank())
-                    ? ImageUrl.reconstitute(e.getArtistImageUrl()) : null;
-            artist = Artist.of(e.getArtistName(), artistImg);
+            AssetId artistAssetId = (e.getArtistImageUrl()!= null && !e.getArtistImageAssetId().isBlank())
+                    ? AssetId.reconstitute(e.getArtistImageAssetId()) : null;
+            artist = Artist.of(e.getArtistName(), artistAssetId);
         }
 
         EventRatingStats ratingStats = (e.getReviewCount() != null && e.getReviewCount() > 0)
@@ -101,13 +101,13 @@ public class EventMapper {
                 .venue(loc != null ? loc.venue()                   : null)
                 .latitude(loc != null ? loc.coordinates().latitude()  : null)
                 .longitude(loc != null ? loc.coordinates().longitude() : null)
-                // imagen
-                .coverImageUrl(event.getCoverImage() != null && !event.getCoverImage().isEmpty()
+                // imagen (public_id de Cloudinary)
+                .coverImageAssetId(event.getCoverImage() != null && !event.getCoverImage().isEmpty()
                         ? event.getCoverImage().value() : null)
                 // artista
                 .artistName(event.getArtist() != null ? event.getArtist().name() : null)
-                .artistImageUrl(event.getArtist() != null && event.getArtist().imageUrl() != null
-                        ? event.getArtist().imageUrl().value() : null)
+                .artistImageUrl(event.getArtist() != null && event.getArtist().imageAssetId() != null
+                        ? event.getArtist().imageAssetId().value() : null)
                 // rating stats
                 .reviewCount(event.getRatingStats().reviewCount())
                 .avgOverallRating(event.getRatingStats().avgOverallRating())

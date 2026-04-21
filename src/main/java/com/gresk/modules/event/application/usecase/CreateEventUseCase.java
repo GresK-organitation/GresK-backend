@@ -4,24 +4,45 @@ import com.gresk.modules.event.domain.model.*;
 import com.gresk.modules.event.domain.port.out.EventRepository;
 import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import com.gresk.shared.domain.MusicGenre;
+import com.gresk.shared.domain.port.out.ImageStoragePort;
 import com.gresk.shared.domain.valueobject.Address;
 import com.gresk.shared.domain.valueobject.City;
 import com.gresk.shared.domain.valueobject.Coordinates;
-import com.gresk.shared.domain.valueobject.ImageUrl;
+import com.gresk.shared.domain.valueobject.AssetId;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CreateEventUseCase {
 
     private final EventRepository eventRepository;
+    private final ImageStoragePort imageStorage;
 
     @Transactional
     public Event execute(CreateEventCommand command) {
         PromoterId promoterId = PromoterId.of(command.promoterId());
         Event event = Event.create(command.title(), promoterId);
+        String coverImageAssetId = null;
+        if (command.coverImageAssetId() != null && !command.coverImageAssetId().isEmpty()) {
+            try {
+                coverImageAssetId = imageStorage.upload(command.coverImageAssetId(), "events/covers").value();
+            } catch (Exception e) {
+                log.warn("Could not upload cover image: {}", e.getMessage());
+            }
+        }
+
+        String artistImageAssetId = null;
+        if (command.artistImageUrl() != null && !command.artistImageUrl().isEmpty()) {
+            try {
+                artistImageAssetId = imageStorage.upload(command.artistImageUrl(), "events/artists").value();
+            } catch (Exception e) {
+                log.warn("Could not upload artist image: {}", e.getMessage());
+            }
+        }
 
         if (command.genre() != null) {
             event.withGenre(MusicGenre.valueOf(command.genre()));
@@ -44,13 +65,13 @@ public class CreateEventUseCase {
         if (command.revealAt() != null) {
             event.withRevealAt(command.revealAt());
         }
-        if (command.coverImageUrl() != null && !command.coverImageUrl().isBlank()) {
-            event.withCoverImage(ImageUrl.of(command.coverImageUrl()));
+        if (coverImageAssetId != null && !coverImageAssetId.isBlank()) {
+            event.withCoverImage(AssetId.of(coverImageAssetId));
         }
         if (command.artistName() != null && !command.artistName().isBlank()) {
-            ImageUrl artistImg = (command.artistImageUrl() != null && !command.artistImageUrl().isBlank())
-                    ? ImageUrl.of(command.artistImageUrl()) : null;
-            event.withArtist(Artist.of(command.artistName(), artistImg));
+            AssetId artistAssetId = (artistImageAssetId != null && !artistImageAssetId.isBlank())
+                    ? AssetId.of(artistImageAssetId) : null;
+            event.withArtist(Artist.of(command.artistName(), artistAssetId));
         }
 
         return eventRepository.save(event);

@@ -4,6 +4,8 @@ import com.gresk.modules.promoter.application.dto.PromoterEventDTO;
 import com.gresk.modules.promoter.application.port.in.GetPromoterEventsPort;
 import com.gresk.modules.promoter.infrastructure.persitence.PromoterEventQueryRepository;
 import com.gresk.modules.promoter.infrastructure.persitence.PromoterEventSummary;
+import com.gresk.shared.domain.port.out.ImageUrlResolverPort;
+import com.gresk.shared.domain.valueobject.AssetId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,7 @@ import java.util.UUID;
 public class GetPromoterEventsUseCase implements GetPromoterEventsPort {
 
     private final PromoterEventQueryRepository eventQueryRepository;
+    private final ImageUrlResolverPort         imageUrlResolver;
 
     @Override
     public List<PromoterEventDTO> execute(UUID accountId) {
@@ -40,7 +43,11 @@ public class GetPromoterEventsUseCase implements GetPromoterEventsPort {
                 ? (ticketsSold * 100.0 / totalCapacity)
                 : 0.0;
 
-        double avgRating = s.getAvgOverallRating() != null ? s.getAvgOverallRating() : 0.0;
+        String coverImageUrl = null;
+        String assetId = s.getCoverImageUrl(); // returns cover_image_asset_id value (aliased)
+        if (assetId != null && !assetId.isBlank()) {
+            coverImageUrl = imageUrlResolver.resolveOrDefault(AssetId.of(assetId));
+        }
 
         return new PromoterEventDTO(
                 s.getId().toString(),
@@ -54,7 +61,7 @@ public class GetPromoterEventsUseCase implements GetPromoterEventsPort {
                 revenue,
                 effectivePrice,
                 s.getGenre(),
-                s.getCoverImageUrl(),
+                coverImageUrl,
                 conversionRate,
                 avgRating
         );

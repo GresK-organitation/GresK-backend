@@ -9,7 +9,7 @@ import com.gresk.modules.artist.domain.model.valueobject.SocialLinks;
 import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import com.gresk.shared.domain.valueobject.City;
 import com.gresk.shared.domain.valueobject.Description;
-import com.gresk.shared.domain.valueobject.ImageUrl;
+import com.gresk.shared.domain.valueobject.AssetId;
 import com.gresk.shared.domain.valueobject.Name;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +26,7 @@ public class ArtistMapper {
                 Name.reconstitute(entity.getName()),
                 City.of(entity.getOrigin()),
                 entity.getGenres(),
-                ImageUrl.reconstitute(entity.getImageUrl() != null ? entity.getImageUrl() : ""),
+                AssetId.reconstitute(entity.getImageAssetId() != null ? entity.getImageAssetId() : ""),
                 Description.reconstitute(entity.getBio() != null ? entity.getBio() : ""),
                 entity.getStatus(),
                 ArtistFee.reconstitute(entity.getFee()),
@@ -47,7 +47,7 @@ public class ArtistMapper {
                 .name(artist.getName().value())
                 .origin(artist.getOrigin().value())
                 .genres(new HashSet<>(artist.getGenres()))
-                .imageUrl(artist.getImageUrl().isEmpty() ? null : artist.getImageUrl().value())
+                .imageAssetId(artist.getImageAssetId().isEmpty() ? null : artist.getImageAssetId().value())
                 .bio(artist.getBio().isEmpty() ? null : artist.getBio().value())
                 .status(artist.getStatus())
                 .fee(artist.getFee().isEmpty() ? null : artist.getFee().value())

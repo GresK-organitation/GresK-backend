@@ -2,13 +2,27 @@ package com.gresk.modules.event.application.dto;
 
 import com.gresk.modules.event.domain.model.Event;
 import com.gresk.modules.event.domain.model.Location;
+import com.gresk.shared.domain.port.out.ImageUrlResolverPort;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class EventResponseMapper {
+
+    private final ImageUrlResolverPort imageUrlResolver;
 
     public EventResponse toResponse(Event event) {
         Location loc = event.getLocation();
+
+        String coverImageUrl = event.getCoverImage() != null && !event.getCoverImage().isEmpty()
+                ? imageUrlResolver.resolveOrDefault(event.getCoverImage()) : null;
+
+        String artistImageUrl = null;
+        if (event.getArtist() != null && event.getArtist().imageAssetId() != null
+                && !event.getArtist().imageAssetId().isEmpty()) {
+            artistImageUrl = imageUrlResolver.resolveOrDefault(event.getArtist().imageAssetId());
+        }
 
         return new EventResponse(
                 event.getId().toString(),
@@ -37,13 +51,11 @@ public class EventResponseMapper {
                 loc != null ? loc.venue()                   : null,
                 loc != null ? loc.coordinates().latitude()  : null,
                 loc != null ? loc.coordinates().longitude() : null,
-                // imagen de portada
-                event.getCoverImage() != null && !event.getCoverImage().isEmpty()
-                        ? event.getCoverImage().value() : null,
+                // imagen de portada (URL resuelta desde AssetId)
+                coverImageUrl,
                 // artista
                 event.getArtist() != null ? event.getArtist().name() : null,
-                event.getArtist() != null && event.getArtist().imageUrl() != null
-                        ? event.getArtist().imageUrl().value() : null
+                artistImageUrl
         );
     }
 }

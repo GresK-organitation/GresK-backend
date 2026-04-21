@@ -38,8 +38,8 @@ public class ArtistEntity {
     @Builder.Default
     private Set<MusicGenre> genres = new HashSet<>();
 
-    @Column(name = "image_url", length = 2048)
-    private String imageUrl;
+    @Column(name = "image_asset_id", length = 2048)
+    private String imageAssetId;
 
     @Column(length = 600)
     private String bio;
@@ -97,12 +97,12 @@ public class ArtistEntity {
     }
 
     public void updateProfile(String name, String origin, Set<MusicGenre> genres,
-                               String imageUrl, String bio) {
-        this.name     = name;
-        this.origin   = origin;
-        this.genres   = new HashSet<>(genres);
-        this.imageUrl = imageUrl;
-        this.bio      = bio;
+                               String imageAssetId, String bio) {
+        this.name         = name;
+        this.origin       = origin;
+        this.genres       = new HashSet<>(genres);
+        this.imageAssetId = imageAssetId;
+        this.bio          = bio;
     }
 
     public void updateProfessionalInfo(ArtistStatus status, String fee,

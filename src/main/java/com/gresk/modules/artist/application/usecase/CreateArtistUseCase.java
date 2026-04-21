@@ -13,13 +13,16 @@ import com.gresk.modules.artist.domain.model.valueobject.SocialLinks;
 import com.gresk.modules.artist.domain.port.out.ArtistRepositoryPort;
 import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import com.gresk.shared.domain.MusicGenre;
+import com.gresk.shared.domain.port.out.ImageStoragePort;
 import com.gresk.shared.domain.valueobject.City;
 import com.gresk.shared.domain.valueobject.Description;
-import com.gresk.shared.domain.valueobject.ImageUrl;
+import com.gresk.shared.domain.valueobject.AssetId;
 import com.gresk.shared.domain.valueobject.Name;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
+
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -27,19 +30,27 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CreateArtistUseCase implements CreateArtistPort {
 
     private final ArtistRepositoryPort artistRepository;
+    private final ImageStoragePort imageStorage;
 
     @Override
     @Transactional
     public ArtistId execute(CreateArtistCommand command) {
-
         PromoterId promoterId = PromoterId.of(command.promoterId());
 
         if (artistRepository.existsByContactAndPromoterId(command.contact(), promoterId)) {
             throw new ArtistAlreadyExistsException(command.contact());
         }
+
+        String logoAssetId = null;
+        if (command.imageAssetId() != null && !command.imageAssetId().isEmpty()) {
+            AssetId assetId = imageStorage.upload(command.imageAssetId(), "promoters/logos");
+            logoAssetId = assetId.value();
+        }
+
 
         Set<MusicGenre> genres = command.genres() != null
                 ? command.genres().stream()
@@ -47,9 +58,7 @@ public class CreateArtistUseCase implements CreateArtistPort {
                          .collect(Collectors.toCollection(LinkedHashSet::new))
                 : new LinkedHashSet<>();
 
-        ImageUrl imageUrl = (command.imageUrl() != null && !command.imageUrl().isBlank())
-                ? ImageUrl.of(command.imageUrl())
-                : new ImageUrl("");
+        AssetId imageAssetId = AssetId.of(logoAssetId);
 
         Set<String> tags = command.tags() != null
                 ? new LinkedHashSet<>(command.tags())
@@ -60,7 +69,7 @@ public class CreateArtistUseCase implements CreateArtistPort {
                 Name.of(command.name()),
                 City.of(command.origin()),
                 genres,
-                imageUrl,
+                imageAssetId,
                 Description.of(command.bio()),
                 ArtistStatus.valueOf(command.status()),
                 ArtistFee.of(command.fee()),

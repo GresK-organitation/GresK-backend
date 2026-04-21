@@ -7,14 +7,18 @@ import com.gresk.modules.artist.application.port.in.GetArtistsByPromoterPort;
 import com.gresk.modules.artist.domain.model.valueobject.ArtistId;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/artists")
 @RequiredArgsConstructor
@@ -25,10 +29,11 @@ public class ArtistController {
     private final GetArtistByIdPort         getArtistByIdUseCase;
     private final ArtistResponseMapper      mapper;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('PROMOTER')")
     public ResponseEntity<ArtistResponse> create(
-            @Valid @RequestBody CreateArtistRequest request,
+            @RequestPart("data") @Valid CreateArtistRequest request,
+            @RequestPart(value = "image", required = false) MultipartFile image,
             @AuthenticationPrincipal String promoterId) {
 
         CreateArtistCommand command = new CreateArtistCommand(
@@ -36,7 +41,7 @@ public class ArtistController {
                 request.name(),
                 request.origin(),
                 request.genres(),
-                request.imageUrl(),
+                image,
                 request.bio(),
                 request.status(),
                 request.fee(),

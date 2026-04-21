@@ -31,10 +31,6 @@ public record CreateEventRequest(
         @NotNull Double   latitude,
         @NotNull Double   longitude,
 
-        // imagen de portada (opcional)
-        String            coverImageUrl,
-
-        // artista (opcional)
-        String            artistName,
-        String            artistImageUrl
+        // artista (opcional — la imagen se sube como multipart)
+        String            artistName
 ) {}

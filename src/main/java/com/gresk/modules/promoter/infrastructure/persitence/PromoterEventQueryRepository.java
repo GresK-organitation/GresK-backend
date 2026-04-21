@@ -26,7 +26,7 @@ public interface PromoterEventQueryRepository extends Repository<EventEntity, UU
                    e.amount,
                    e.discounted_amount,
                    e.genre::text           AS genre,
-                   e.cover_image_url,
+                   e.cover_image_asset_id AS cover_image_url,
                    e.avg_overall_rating,
                    COUNT(t.id)             AS tickets_sold
             FROM   events e
