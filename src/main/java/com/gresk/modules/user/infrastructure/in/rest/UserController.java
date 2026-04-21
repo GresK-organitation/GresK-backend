@@ -1,6 +1,8 @@
 package com.gresk.modules.user.infrastructure.in.rest;
 
 import com.gresk.infrastructure.security.SecurityContextService;
+import com.gresk.modules.review.application.usecase.GetUserAttendedEventsUseCase;
+import com.gresk.modules.review.infrastructure.web.AttendedEventResponse;
 import com.gresk.modules.user.application.dto.UserDashboardDTO;
 import com.gresk.modules.user.domain.port.in.GetUserDashboardUseCase;
 import com.gresk.modules.user.domain.port.in.UpdateUserAvatarUseCase;
@@ -12,9 +14,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -22,16 +26,24 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UpdateUserUseCase updateUseCase;
-    private final UpdateUserAvatarUseCase updateAvatarUseCase;
-    private final GetUserDashboardUseCase getDashboardUseCase;
-    private final SecurityContextService securityContextService;
+    private final UpdateUserUseCase               updateUseCase;
+    private final UpdateUserAvatarUseCase         updateAvatarUseCase;
+    private final GetUserDashboardUseCase         getDashboardUseCase;
+    private final GetUserAttendedEventsUseCase    getUserAttendedEventsUseCase;
+    private final SecurityContextService          securityContextService;
 
     @GetMapping("/me/dashboard")
     public ResponseEntity<UserDashboardResponseDTO> getDashboard() {
         UUID id = securityContextService.currentUserId();
         UserDashboardDTO dto = getDashboardUseCase.execute(id);
         return ResponseEntity.ok(UserDashboardResponseDTO.from(dto));
+    }
+
+    @GetMapping("/me/events")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<AttendedEventResponse>> getMyEvents() {
+        UUID id = securityContextService.currentUserId();
+        return ResponseEntity.ok(getUserAttendedEventsUseCase.execute(id));
     }
 
     @PutMapping("/me")

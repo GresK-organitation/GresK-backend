@@ -15,5 +15,6 @@ public record PromoterEventDTO(
         BigDecimal price,
         String     genre,
         String     coverImageUrl,
-        Double     conversionRate
+        Double     conversionRate,
+        double     avgRating
 ) {}

@@ -19,19 +19,19 @@ public class PromoterStatsProviderAdapter implements PromoterStatsProviderPort {
     public PromoterStats getStatsByPromoterId(PromoterId promoterId) {
         var id = promoterId.value();
 
-        BigDecimal totalRevenue  = nullSafe(statsRepository.getTotalRevenue(id));
-        long       totalEvents   = nullSafeLong(statsRepository.getTotalEvents(id));
+        BigDecimal totalRevenue   = nullSafe(statsRepository.getTotalRevenue(id));
+        long       totalEvents    = nullSafeLong(statsRepository.getTotalEvents(id));
         long       totalAttendees = nullSafeLong(statsRepository.getTotalAttendees(id));
-        double     sellThrough   = nullSafeDouble(statsRepository.getSellThrough(id));
-        long       activeEvents  = nullSafeLong(statsRepository.getActiveEvents(id));
-        long       pendingEvents = nullSafeLong(statsRepository.getPendingEvents(id));
+        double     sellThrough    = nullSafeDouble(statsRepository.getSellThrough(id));
+        long       activeEvents   = nullSafeLong(statsRepository.getActiveEvents(id));
+        long       pendingEvents  = nullSafeLong(statsRepository.getPendingEvents(id));
         BigDecimal avgTicketPrice = nullSafe(statsRepository.getAvgTicketPrice(id));
+        double     averageRating  = nullSafeDouble(statsRepository.getAverageRating(id));
 
-        // averageRating permanece en 0.0 hasta que se implemente el módulo de ratings
         return new PromoterStats(
                 totalRevenue,
                 totalEvents,
-                0.0,
+                averageRating,
                 totalAttendees,
                 sellThrough,
                 activeEvents,
