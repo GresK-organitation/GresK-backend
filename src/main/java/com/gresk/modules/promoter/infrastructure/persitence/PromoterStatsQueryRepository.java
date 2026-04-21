@@ -123,4 +123,19 @@ public interface PromoterStatsQueryRepository extends Repository<EventEntity, UU
         nativeQuery = true
     )
     BigDecimal getAvgTicketPrice(@Param("promoterId") UUID promoterId);
+
+    /**
+     * Valoración media de todos los reviews de los eventos del promotor.
+     * Devuelve 0.0 si aún no hay ninguna valoración.
+     */
+    @Query(
+        value = """
+            SELECT COALESCE(AVG(r.overall_rating), 0.0)
+            FROM reviews r
+            JOIN events e ON e.id = r.event_id
+            WHERE e.promoter_id = :promoterId
+            """,
+        nativeQuery = true
+    )
+    Double getAverageRating(@Param("promoterId") UUID promoterId);
 }

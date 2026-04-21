@@ -21,4 +21,5 @@ public interface PromoterEventSummary {
     String     getGenre();
     String     getCoverImageUrl();
     Long       getTicketsSold();
+    Double     getAvgOverallRating();
 }

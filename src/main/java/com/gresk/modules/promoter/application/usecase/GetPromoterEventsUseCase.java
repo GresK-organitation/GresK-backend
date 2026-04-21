@@ -40,6 +40,8 @@ public class GetPromoterEventsUseCase implements GetPromoterEventsPort {
                 ? (ticketsSold * 100.0 / totalCapacity)
                 : 0.0;
 
+        double avgRating = s.getAvgOverallRating() != null ? s.getAvgOverallRating() : 0.0;
+
         return new PromoterEventDTO(
                 s.getId().toString(),
                 s.getTitle(),
@@ -53,7 +55,8 @@ public class GetPromoterEventsUseCase implements GetPromoterEventsPort {
                 effectivePrice,
                 s.getGenre(),
                 s.getCoverImageUrl(),
-                conversionRate
+                conversionRate,
+                avgRating
         );
     }
 }
