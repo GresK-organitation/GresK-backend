@@ -20,17 +20,15 @@ public interface EventJpaRepository
     Optional<EventEntity> findByIdWithLock(@Param("id") UUID id);
 
     /**
-     * Eventos de última hora: publicados, futuros, con descuento activo y plazas disponibles.
-     * Máximo 6 resultados ordenados por fecha ascendente.
+     * Eventos de última hora: publicados, con inicio en las próximas 48 horas y plazas disponibles.
      */
     @Query(value = """
             SELECT * FROM events
             WHERE  status             = 'PUBLISHED'
               AND  event_date         >= NOW()
-              AND  discounted_amount  IS NOT NULL
+              AND  event_date         < NOW() + INTERVAL '48 hours'
               AND  available_capacity > 0
             ORDER BY event_date ASC
-            LIMIT 6
             """, nativeQuery = true)
     List<EventEntity> findLastMinuteEvents();
 }
