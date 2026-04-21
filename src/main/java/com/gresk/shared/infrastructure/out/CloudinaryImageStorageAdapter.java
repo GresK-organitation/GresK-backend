@@ -20,15 +20,27 @@ public class CloudinaryImageStorageAdapter implements ImageStoragePort {
 
     @Override
     public AssetId upload(MultipartFile file, String folder) {
+        if (file.isEmpty()) {
+            throw new ImageStorageException("Cannot upload empty file");
+        }
+
         try {
             Map<?, ?> result = cloudinary.uploader().upload(
                     file.getBytes(),
-                    ObjectUtils.asMap("folder", folder, "resource_type", "image")
+                    ObjectUtils.asMap(
+                            "folder", folder,
+                            "resource_type", "image",
+                            "overwrite", true,
+                            "invalidate", true
+                    )
             );
+
+            // El public_id ya incluye la carpeta (ej: "folder/archivo")
             String publicId = (String) result.get("public_id");
             return AssetId.of(publicId);
         } catch (IOException e) {
-            throw new ImageStorageException("Failed to upload image", e);        }
+            throw new ImageStorageException("Failed to upload image to Cloudinary", e);
+        }
     }
 
     @Override
