@@ -1,5 +1,6 @@
 package com.gresk.modules.event.application.dto;
 
+import com.gresk.modules.artist.domain.model.Artist;
 import com.gresk.modules.event.domain.model.Event;
 import com.gresk.modules.event.domain.model.Location;
 import com.gresk.shared.domain.port.out.ImageUrlResolverPort;
@@ -12,15 +13,21 @@ public class EventResponseMapper {
 
     private final ImageUrlResolverPort imageUrlResolver;
 
-    public EventResponse toResponse(Event event) {
+    /**
+     * Convierte un Event domain en EventResponse, enriqueciendo los datos
+     * del artista desde el agregado Artist (puede ser null si no está vinculado).
+     */
+    public EventResponse toResponse(Event event, Artist artist) {
         Location loc = event.getLocation();
 
         String coverImageUrl = imageUrlResolver.resolveOrDefault(event.getCoverImage());
 
+        String artistId       = event.getArtistId() != null ? event.getArtistId().toString() : null;
+        String artistName     = artist != null ? artist.getName().value() : null;
         String artistImageUrl = null;
-        if (event.getArtist() != null && event.getArtist().imageAssetId() != null
-                && !event.getArtist().imageAssetId().isEmpty()) {
-            artistImageUrl = imageUrlResolver.resolveOrDefault(event.getArtist().imageAssetId());
+        if (artist != null && artist.getImageAssetId() != null
+                && !artist.getImageAssetId().isEmpty()) {
+            artistImageUrl = imageUrlResolver.resolveOrDefault(artist.getImageAssetId());
         }
 
         return new EventResponse(
@@ -50,10 +57,11 @@ public class EventResponseMapper {
                 loc != null ? loc.venue()                   : null,
                 loc != null ? loc.coordinates().latitude()  : null,
                 loc != null ? loc.coordinates().longitude() : null,
-                // imagen de portada (URL resuelta desde AssetId)
+                // imagen de portada
                 coverImageUrl,
                 // artista
-                event.getArtist() != null ? event.getArtist().name() : null,
+                artistId,
+                artistName,
                 artistImageUrl
         );
     }

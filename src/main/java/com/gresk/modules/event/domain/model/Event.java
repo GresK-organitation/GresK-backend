@@ -9,6 +9,7 @@ import com.gresk.shared.domain.valueobject.Percentage;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.UUID;
 
 public final class Event {
 
@@ -25,15 +26,15 @@ public final class Event {
     private Instant          eventDate;
     private Location         location;
     private Instant          revealAt;
-    private AssetId         coverImage;
-    private Artist           artist;
+    private AssetId          coverImage;
+    private UUID             artistId;          // FK al agregado Artist (nullable)
     private EventRatingStats ratingStats;
 
     private Event(EventId id, String title, PromoterId promoterId,
                   MusicGenre genre, Price price, Price discountedPrice,
                   Capacity capacity, Instant eventDate,
                   Location location, Instant revealAt,
-                  AssetId coverImage, Artist artist,
+                  AssetId coverImage, UUID artistId,
                   EventStatus status, Instant createdAt,
                   EventRatingStats ratingStats) {
         this.id              = id;
@@ -47,7 +48,7 @@ public final class Event {
         this.location        = location;
         this.revealAt        = revealAt;
         this.coverImage      = coverImage;
-        this.artist          = artist;
+        this.artistId        = artistId;
         this.status          = status;
         this.createdAt       = createdAt;
         this.ratingStats     = ratingStats != null ? ratingStats : EventRatingStats.empty();
@@ -63,29 +64,17 @@ public final class Event {
         );
     }
 
-    /** Reconstitución sin stats (backward-compat para el mapper actual). */
-    public static Event reconstitute(EventId id, String title, PromoterId promoterId,
-                                     MusicGenre genre, Price price, Price discountedPrice,
-                                     Capacity capacity, Instant eventDate,
-                                     Location location, Instant revealAt,
-                                     AssetId coverImage, Artist artist,
-                                     EventStatus status, Instant createdAt) {
-        return new Event(id, title, promoterId, genre, price, discountedPrice,
-                capacity, eventDate, location, revealAt,
-                coverImage, artist, status, createdAt, EventRatingStats.empty());
-    }
-
     /** Reconstitución completa incluyendo stats de valoración. */
     public static Event reconstitute(EventId id, String title, PromoterId promoterId,
                                      MusicGenre genre, Price price, Price discountedPrice,
                                      Capacity capacity, Instant eventDate,
                                      Location location, Instant revealAt,
-                                     AssetId coverImage, Artist artist,
+                                     AssetId coverImage, UUID artistId,
                                      EventStatus status, Instant createdAt,
                                      EventRatingStats ratingStats) {
         return new Event(id, title, promoterId, genre, price, discountedPrice,
                 capacity, eventDate, location, revealAt,
-                coverImage, artist, status, createdAt, ratingStats);
+                coverImage, artistId, status, createdAt, ratingStats);
     }
 
     // ── Comportamientos ──────────────────────────────────────────────────────
@@ -185,8 +174,8 @@ public final class Event {
         return this;
     }
 
-    public Event withArtist(Artist artist) {
-        this.artist = artist;
+    public Event withArtistId(UUID artistId) {
+        this.artistId = artistId;
         return this;
     }
 
@@ -205,7 +194,7 @@ public final class Event {
     public Location   getLocation()        { return location; }
     public Instant    getRevealAt()        { return revealAt; }
     public AssetId   getCoverImage()      { return coverImage; }
-    public Artist     getArtist()          { return artist; }
+    public UUID      getArtistId()        { return artistId; }
 
     /** Precio efectivo: usa discountedPrice si existe, si no el original. */
     public Price effectivePrice() {

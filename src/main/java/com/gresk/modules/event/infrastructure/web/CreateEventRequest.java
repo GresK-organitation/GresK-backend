@@ -31,6 +31,6 @@ public record CreateEventRequest(
         @NotNull Double   latitude,
         @NotNull Double   longitude,
 
-        // artista (opcional — la imagen se sube como multipart)
-        String            artistName
+        // artista (opcional — UUID del Artist del promotor)
+        String            artistId
 ) {}

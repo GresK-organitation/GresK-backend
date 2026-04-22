@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -26,21 +28,13 @@ public class CreateEventUseCase {
     public Event execute(CreateEventCommand command) {
         PromoterId promoterId = PromoterId.of(command.promoterId());
         Event event = Event.create(command.title(), promoterId);
+
         String coverImageAssetId = null;
-        if (command.coverImageAssetId() != null && !command.coverImageAssetId().isEmpty()) {
+        if (command.coverImageFile() != null && !command.coverImageFile().isEmpty()) {
             try {
-                coverImageAssetId = imageStorage.upload(command.coverImageAssetId(), "events/covers").value();
+                coverImageAssetId = imageStorage.upload(command.coverImageFile(), "events/covers").value();
             } catch (Exception e) {
                 log.warn("Could not upload cover image: {}", e.getMessage());
-            }
-        }
-
-        String artistImageAssetId = null;
-        if (command.artistImageUrl() != null && !command.artistImageUrl().isEmpty()) {
-            try {
-                artistImageAssetId = imageStorage.upload(command.artistImageUrl(), "events/artists").value();
-            } catch (Exception e) {
-                log.warn("Could not upload artist image: {}", e.getMessage());
             }
         }
 
@@ -68,10 +62,8 @@ public class CreateEventUseCase {
         if (coverImageAssetId != null && !coverImageAssetId.isBlank()) {
             event.withCoverImage(AssetId.of(coverImageAssetId));
         }
-        if (command.artistName() != null && !command.artistName().isBlank()) {
-            AssetId artistAssetId = (artistImageAssetId != null && !artistImageAssetId.isBlank())
-                    ? AssetId.of(artistImageAssetId) : null;
-            event.withArtist(Artist.of(command.artistName(), artistAssetId));
+        if (command.artistId() != null && !command.artistId().isBlank()) {
+            event.withArtistId(UUID.fromString(command.artistId()));
         }
 
         return eventRepository.save(event);

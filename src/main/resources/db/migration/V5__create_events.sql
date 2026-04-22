@@ -1,15 +1,15 @@
 -- ─────────────────────────────────────────────────────────────────────────
--- V4: events
+-- V5: events
 --
 -- Event aggregate:
---   id, title, accountId (FK→promoters),
+--   id, title, promoter_id (FK→promoters),
 --   status, genre (MusicGenre),
 --   price (amount + currency), discountedPrice (discounted_amount),
 --   capacity (total_capacity + available_capacity),
 --   eventDate, revealAt, createdAt,
 --   location (street + city + country + venue + latitude + longitude),
---   coverImage (cover_image_url),
---   artist (artist_name + artist_image_url)
+--   coverImage (cover_image_asset_id),
+--   artist_id (FK→artists, nullable — Artist is its own aggregate)
 --   + updatedAt (Hibernate infra)
 --
 -- EventStatus enum: DRAFT, PUBLISHED, FINISHED, CANCELLED
@@ -54,15 +54,15 @@ CREATE TABLE events (
     latitude            DOUBLE PRECISION,
     longitude           DOUBLE PRECISION,
 
-    -- imagen de portada
-    cover_image_asset_id     VARCHAR(512),
+    -- imagen de portada (Cloudinary asset_id)
+    cover_image_asset_id VARCHAR(512),
 
-    -- artista
-    artist_name         VARCHAR(255),
-    artist_image_asset_id    VARCHAR(512),
+    -- artista (referencia FK al agregado Artist; null si no hay artista asignado)
+    artist_id           UUID,
 
     CONSTRAINT pk_events              PRIMARY KEY (id),
     CONSTRAINT fk_events_promoter     FOREIGN KEY (promoter_id) REFERENCES promoters (id) ON DELETE RESTRICT,
+    CONSTRAINT fk_events_artist       FOREIGN KEY (artist_id)   REFERENCES artists  (id) ON DELETE SET NULL,
     CONSTRAINT chk_events_status      CHECK (status IN ('DRAFT', 'PUBLISHED', 'FINISHED', 'CANCELLED')),
     CONSTRAINT chk_events_genre       CHECK (genre IN (
         'ROCK', 'POP', 'TECHNO', 'REGGAETON', 'HIP_HOP', 'HOUSE',
@@ -71,8 +71,8 @@ CREATE TABLE events (
     ))
 );
 
-CREATE INDEX idx_events_promoter_id     ON events (promoter_id);
-CREATE INDEX idx_events_status          ON events (status);
-CREATE INDEX idx_events_genre_status    ON events (genre, status);
-CREATE INDEX idx_events_city_date       ON events (city, event_date);
-CREATE INDEX idx_events_artist_name     ON events (artist_name);
+CREATE INDEX idx_events_promoter_id  ON events (promoter_id);
+CREATE INDEX idx_events_status       ON events (status);
+CREATE INDEX idx_events_genre_status ON events (genre, status);
+CREATE INDEX idx_events_city_date    ON events (city, event_date);
+CREATE INDEX idx_events_artist_id    ON events (artist_id);

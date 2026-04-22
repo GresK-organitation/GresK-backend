@@ -89,12 +89,9 @@ public class EventEntity {
     @Column(name = "cover_image_asset_id", length = 512)
     private String coverImageAssetId;
 
-    // ── Artista ──────────────────────────────────────────────────────────────
-    @Column(name = "artist_name", length = 255)
-    private String artistName;
-
-    @Column(name = "artist_image_asset_id", length = 512)
-    private String artistImageUrl;
+    // ── Artista (FK al agregado Artist; null si no hay artista asignado) ─────
+    @Column(name = "artist_id")
+    private UUID artistId;
 
     // ── Rating stats (denormalized community averages) ───────────────────────
     @Column(name = "review_count")
