@@ -93,7 +93,7 @@ public class EventEntity {
     @Column(name = "artist_name", length = 255)
     private String artistName;
 
-    @Column(name = "artist_image_url", length = 512)
+    @Column(name = "artist_image_asset_id", length = 512)
     private String artistImageUrl;
 
     // ── Rating stats (denormalized community averages) ───────────────────────

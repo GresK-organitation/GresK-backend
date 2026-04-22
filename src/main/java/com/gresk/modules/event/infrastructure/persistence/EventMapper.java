@@ -37,8 +37,8 @@ public class EventMapper {
 
         Artist artist = null;
         if (e.getArtistName() != null && !e.getArtistName().isBlank()) {
-            AssetId artistAssetId = (e.getArtistImageUrl()!= null && !e.getArtistImageAssetId().isBlank())
-                    ? AssetId.reconstitute(e.getArtistImageAssetId()) : null;
+            AssetId artistAssetId = (e.getArtistImageUrl()!= null && !e.getArtistImageUrl().isBlank())
+                    ? AssetId.reconstitute(e.getArtistImageUrl()) : null;
             artist = Artist.of(e.getArtistName(), artistAssetId);
         }
 
