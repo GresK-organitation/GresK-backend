@@ -6,6 +6,8 @@ import com.gresk.modules.user.domain.model.EventRecommendation;
 import com.gresk.modules.user.domain.port.out.EventRecommendationProvider;
 import com.gresk.modules.user.infrastructure.persistence.UserEventQueryRepository;
 import com.gresk.shared.domain.MusicGenre;
+import com.gresk.shared.domain.port.out.ImageUrlResolverPort;
+import com.gresk.shared.domain.valueobject.AssetId;
 import com.gresk.shared.domain.valueobject.City;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +27,7 @@ public class EventRecommendationProviderAdapter implements EventRecommendationPr
     private static final int MAX_RECOMMENDATIONS = 3;
 
     private final UserEventQueryRepository queryRepository;
+    private final ImageUrlResolverPort     imageUrlResolver;
 
     @Override
     public Set<EventRecommendation> getTopEvents(City city, Set<MusicGenre> musicGenres) {
@@ -59,12 +62,17 @@ public class EventRecommendationProviderAdapter implements EventRecommendationPr
                 ? e.getVenue()
                 : e.getCity();
 
+        String imageUrl = null;
+        if (e.getCoverImageAssetId() != null && !e.getCoverImageAssetId().isBlank()) {
+            imageUrl = imageUrlResolver.resolveOrDefault(AssetId.of(e.getCoverImageAssetId()));
+        }
+
         return new EventRecommendation(
                 e.getId().toString(),
                 e.getTitle(),
                 location,
                 e.getEventDate().atZone(ZoneId.systemDefault()).toLocalDateTime(),
-                e.getCoverImageUrl(),
+                imageUrl,
                 e.getGenre() != null ? e.getGenre().name() : null,
                 effectivePrice
         );
