@@ -15,8 +15,7 @@ public class EventResponseMapper {
     public EventResponse toResponse(Event event) {
         Location loc = event.getLocation();
 
-        String coverImageUrl = event.getCoverImage() != null && !event.getCoverImage().isEmpty()
-                ? imageUrlResolver.resolveOrDefault(event.getCoverImage()) : null;
+        String coverImageUrl = imageUrlResolver.resolveOrDefault(event.getCoverImage());
 
         String artistImageUrl = null;
         if (event.getArtist() != null && event.getArtist().imageAssetId() != null
