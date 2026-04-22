@@ -48,6 +48,7 @@ public class GetPromoterEventsUseCase implements GetPromoterEventsPort {
         if (assetId != null && !assetId.isBlank()) {
             coverImageUrl = imageUrlResolver.resolveOrDefault(AssetId.of(assetId));
         }
+        double avgRating = s.getAvgOverallRating() != null ? s.getAvgOverallRating() : 0.0;
 
         return new PromoterEventDTO(
                 s.getId().toString(),
