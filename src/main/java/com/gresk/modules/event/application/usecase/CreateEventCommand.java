@@ -26,8 +26,7 @@ public record CreateEventCommand(
         Double     latitude,
         Double     longitude,
         // imagen (Cloudinary public_id)
-        MultipartFile coverImageAssetId,
-        // artista
-        String     artistName,
-        MultipartFile     artistImageUrl
+        MultipartFile coverImageFile,
+        // artista (UUID del Artist del promotor; null si no aplica)
+        String     artistId
 ) {}

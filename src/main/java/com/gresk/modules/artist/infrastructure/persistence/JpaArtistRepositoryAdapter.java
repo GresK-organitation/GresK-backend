@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +23,35 @@ public class JpaArtistRepositoryAdapter implements ArtistRepositoryPort {
     @Override
     @Transactional
     public Artist save(Artist artist) {
-        return mapper.toDomain(jpaRepository.save(mapper.toEntity(artist)));
+        // For existing entities we MUST update in place — mapper.toEntity() builds a
+        // fresh ArtistEntity with version=null, which makes Spring Data call persist()
+        // (INSERT) instead of merge() (UPDATE), causing an EntityExistsException.
+        // Loading the managed entity and mutating it preserves the @Version field.
+        return jpaRepository.findById(artist.getId().value())
+                .map(entity -> {
+                    entity.updateProfile(
+                            artist.getName().value(),
+                            artist.getOrigin().value(),
+                            new HashSet<>(artist.getGenres()),
+                            artist.getImageAssetId().isEmpty() ? null : artist.getImageAssetId().value(),
+                            artist.getBio().isEmpty()          ? null : artist.getBio().value()
+                    );
+                    entity.updateProfessionalInfo(
+                            artist.getStatus(),
+                            artist.getFee().isEmpty()       ? null : artist.getFee().value(),
+                            artist.getFollowers().isEmpty() ? null : artist.getFollowers().value(),
+                            new HashSet<>(artist.getTags())
+                    );
+                    entity.updateContact(
+                            artist.getContact().value(),
+                            artist.getSocialLinks().hasInstagram() ? artist.getSocialLinks().instagramUrl() : null,
+                            artist.getSocialLinks().hasSpotify()   ? artist.getSocialLinks().spotifyUrl()   : null
+                    );
+                    entity.updateStats(artist.getEventsPlayed(), artist.getAvgRating());
+                    return mapper.toDomain(jpaRepository.save(entity));
+                })
+                // Artist not yet persisted — create from scratch (new entity, version=null is correct)
+                .orElseGet(() -> mapper.toDomain(jpaRepository.save(mapper.toEntity(artist))));
     }
 
     @Override

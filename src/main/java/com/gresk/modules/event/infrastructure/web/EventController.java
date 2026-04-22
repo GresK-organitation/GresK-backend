@@ -1,5 +1,8 @@
 package com.gresk.modules.event.infrastructure.web;
 
+import com.gresk.modules.artist.domain.model.Artist;
+import com.gresk.modules.artist.domain.model.valueobject.ArtistId;
+import com.gresk.modules.artist.domain.port.out.ArtistRepositoryPort;
 import com.gresk.modules.event.application.dto.EventResponse;
 import com.gresk.modules.event.application.dto.EventResponseMapper;
 import com.gresk.modules.event.application.dto.PageResponse;
@@ -10,6 +13,7 @@ import com.gresk.modules.event.application.usecase.GetEventUseCase;
 import com.gresk.modules.event.application.usecase.GetLastMinuteEventsUseCase;
 import com.gresk.modules.event.application.usecase.ListEventsUseCase;
 import com.gresk.modules.event.application.usecase.PublishEventUseCase;
+import com.gresk.modules.event.domain.model.Event;
 import com.gresk.modules.event.domain.model.EventStatus;
 import com.gresk.modules.event.domain.port.out.EventFilter;
 import com.gresk.shared.domain.MusicGenre;
@@ -41,6 +45,19 @@ public class EventController {
     private final ListEventsUseCase          listUseCase;
     private final GetLastMinuteEventsUseCase getLastMinuteUseCase;
     private final EventResponseMapper        mapper;
+    private final ArtistRepositoryPort       artistRepository;
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    /** Resuelve el artista vinculado al evento y delega en el mapper. */
+    private EventResponse toResponse(Event event) {
+        Artist artist = null;
+        if (event.getArtistId() != null) {
+            artist = artistRepository.findById(ArtistId.of(event.getArtistId().toString()))
+                    .orElse(null);
+        }
+        return mapper.toResponse(event, artist);
+    }
 
     // ── POST /api/v1/events ──────────────────────────────────────────────────
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -48,7 +65,6 @@ public class EventController {
     public ResponseEntity<EventResponse> create(
             @RequestPart("data") @Valid CreateEventRequest request,
             @RequestPart(value = "coverImage", required = false) MultipartFile coverImage,
-            @RequestPart(value = "artistImage", required = false) MultipartFile artistImage,
             @AuthenticationPrincipal String promoterId) {
 
         CreateEventCommand command = new CreateEventCommand(
@@ -67,10 +83,9 @@ public class EventController {
                 request.latitude(),
                 request.longitude(),
                 coverImage,
-                request.artistName(),
-                artistImage
+                request.artistId()
         );
-        return ResponseEntity.status(201).body(mapper.toResponse(createUseCase.execute(command)));
+        return ResponseEntity.status(201).body(toResponse(createUseCase.execute(command)));
     }
 
     // ── PUT /api/v1/events/{id}/publish ──────────────────────────────────────
@@ -79,13 +94,13 @@ public class EventController {
     public ResponseEntity<EventResponse> publish(
             @PathVariable String id,
             @AuthenticationPrincipal String promoterId) {
-        return ResponseEntity.ok(mapper.toResponse(publishUseCase.execute(id, promoterId)));
+        return ResponseEntity.ok(toResponse(publishUseCase.execute(id, promoterId)));
     }
 
     // ── GET /api/v1/events/{id} ──────────────────────────────────────────────
     @GetMapping("/{id}")
     public ResponseEntity<EventResponse> getById(@PathVariable String id) {
-        return ResponseEntity.ok(mapper.toResponse(getUseCase.execute(new GetEventQuery(id))));
+        return ResponseEntity.ok(toResponse(getUseCase.execute(new GetEventQuery(id))));
     }
 
     // ── GET /api/v1/events ───────────────────────────────────────────────────
@@ -115,7 +130,7 @@ public class EventController {
         PageRequest pageRequest = PageRequest.of(page, size);
 
         List<EventResponse> content = listUseCase.execute(filter, pageRequest)
-                .stream().map(mapper::toResponse).toList();
+                .stream().map(this::toResponse).toList();
         long total = listUseCase.count(filter);
 
         return ResponseEntity.ok(PageResponse.of(content, total, pageRequest));
@@ -126,7 +141,7 @@ public class EventController {
     public ResponseEntity<List<EventResponse>> getLastMinute() {
         List<EventResponse> result = getLastMinuteUseCase.execute()
                 .stream()
-                .map(mapper::toResponse)
+                .map(this::toResponse)
                 .toList();
         return ResponseEntity.ok(result);
     }

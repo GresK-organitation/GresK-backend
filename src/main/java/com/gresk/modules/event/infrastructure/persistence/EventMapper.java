@@ -9,6 +9,7 @@ import com.gresk.shared.domain.valueobject.Coordinates;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Component
 public class EventMapper {
@@ -35,12 +36,7 @@ public class EventMapper {
         AssetId coverImage = (e.getCoverImageAssetId() != null && !e.getCoverImageAssetId().isBlank())
                 ? AssetId.reconstitute(e.getCoverImageAssetId()) : null;
 
-        Artist artist = null;
-        if (e.getArtistName() != null && !e.getArtistName().isBlank()) {
-            AssetId artistAssetId = (e.getArtistImageUrl()!= null && !e.getArtistImageUrl().isBlank())
-                    ? AssetId.reconstitute(e.getArtistImageUrl()) : null;
-            artist = Artist.of(e.getArtistName(), artistAssetId);
-        }
+        UUID artistId = e.getArtistId();
 
         EventRatingStats ratingStats = (e.getReviewCount() != null && e.getReviewCount() > 0)
                 ? new EventRatingStats(
@@ -65,7 +61,7 @@ public class EventMapper {
                 location,
                 e.getRevealAt(),
                 coverImage,
-                artist,
+                artistId,
                 e.getStatus(),
                 e.getCreatedAt(),
                 ratingStats
@@ -104,10 +100,8 @@ public class EventMapper {
                 // imagen (public_id de Cloudinary)
                 .coverImageAssetId(event.getCoverImage() != null && !event.getCoverImage().isEmpty()
                         ? event.getCoverImage().value() : null)
-                // artista
-                .artistName(event.getArtist() != null ? event.getArtist().name() : null)
-                .artistImageUrl(event.getArtist() != null && event.getArtist().imageAssetId() != null
-                        ? event.getArtist().imageAssetId().value() : null)
+                // artista (solo FK)
+                .artistId(event.getArtistId())
                 // rating stats
                 .reviewCount(event.getRatingStats().reviewCount())
                 .avgOverallRating(event.getRatingStats().avgOverallRating())

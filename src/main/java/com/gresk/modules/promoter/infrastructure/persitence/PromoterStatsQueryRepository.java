@@ -48,14 +48,17 @@ public interface PromoterStatsQueryRepository extends Repository<EventEntity, UU
     Long getTotalEvents(@Param("promoterId") UUID promoterId);
 
     /**
-     * Asistentes totales: suma de tickets vendidos en eventos FINISHED.
+     * Asistentes totales: usuarios que han comprado entrada en eventos
+     * PUBLISHED o FINISHED del promotor (tickets en estado PURCHASED).
      */
     @Query(
         value = """
-            SELECT COALESCE(SUM(total_capacity - available_capacity), 0)
-            FROM events
-            WHERE promoter_id = :promoterId
-              AND status = 'FINISHED'
+            SELECT COUNT(t.id)
+            FROM tickets t
+            JOIN events e ON t.event_id = e.id
+            WHERE e.promoter_id = :promoterId
+              AND e.status IN ('PUBLISHED', 'FINISHED')
+              AND t.status = 'PURCHASED'
             """,
         nativeQuery = true
     )

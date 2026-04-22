@@ -7,6 +7,7 @@ import com.gresk.modules.review.domain.model.DetailedRating;
 import com.gresk.modules.review.domain.model.Review;
 import com.gresk.modules.review.domain.model.ReviewComment;
 import com.gresk.modules.review.domain.model.ReviewId;
+import com.gresk.modules.review.domain.port.out.ArtistRatingPort;
 import com.gresk.modules.review.domain.port.out.EventRatingPort;
 import com.gresk.modules.review.domain.port.out.ReviewRepository;
 import com.gresk.modules.user.domain.model.UserId;
@@ -18,11 +19,14 @@ public class UpdateReviewUseCase {
 
     private final ReviewRepository reviewRepository;
     private final EventRatingPort  eventRatingPort;
+    private final ArtistRatingPort artistRatingPort;
 
     public UpdateReviewUseCase(ReviewRepository reviewRepository,
-                               EventRatingPort eventRatingPort) {
+                               EventRatingPort eventRatingPort,
+                               ArtistRatingPort artistRatingPort) {
         this.reviewRepository = reviewRepository;
         this.eventRatingPort  = eventRatingPort;
+        this.artistRatingPort = artistRatingPort;
     }
 
     public Review execute(UpdateReviewCommand command) {
@@ -65,6 +69,9 @@ public class UpdateReviewUseCase {
 
         eventRatingPort.setStats(eventId, count,
                 avgOverall, avgArtist, avgSound, avgAmbience, avgVenue, avgSetlist);
+
+        // Recalcular avgRating en el Artist vinculado (sólo artist_rating)
+        artistRatingPort.recalculateForEvent(eventId);
 
         return review;
     }

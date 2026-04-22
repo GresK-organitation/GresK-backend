@@ -7,6 +7,7 @@ import com.gresk.modules.review.domain.exception.ReviewNotFoundException;
 import com.gresk.modules.review.domain.model.DetailedRating;
 import com.gresk.modules.review.domain.model.Review;
 import com.gresk.modules.review.domain.model.ReviewComment;
+import com.gresk.modules.review.domain.port.out.ArtistRatingPort;
 import com.gresk.modules.review.domain.port.out.EventRatingPort;
 import com.gresk.modules.review.domain.port.out.ReviewRepository;
 import com.gresk.modules.review.domain.port.out.UserPointsPort;
@@ -22,15 +23,18 @@ public class SubmitReviewUseCase {
     private final TicketRepository  ticketRepository;
     private final UserPointsPort    userPointsPort;
     private final EventRatingPort   eventRatingPort;
+    private final ArtistRatingPort  artistRatingPort;
 
     public SubmitReviewUseCase(ReviewRepository reviewRepository,
                                TicketRepository ticketRepository,
                                UserPointsPort userPointsPort,
-                               EventRatingPort eventRatingPort) {
+                               EventRatingPort eventRatingPort,
+                               ArtistRatingPort artistRatingPort) {
         this.reviewRepository = reviewRepository;
         this.ticketRepository  = ticketRepository;
         this.userPointsPort    = userPointsPort;
         this.eventRatingPort   = eventRatingPort;
+        this.artistRatingPort  = artistRatingPort;
     }
 
     public Review execute(SubmitReviewCommand command) {
@@ -85,6 +89,9 @@ public class SubmitReviewUseCase {
                 detailedRating.setlistRating().value(),
                 review.getOverallRating().value()
         );
+
+        // Recalcular avgRating en el Artist vinculado (sólo artist_rating)
+        artistRatingPort.recalculateForEvent(eventId);
 
         return review;
     }

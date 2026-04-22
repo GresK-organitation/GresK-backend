@@ -30,7 +30,8 @@ public record EventResponse(
         Double     longitude,
         // imagen de portada
         String     coverImageUrl,
-        // artista
+        // artista (id para referencias + datos resueltos para display)
+        String     artistId,
         String     artistName,
         String     artistImageUrl
 ) {}
