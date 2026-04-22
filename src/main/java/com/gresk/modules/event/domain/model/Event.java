@@ -17,23 +17,25 @@ public final class Event {
     private final PromoterId   promoterId;
     private final Instant      createdAt;
 
-    private EventStatus status;
-    private MusicGenre  genre;
-    private Price       price;
-    private Price       discountedPrice;   // null mientras no se aplique descuento
-    private Capacity    capacity;
-    private Instant     eventDate;
-    private Location    location;
-    private Instant     revealAt;
-    private AssetId     coverImage;
-    private Artist      artist;
+    private EventStatus      status;
+    private MusicGenre       genre;
+    private Price            price;
+    private Price            discountedPrice;   // null mientras no se aplique descuento
+    private Capacity         capacity;
+    private Instant          eventDate;
+    private Location         location;
+    private Instant          revealAt;
+    private AssetId         coverImage;
+    private Artist           artist;
+    private EventRatingStats ratingStats;
 
     private Event(EventId id, String title, PromoterId promoterId,
                   MusicGenre genre, Price price, Price discountedPrice,
                   Capacity capacity, Instant eventDate,
                   Location location, Instant revealAt,
                   AssetId coverImage, Artist artist,
-                  EventStatus status, Instant createdAt) {
+                  EventStatus status, Instant createdAt,
+                  EventRatingStats ratingStats) {
         this.id              = id;
         this.title           = title;
         this.promoterId      = promoterId;
@@ -57,10 +59,11 @@ public final class Event {
         return new Event(
                 EventId.generate(), title, promoterId,
                 null, null, null, null, null, null, null, null, null,
-                EventStatus.DRAFT, Instant.now()
+                EventStatus.DRAFT, Instant.now(), EventRatingStats.empty()
         );
     }
 
+    /** Reconstitución sin stats (backward-compat para el mapper actual). */
     public static Event reconstitute(EventId id, String title, PromoterId promoterId,
                                      MusicGenre genre, Price price, Price discountedPrice,
                                      Capacity capacity, Instant eventDate,
@@ -69,7 +72,20 @@ public final class Event {
                                      EventStatus status, Instant createdAt) {
         return new Event(id, title, promoterId, genre, price, discountedPrice,
                 capacity, eventDate, location, revealAt,
-                coverImage, artist, status, createdAt);
+                coverImage, artist, status, createdAt, EventRatingStats.empty());
+    }
+
+    /** Reconstitución completa incluyendo stats de valoración. */
+    public static Event reconstitute(EventId id, String title, PromoterId promoterId,
+                                     MusicGenre genre, Price price, Price discountedPrice,
+                                     Capacity capacity, Instant eventDate,
+                                     Location location, Instant revealAt,
+                                     AssetId coverImage, Artist artist,
+                                     EventStatus status, Instant createdAt,
+                                     EventRatingStats ratingStats) {
+        return new Event(id, title, promoterId, genre, price, discountedPrice,
+                capacity, eventDate, location, revealAt,
+                coverImage, artist, status, createdAt, ratingStats);
     }
 
     // ── Comportamientos ──────────────────────────────────────────────────────
@@ -188,7 +204,7 @@ public final class Event {
     public Instant    getEventDate()       { return eventDate; }
     public Location   getLocation()        { return location; }
     public Instant    getRevealAt()        { return revealAt; }
-    public AssetId    getCoverImage()      { return coverImage; }
+    public AssetId   getCoverImage()      { return coverImage; }
     public Artist     getArtist()          { return artist; }
 
     /** Precio efectivo: usa discountedPrice si existe, si no el original. */
