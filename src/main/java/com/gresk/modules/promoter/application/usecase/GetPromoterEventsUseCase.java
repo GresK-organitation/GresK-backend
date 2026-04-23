@@ -43,11 +43,9 @@ public class GetPromoterEventsUseCase implements GetPromoterEventsPort {
                 ? (ticketsSold * 100.0 / totalCapacity)
                 : 0.0;
 
-        String coverImageUrl = null;
-        String assetId = s.getCoverImageUrl(); // returns cover_image_asset_id value (aliased)
-        if (assetId != null && !assetId.isBlank()) {
-            coverImageUrl = imageUrlResolver.resolveOrDefault(AssetId.of(assetId));
-        }
+        String assetId = s.getCoverImageUrl();
+        AssetId coverAsset = (assetId != null && !assetId.isBlank()) ? AssetId.of(assetId) : null;
+        String coverImageUrl = imageUrlResolver.resolveOrDefault(coverAsset);
         double avgRating = s.getAvgOverallRating() != null ? s.getAvgOverallRating() : 0.0;
 
         return new PromoterEventDTO(

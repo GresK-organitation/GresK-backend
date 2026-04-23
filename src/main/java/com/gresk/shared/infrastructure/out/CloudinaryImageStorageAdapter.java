@@ -35,7 +35,6 @@ public class CloudinaryImageStorageAdapter implements ImageStoragePort {
                     )
             );
 
-            // El public_id ya incluye la carpeta (ej: "folder/archivo")
             String publicId = (String) result.get("public_id");
             return AssetId.of(publicId);
         } catch (IOException e) {

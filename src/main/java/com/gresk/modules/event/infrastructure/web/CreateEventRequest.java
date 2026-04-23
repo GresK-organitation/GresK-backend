@@ -10,27 +10,22 @@ import java.time.Instant;
 
 public record CreateEventRequest(
         @NotBlank String  title,
-        @NotNull  String  genre,            // nombre del enum MusicGenre
+        @NotNull  String  genre,
 
-        // precio
         @NotNull @DecimalMin("0.01") BigDecimal price,
         @NotBlank String  currency,
 
-        // aforo
         @NotNull @Min(1) Integer totalCapacity,
 
-        // fechas (ISO-8601 con zona horaria)
         @NotNull Instant eventDate,
-        Instant          revealAt,          // opcional
+        Instant          revealAt,
 
-        // ubicación
         @NotBlank String  street,
         @NotBlank String  city,
         @NotBlank String  country,
-        String            venue,            // opcional
+        String            venue,
         @NotNull Double   latitude,
         @NotNull Double   longitude,
 
-        // artista (opcional — UUID del Artist del promotor)
         String            artistId
 ) {}
