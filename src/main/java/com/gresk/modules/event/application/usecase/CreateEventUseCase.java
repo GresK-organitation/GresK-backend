@@ -2,8 +2,11 @@ package com.gresk.modules.event.application.usecase;
 
 import com.gresk.modules.event.domain.model.*;
 import com.gresk.modules.event.domain.port.out.EventRepository;
+import com.gresk.modules.promoter.domain.exception.PromoterNotActiveException;
 import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
+import com.gresk.shared.domain.AccountStatus;
 import com.gresk.shared.domain.MusicGenre;
+import com.gresk.shared.domain.port.out.AccountStatusPort;
 import com.gresk.shared.domain.port.out.ImageStoragePort;
 import com.gresk.shared.domain.valueobject.Address;
 import com.gresk.shared.domain.valueobject.City;
@@ -23,9 +26,15 @@ public class CreateEventUseCase {
 
     private final EventRepository eventRepository;
     private final ImageStoragePort imageStorage;
+    private final AccountStatusPort accountStatusPort;
 
     @Transactional
     public Event execute(CreateEventCommand command) {
+        UUID accountId = UUID.fromString(command.promoterId());
+        if (accountStatusPort.getStatus(accountId) != AccountStatus.ACTIVE) {
+            throw new PromoterNotActiveException("Promoter account is not active: " + accountId);
+        }
+
         PromoterId promoterId = PromoterId.of(command.promoterId());
         Event event = Event.create(command.title(), promoterId);
 
