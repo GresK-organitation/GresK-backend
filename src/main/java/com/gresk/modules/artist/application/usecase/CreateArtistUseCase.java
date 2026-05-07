@@ -6,7 +6,6 @@ import com.gresk.modules.artist.domain.exception.ArtistAlreadyExistsException;
 import com.gresk.modules.artist.domain.model.Artist;
 import com.gresk.modules.artist.domain.model.valueobject.ArtistContact;
 import com.gresk.modules.artist.domain.model.valueobject.ArtistFee;
-import com.gresk.modules.artist.domain.model.valueobject.ArtistId;
 import com.gresk.modules.artist.domain.model.valueobject.ArtistStatus;
 import com.gresk.modules.artist.domain.model.valueobject.FollowerCount;
 import com.gresk.modules.artist.domain.model.valueobject.SocialLinks;
@@ -38,7 +37,7 @@ public class CreateArtistUseCase implements CreateArtistPort {
 
     @Override
     @Transactional
-    public ArtistId execute(CreateArtistCommand command) {
+    public Artist execute(CreateArtistCommand command) {
         PromoterId promoterId = PromoterId.of(command.promoterId());
 
         if (artistRepository.existsByContactAndPromoterId(command.contact(), promoterId)) {
@@ -79,6 +78,6 @@ public class CreateArtistUseCase implements CreateArtistPort {
                 SocialLinks.of(command.instagramUrl(), command.spotifyUrl())
         );
 
-        return artistRepository.save(artist).getId();
+        return artistRepository.save(artist);
     }
 }

@@ -1,6 +1,8 @@
 package com.gresk.modules.event.application.dto;
 
 import com.gresk.modules.artist.domain.model.Artist;
+import com.gresk.modules.artist.domain.model.valueobject.ArtistId;
+import com.gresk.modules.artist.domain.port.out.ArtistRepositoryPort;
 import com.gresk.modules.event.domain.model.Event;
 import com.gresk.modules.event.domain.model.Location;
 import com.gresk.shared.domain.port.out.ImageUrlResolverPort;
@@ -12,12 +14,14 @@ import org.springframework.stereotype.Component;
 public class EventResponseMapper {
 
     private final ImageUrlResolverPort imageUrlResolver;
+    private final ArtistRepositoryPort artistRepository;
 
-    /**
-     * Convierte un Event domain en EventResponse, enriqueciendo los datos
-     * del artista desde el agregado Artist (puede ser null si no está vinculado).
-     */
-    public EventResponse toResponse(Event event, Artist artist) {
+    public EventResponse toResponse(Event event) {
+        Artist artist = null;
+        if (event.getArtistId() != null) {
+            artist = artistRepository.findById(ArtistId.of(event.getArtistId().toString()))
+                    .orElse(null);
+        }
         Location loc = event.getLocation();
 
         String coverImageUrl = imageUrlResolver.resolveOrDefault(event.getCoverImage());

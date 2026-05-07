@@ -1,6 +1,7 @@
 package com.gresk.modules.review.application.usecase;
 
 import com.gresk.modules.event.domain.model.EventId;
+import com.gresk.modules.review.application.port.in.SubmitReviewPort;
 import com.gresk.modules.review.domain.exception.ReviewAlreadyExistsException;
 import com.gresk.modules.review.domain.exception.ReviewForbiddenException;
 import com.gresk.modules.review.domain.exception.ReviewNotFoundException;
@@ -16,8 +17,13 @@ import com.gresk.modules.ticket.domain.model.TicketId;
 import com.gresk.modules.ticket.domain.port.out.TicketRepository;
 import com.gresk.modules.user.domain.model.UserId;
 import com.gresk.shared.domain.valueobject.ImageUrl;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-public class SubmitReviewUseCase {
+@Service
+@RequiredArgsConstructor
+public class SubmitReviewUseCase implements SubmitReviewPort {
 
     private final ReviewRepository  reviewRepository;
     private final TicketRepository  ticketRepository;
@@ -25,18 +31,8 @@ public class SubmitReviewUseCase {
     private final EventRatingPort   eventRatingPort;
     private final ArtistRatingPort  artistRatingPort;
 
-    public SubmitReviewUseCase(ReviewRepository reviewRepository,
-                               TicketRepository ticketRepository,
-                               UserPointsPort userPointsPort,
-                               EventRatingPort eventRatingPort,
-                               ArtistRatingPort artistRatingPort) {
-        this.reviewRepository = reviewRepository;
-        this.ticketRepository  = ticketRepository;
-        this.userPointsPort    = userPointsPort;
-        this.eventRatingPort   = eventRatingPort;
-        this.artistRatingPort  = artistRatingPort;
-    }
-
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public Review execute(SubmitReviewCommand command) {
         UserId   userId   = UserId.from(command.userId());
         TicketId ticketId = TicketId.from(command.ticketId());

@@ -1,8 +1,8 @@
 package com.gresk.modules.artist.application.port.in;
 
 import com.gresk.modules.artist.application.command.CreateArtistCommand;
-import com.gresk.modules.artist.domain.model.valueobject.ArtistId;
+import com.gresk.modules.artist.domain.model.Artist;
 
 public interface CreateArtistPort {
-    ArtistId execute(CreateArtistCommand command);
+    Artist execute(CreateArtistCommand command);
 }

@@ -4,7 +4,7 @@ import com.gresk.modules.artist.application.command.CreateArtistCommand;
 import com.gresk.modules.artist.application.port.in.CreateArtistPort;
 import com.gresk.modules.artist.application.port.in.GetArtistByIdPort;
 import com.gresk.modules.artist.application.port.in.GetArtistsByPromoterPort;
-import com.gresk.modules.artist.domain.model.valueobject.ArtistId;
+import com.gresk.modules.artist.domain.model.Artist;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,13 +52,11 @@ public class ArtistController {
                 request.spotifyUrl()
         );
 
-        ArtistId artistId = createArtistUseCase.execute(command);
-        ArtistResponse response = mapper.toResponse(
-                getArtistByIdUseCase.execute(artistId.value().toString(), promoterId)
-        );
+        Artist artist = createArtistUseCase.execute(command);
+        ArtistResponse response = mapper.toResponse(artist);
 
         return ResponseEntity
-                .created(URI.create("/api/v1/artists/" + artistId.value()))
+                .created(URI.create("/api/v1/artists/" + artist.getId().value()))
                 .body(response);
     }
 
