@@ -7,9 +7,9 @@ import com.gresk.modules.review.application.usecase.GetUserReviewsQuery;
 import com.gresk.modules.review.application.usecase.GetUserReviewsUseCase;
 import com.gresk.modules.review.application.usecase.SubmitReviewCommand;
 import com.gresk.modules.review.application.usecase.UpdateReviewCommand;
+import com.gresk.modules.review.application.port.in.SubmitReviewPort;
+import com.gresk.modules.review.application.port.in.UpdateReviewPort;
 import com.gresk.modules.review.domain.model.Review;
-import com.gresk.modules.review.infrastructure.TransactionalSubmitReviewService;
-import com.gresk.modules.review.infrastructure.TransactionalUpdateReviewService;
 import com.gresk.modules.review.infrastructure.web.request.SubmitReviewRequest;
 import com.gresk.modules.review.infrastructure.web.request.UpdateReviewRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,8 +36,8 @@ import java.util.List;
 @Tag(name = "Reviews", description = "Post-concert review endpoints")
 public class ReviewController {
 
-    private final TransactionalSubmitReviewService submitReviewService;
-    private final TransactionalUpdateReviewService updateReviewService;
+    private final SubmitReviewPort submitReviewPort;
+    private final UpdateReviewPort updateReviewPort;
     private final GetUserReviewsUseCase            getUserReviewsUseCase;
     private final GetEventRatingStatsUseCase       getEventRatingStatsUseCase;
     private final GetEventReviewsUseCase           getEventReviewsUseCase;
@@ -71,7 +71,7 @@ public class ReviewController {
                 request.photoUrl()
         );
 
-        Review review = submitReviewService.execute(command);
+        Review review = submitReviewPort.execute(command);
         return ResponseEntity.status(201).body(mapper.toResponse(review));
     }
 
@@ -97,7 +97,7 @@ public class ReviewController {
                 request.comment(), request.photoUrl()
         );
 
-        return ResponseEntity.ok(mapper.toResponse(updateReviewService.execute(command)));
+        return ResponseEntity.ok(mapper.toResponse(updateReviewPort.execute(command)));
     }
 
     // ── GET /api/v1/reviews/users/me ─────────────────────────────────────────

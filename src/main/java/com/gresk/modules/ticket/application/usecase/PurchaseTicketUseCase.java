@@ -4,6 +4,7 @@ import com.gresk.modules.event.domain.exception.EventNotFoundException;
 import com.gresk.modules.event.domain.model.Event;
 import com.gresk.modules.event.domain.model.EventId;
 import com.gresk.modules.event.domain.port.out.EventRepository;
+import com.gresk.modules.ticket.application.port.in.PurchaseTicketPort;
 import com.gresk.modules.ticket.domain.exception.DuplicateTicketException;
 import com.gresk.modules.ticket.domain.exception.PaymentFailedException;
 import com.gresk.modules.ticket.domain.model.PaymentResult;
@@ -14,24 +15,21 @@ import com.gresk.modules.ticket.domain.port.out.PaymentGateway;
 import com.gresk.modules.ticket.domain.port.out.QrCodeGenerator;
 import com.gresk.modules.ticket.domain.port.out.TicketRepository;
 import com.gresk.modules.user.domain.model.UserId;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-public class PurchaseTicketUseCase {
+@Service
+@RequiredArgsConstructor
+public class PurchaseTicketUseCase implements PurchaseTicketPort {
 
     private final TicketRepository ticketRepository;
     private final EventRepository eventRepository;
     private final PaymentGateway paymentGateway;
     private final QrCodeGenerator qrCodeGenerator;
 
-    public PurchaseTicketUseCase(TicketRepository ticketRepository,
-                                 EventRepository eventRepository,
-                                 PaymentGateway paymentGateway,
-                                 QrCodeGenerator qrCodeGenerator) {
-        this.ticketRepository = ticketRepository;
-        this.eventRepository = eventRepository;
-        this.paymentGateway = paymentGateway;
-        this.qrCodeGenerator = qrCodeGenerator;
-    }
-
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public Ticket execute(PurchaseTicketCommand command) {
         UserId userId = UserId.from(command.userId());
         EventId eventId = EventId.of(command.eventId());

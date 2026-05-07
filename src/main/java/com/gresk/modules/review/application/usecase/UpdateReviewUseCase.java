@@ -1,6 +1,7 @@
 package com.gresk.modules.review.application.usecase;
 
 import com.gresk.modules.event.domain.model.EventId;
+import com.gresk.modules.review.application.port.in.UpdateReviewPort;
 import com.gresk.modules.review.domain.exception.ReviewForbiddenException;
 import com.gresk.modules.review.domain.exception.ReviewNotFoundException;
 import com.gresk.modules.review.domain.model.DetailedRating;
@@ -12,23 +13,22 @@ import com.gresk.modules.review.domain.port.out.EventRatingPort;
 import com.gresk.modules.review.domain.port.out.ReviewRepository;
 import com.gresk.modules.user.domain.model.UserId;
 import com.gresk.shared.domain.valueobject.ImageUrl;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-public class UpdateReviewUseCase {
+@Service
+@RequiredArgsConstructor
+public class UpdateReviewUseCase implements UpdateReviewPort {
 
     private final ReviewRepository reviewRepository;
     private final EventRatingPort  eventRatingPort;
     private final ArtistRatingPort artistRatingPort;
 
-    public UpdateReviewUseCase(ReviewRepository reviewRepository,
-                               EventRatingPort eventRatingPort,
-                               ArtistRatingPort artistRatingPort) {
-        this.reviewRepository = reviewRepository;
-        this.eventRatingPort  = eventRatingPort;
-        this.artistRatingPort = artistRatingPort;
-    }
-
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public Review execute(UpdateReviewCommand command) {
         ReviewId reviewId = ReviewId.of(command.reviewId());
         UserId   userId   = UserId.from(command.userId());

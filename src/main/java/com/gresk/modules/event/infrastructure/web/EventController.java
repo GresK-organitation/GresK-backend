@@ -1,22 +1,16 @@
 package com.gresk.modules.event.infrastructure.web;
 
-import com.gresk.modules.artist.domain.model.Artist;
-import com.gresk.modules.artist.domain.model.valueobject.ArtistId;
-import com.gresk.modules.artist.domain.port.out.ArtistRepositoryPort;
 import com.gresk.modules.event.application.dto.EventResponse;
 import com.gresk.modules.event.application.dto.EventResponseMapper;
 import com.gresk.modules.event.application.dto.PageResponse;
 import com.gresk.modules.event.application.query.GetEventQuery;
+import com.gresk.modules.event.application.query.ListEventsQuery;
 import com.gresk.modules.event.application.usecase.CreateEventCommand;
 import com.gresk.modules.event.application.usecase.CreateEventUseCase;
 import com.gresk.modules.event.application.usecase.GetEventUseCase;
 import com.gresk.modules.event.application.usecase.GetLastMinuteEventsUseCase;
 import com.gresk.modules.event.application.usecase.ListEventsUseCase;
 import com.gresk.modules.event.application.usecase.PublishEventUseCase;
-import com.gresk.modules.event.domain.model.Event;
-import com.gresk.modules.event.domain.model.EventStatus;
-import com.gresk.modules.event.domain.port.out.EventFilter;
-import com.gresk.shared.domain.MusicGenre;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +25,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -45,19 +38,6 @@ public class EventController {
     private final ListEventsUseCase          listUseCase;
     private final GetLastMinuteEventsUseCase getLastMinuteUseCase;
     private final EventResponseMapper        mapper;
-    private final ArtistRepositoryPort       artistRepository;
-
-    // ── Helpers ──────────────────────────────────────────────────────────────
-
-    /** Resuelve el artista vinculado al evento y delega en el mapper. */
-    private EventResponse toResponse(Event event) {
-        Artist artist = null;
-        if (event.getArtistId() != null) {
-            artist = artistRepository.findById(ArtistId.of(event.getArtistId().toString()))
-                    .orElse(null);
-        }
-        return mapper.toResponse(event, artist);
-    }
 
     // ── POST /api/v1/events ──────────────────────────────────────────────────
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -85,7 +65,7 @@ public class EventController {
                 coverImage,
                 request.artistId()
         );
-        return ResponseEntity.status(201).body(toResponse(createUseCase.execute(command)));
+        return ResponseEntity.status(201).body(mapper.toResponse(createUseCase.execute(command)));
     }
 
     // ── PUT /api/v1/events/{id}/publish ──────────────────────────────────────
@@ -94,13 +74,13 @@ public class EventController {
     public ResponseEntity<EventResponse> publish(
             @PathVariable String id,
             @AuthenticationPrincipal String promoterId) {
-        return ResponseEntity.ok(toResponse(publishUseCase.execute(id, promoterId)));
+        return ResponseEntity.ok(mapper.toResponse(publishUseCase.execute(id, promoterId)));
     }
 
     // ── GET /api/v1/events/{id} ──────────────────────────────────────────────
     @GetMapping("/{id}")
     public ResponseEntity<EventResponse> getById(@PathVariable String id) {
-        return ResponseEntity.ok(toResponse(getUseCase.execute(new GetEventQuery(id))));
+        return ResponseEntity.ok(mapper.toResponse(getUseCase.execute(new GetEventQuery(id))));
     }
 
     // ── GET /api/v1/events ───────────────────────────────────────────────────
@@ -116,24 +96,14 @@ public class EventController {
             @RequestParam(defaultValue = "0")  int    page,
             @RequestParam(defaultValue = "20") int    size) {
 
-        EventFilter filter = new EventFilter(
-                Optional.ofNullable(genre).map(MusicGenre::valueOf),
-                Optional.ofNullable(city),
-                Optional.ofNullable(dateFrom),
-                Optional.ofNullable(dateTo),
-                Optional.ofNullable(minPrice),
-                Optional.ofNullable(maxPrice),
-                Optional.ofNullable(artistName),
-                Optional.of(EventStatus.PUBLISHED)
-        );
+        ListEventsQuery query = new ListEventsQuery(
+                genre, city, dateFrom, dateTo, minPrice, maxPrice, artistName, page, size);
 
-        PageRequest pageRequest = PageRequest.of(page, size);
+        List<EventResponse> content = listUseCase.execute(query)
+                .stream().map(mapper::toResponse).toList();
+        long total = listUseCase.count(query);
 
-        List<EventResponse> content = listUseCase.execute(filter, pageRequest)
-                .stream().map(this::toResponse).toList();
-        long total = listUseCase.count(filter);
-
-        return ResponseEntity.ok(PageResponse.of(content, total, pageRequest));
+        return ResponseEntity.ok(PageResponse.of(content, total, PageRequest.of(page, size)));
     }
 
     // ── GET /api/v1/events/last-minute ───────────────────────────────────────
@@ -141,7 +111,7 @@ public class EventController {
     public ResponseEntity<List<EventResponse>> getLastMinute() {
         List<EventResponse> result = getLastMinuteUseCase.execute()
                 .stream()
-                .map(this::toResponse)
+                .map(mapper::toResponse)
                 .toList();
         return ResponseEntity.ok(result);
     }

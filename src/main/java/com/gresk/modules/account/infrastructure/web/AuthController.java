@@ -17,7 +17,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,7 +33,6 @@ public class AuthController {
     private final LoginUseCase loginUseCase;
 
     @PostMapping(value = "/register/user", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Transactional
     public ResponseEntity<Map<String, String>> registerUser(
             @Valid @RequestPart("data") RegisterUserAuthRequest request,
             @RequestPart(value = "avatar", required = false) MultipartFile avatar) {
@@ -56,7 +54,6 @@ public class AuthController {
     }
 
     @PostMapping(value = "/register/promoter", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Transactional
     public ResponseEntity<Map<String, String>> registerPromoter(
             @Valid @RequestPart("data") RegisterPromoterAuthRequest request,
             @RequestPart(value = "logo", required = false) MultipartFile logo) {

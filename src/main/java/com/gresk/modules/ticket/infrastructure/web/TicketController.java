@@ -4,9 +4,9 @@ import com.gresk.modules.ticket.application.usecase.GetTicketQrQuery;
 import com.gresk.modules.ticket.application.usecase.GetTicketQrUseCase;
 import com.gresk.modules.ticket.application.usecase.GetUserTicketsQuery;
 import com.gresk.modules.ticket.application.usecase.GetUserTicketsUseCase;
+import com.gresk.modules.ticket.application.port.in.PurchaseTicketPort;
 import com.gresk.modules.ticket.application.usecase.PurchaseTicketCommand;
 import com.gresk.modules.ticket.domain.model.Ticket;
-import com.gresk.modules.ticket.infrastructure.TransactionalPurchaseTicketService;
 import com.gresk.modules.ticket.infrastructure.web.dto.PurchaseTicketRequest;
 import com.gresk.modules.ticket.infrastructure.web.dto.TicketResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,7 +27,7 @@ import java.util.List;
 @Tag(name = "Tickets", description = "Ticket purchase and retrieval endpoints")
 public class TicketController {
 
-    private final TransactionalPurchaseTicketService purchaseTicketService;
+    private final PurchaseTicketPort purchaseTicketPort;
     private final GetUserTicketsUseCase getUserTicketsUseCase;
     private final GetTicketQrUseCase getTicketQrUseCase;
 
@@ -41,7 +41,7 @@ public class TicketController {
     public ResponseEntity<TicketResponse> purchase(
             @Valid @RequestBody PurchaseTicketRequest request,
             @AuthenticationPrincipal String userId) {
-        Ticket ticket = purchaseTicketService.execute(
+        Ticket ticket = purchaseTicketPort.execute(
                 new PurchaseTicketCommand(userId, request.eventId()));
         return ResponseEntity.status(201).body(toResponse(ticket));
     }
