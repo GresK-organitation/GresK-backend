@@ -3,6 +3,7 @@ package com.gresk.shared.infrastructure.web;
 import com.gresk.modules.account.domain.exception.AccountAlreadyExistsException;
 import com.gresk.modules.account.domain.exception.InvalidAccountCredentialsException;
 import com.gresk.modules.promoter.domain.exception.*;
+import com.gresk.modules.promoter.domain.exception.PromoterNotActiveException;
 import com.gresk.modules.user.domain.exception.UserNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -33,6 +34,11 @@ public class GlobalExceptionHandler {
     }
 
     // Promoter exceptions
+    @ExceptionHandler(PromoterNotActiveException.class)
+    ResponseEntity<Map<String, String>> handlePromoterNotActive(PromoterNotActiveException ex) {
+        return ResponseEntity.status(403).body(Map.of("error", ex.getMessage()));
+    }
+
     @ExceptionHandler(PromoterNotFoundException.class)
     ResponseEntity<Map<String, String>> handleNotFound(PromoterNotFoundException ex) {
         return ResponseEntity.status(404).body(Map.of("error", ex.getMessage()));
