@@ -1,6 +1,6 @@
 package com.gresk.modules.account.infrastructure.security;
 
-import com.gresk.modules.account.application.port.out.PasswordHasherPort;
+import com.gresk.modules.account.domain.port.out.PasswordHasherPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
