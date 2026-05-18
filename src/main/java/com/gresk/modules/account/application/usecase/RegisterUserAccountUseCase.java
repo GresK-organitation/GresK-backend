@@ -1,8 +1,7 @@
 package com.gresk.modules.account.application.usecase;
 
 import com.gresk.modules.account.application.command.RegisterUserAccountCommand;
-import com.gresk.modules.account.application.port.in.RegisterUserAccountUseCase;
-import com.gresk.modules.account.application.port.out.PasswordHasherPort;
+import com.gresk.modules.account.domain.port.out.PasswordHasherPort;
 import com.gresk.modules.account.domain.exception.AccountAlreadyExistsException;
 import com.gresk.modules.account.domain.model.Account;
 import com.gresk.modules.account.domain.model.AccountId;
@@ -22,7 +21,7 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-public class RegisterUserAccountUseCaseImpl implements RegisterUserAccountUseCase {
+public class RegisterUserAccountUseCase {
 
     private final AccountRepositoryPort accountRepositoryPort;
     private final PasswordHasherPort passwordHasherPort;
@@ -30,7 +29,7 @@ public class RegisterUserAccountUseCaseImpl implements RegisterUserAccountUseCas
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    @Override
+
     public AccountId execute(RegisterUserAccountCommand command) {
         Email email = Email.of(command.email());
 
