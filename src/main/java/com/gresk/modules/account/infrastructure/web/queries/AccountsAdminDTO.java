@@ -1,4 +1,4 @@
-package com.gresk.modules.account.application.dto;
+package com.gresk.modules.account.infrastructure.web.queries;
 
 import com.gresk.shared.domain.AccountStatus;
 import lombok.Builder;
@@ -6,7 +6,7 @@ import lombok.Builder;
 import java.time.Instant;
 import java.util.UUID;
 @Builder
-public record AccountAdminSummary(
+public record AccountsAdminDTO(
         UUID id,
         String name,
         String email,
