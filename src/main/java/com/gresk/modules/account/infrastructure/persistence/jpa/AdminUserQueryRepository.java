@@ -1,7 +1,7 @@
-package com.gresk.modules.account.infrastructure.persistence;
+package com.gresk.modules.account.infrastructure.persistence.jpa;
 
-import com.gresk.modules.account.application.dto.AccountAdminSummary;
-import com.gresk.modules.user.infrastructure.persistence.entity.UserEntity;
+import com.gresk.modules.account.infrastructure.web.queries.AccountsAdminDTO;
+import com.gresk.modules.user.infrastructure.persistence.UserEntity;
 import com.gresk.shared.domain.AccountStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @Repository
 public interface AdminUserQueryRepository extends JpaRepository<UserEntity, UUID> {
     @Query("""
-                SELECT new com.gresk.modules.account.application.dto.AccountAdminSummary(
+                SELECT new com.gresk.modules.account.infrastructure.web.queries.AccountsAdminDTO(
                     u.id, u.name, u.email, u.city, a.status, u.createdAt
                 )
                 FROM UserEntity u
@@ -23,7 +23,7 @@ public interface AdminUserQueryRepository extends JpaRepository<UserEntity, UUID
                 WHERE (:status IS NULL OR a.status = :status)
                 AND (:city IS NULL OR u.city = :city)
             """)
-    Page<AccountAdminSummary> findForAdmin(
+    Page<AccountsAdminDTO> findForAdmin(
             @Param("status") AccountStatus status,
             @Param("city") String city,
             Pageable pageable
