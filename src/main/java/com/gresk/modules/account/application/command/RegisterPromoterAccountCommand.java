@@ -1,6 +1,5 @@
 package com.gresk.modules.account.application.command;
 
-import com.gresk.shared.domain.Role;
 import lombok.Builder;
 import org.springframework.web.multipart.MultipartFile;
 

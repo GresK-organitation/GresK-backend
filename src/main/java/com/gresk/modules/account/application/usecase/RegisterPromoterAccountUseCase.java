@@ -1,7 +1,7 @@
 package com.gresk.modules.account.application.usecase;
 
 import com.gresk.modules.account.application.command.RegisterPromoterAccountCommand;
-import com.gresk.modules.account.application.port.out.PasswordHasherPort;
+import com.gresk.modules.account.domain.port.out.PasswordHasherPort;
 import com.gresk.modules.account.domain.exception.AccountAlreadyExistsException;
 import com.gresk.modules.account.domain.model.Account;
 import com.gresk.modules.account.domain.model.AccountId;
