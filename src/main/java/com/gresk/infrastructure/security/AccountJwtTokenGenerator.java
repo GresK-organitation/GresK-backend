@@ -1,7 +1,7 @@
 package com.gresk.infrastructure.security;
 
 import com.gresk.infrastructure.port.AuthToken;
-import com.gresk.modules.account.application.port.out.JwtTokenGeneratorPort;
+import com.gresk.modules.account.domain.port.out.JwtTokenGeneratorPort;
 import com.gresk.modules.account.domain.model.AccountId;
 import com.gresk.shared.domain.Role;
 import com.gresk.shared.domain.valueobject.Email;
