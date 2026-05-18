@@ -21,8 +21,8 @@ public class AccountMapper {
 
     public Account toDomain(AccountEntity entity) {
         return Account.reconstitute(
-                new AccountId(entity.getId()),
-                new Email(entity.getEmail()),
+                AccountId.of(entity.getId()),
+                Email.of(entity.getEmail()),
                 entity.getPasswordHash(),
                 entity.getRoles(),
                 entity.getStatus(),
