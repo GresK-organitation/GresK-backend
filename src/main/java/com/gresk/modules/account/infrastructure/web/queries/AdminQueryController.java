@@ -1,7 +1,7 @@
 package com.gresk.modules.account.infrastructure.web.queries;
 
-import com.gresk.modules.account.infrastructure.persistence.jpa.AdminPromoterQueryRepository;
-import com.gresk.modules.account.infrastructure.persistence.jpa.AdminUserQueryRepository;
+import com.gresk.modules.account.application.handler.GetPromotersForAdminHandler;
+import com.gresk.modules.account.application.handler.GetUsersForAdminHandler;
 import com.gresk.shared.domain.AccountStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -19,8 +19,8 @@ import java.util.List;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminQueryController {
 
-    private final AdminUserQueryRepository userQueryRepository;
-    private final AdminPromoterQueryRepository promoterQueryRepository;
+    private final GetUsersForAdminHandler getUsersForAdminHandler;
+    private final GetPromotersForAdminHandler getPromotersForAdminHandler;
 
     @GetMapping("/promoters")
     public ResponseEntity<List<AccountsAdminDTO>> getPromoters(
@@ -28,12 +28,7 @@ public class AdminQueryController {
             @RequestParam(required = false) String status,
             Pageable pageable) {
 
-        AccountStatus accountStatus = parseStatus(status);
-        String cityFilter = parseCity(city);
-
-        List<AccountsAdminDTO> result = promoterQueryRepository
-                .findForAdmin(accountStatus, cityFilter, pageable)
-                .getContent();
+        List<AccountsAdminDTO> result = getPromotersForAdminHandler.execute(city, status, pageable);
 
         return ResponseEntity.ok(result);
     }
@@ -44,23 +39,7 @@ public class AdminQueryController {
             @RequestParam(required = false) String status,
             Pageable pageable) {
 
-        AccountStatus accountStatus = parseStatus(status);
-        String cityFilter = parseCity(city);
-
-        List<AccountsAdminDTO> result = userQueryRepository
-                .findForAdmin(accountStatus, cityFilter, pageable)
-                .getContent();
-
+        List<AccountsAdminDTO> result = getUsersForAdminHandler.execute(city, status, pageable);
         return ResponseEntity.ok(result);
-    }
-
-    private AccountStatus parseStatus(String status) {
-        return (status == null || status.isBlank())
-                ? null
-                : AccountStatus.valueOf(status.toUpperCase().trim());
-    }
-
-    private String parseCity(String city) {
-        return (city != null && !city.isBlank()) ? city.trim() : null;
     }
 }
