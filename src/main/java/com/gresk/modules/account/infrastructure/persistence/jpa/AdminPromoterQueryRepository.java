@@ -1,6 +1,6 @@
-package com.gresk.modules.account.infrastructure.persistence;
+package com.gresk.modules.account.infrastructure.persistence.jpa;
 
-import com.gresk.modules.account.application.dto.AccountAdminSummary;
+import com.gresk.modules.account.infrastructure.web.queries.AccountsAdminDTO;
 import com.gresk.modules.promoter.infrastructure.persitence.PromoterEntity;
 import com.gresk.shared.domain.AccountStatus;
 import org.springframework.data.domain.Page;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @Repository
 public interface AdminPromoterQueryRepository extends JpaRepository<PromoterEntity, UUID> {
     @Query("""
-                SELECT new com.gresk.modules.account.application.dto.AccountAdminSummary(
+                SELECT new com.gresk.modules.account.infrastructure.web.queries.AccountsAdminDTO(
                     p.id,
                     p.name,
                     p.email,
@@ -28,7 +28,7 @@ public interface AdminPromoterQueryRepository extends JpaRepository<PromoterEnti
                 WHERE (:status IS NULL OR a.status = :status)
                 AND (:city IS NULL OR p.city = :city)
             """)
-    Page<AccountAdminSummary> findForAdmin(
+    Page<AccountsAdminDTO> findForAdmin(
             @Param("status") AccountStatus status,
             @Param("city") String city,
             Pageable pageable

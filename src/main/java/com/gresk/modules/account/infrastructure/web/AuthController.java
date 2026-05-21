@@ -4,10 +4,10 @@ import com.gresk.infrastructure.port.AuthToken;
 import com.gresk.modules.account.application.command.LoginCommand;
 import com.gresk.modules.account.application.command.RegisterPromoterAccountCommand;
 import com.gresk.modules.account.application.command.RegisterUserAccountCommand;
-import com.gresk.modules.account.application.port.in.LoginUseCase;
-import com.gresk.modules.account.application.port.in.RegisterUserAccountUseCase;
-import com.gresk.modules.account.application.usecase.GetEmailUseCase;
+import com.gresk.modules.account.application.handler.CheckEmailHandler;
+import com.gresk.modules.account.application.usecase.LoginUseCase;
 import com.gresk.modules.account.application.usecase.RegisterPromoterAccountUseCase;
+import com.gresk.modules.account.application.usecase.RegisterUserAccountUseCase;
 import com.gresk.modules.account.domain.model.AccountId;
 import com.gresk.modules.account.infrastructure.web.dto.AuthResponse;
 import com.gresk.modules.account.infrastructure.web.dto.LoginRequest;
@@ -29,8 +29,14 @@ public class AuthController {
 
     private final RegisterUserAccountUseCase registerUserAccountUseCase;
     private final RegisterPromoterAccountUseCase registerPromoterAccountUseCase;
-    private final GetEmailUseCase getEmailUseCase;
     private final LoginUseCase loginUseCase;
+    private final CheckEmailHandler checkEmail;
+
+    @GetMapping("/check-email")
+    public ResponseEntity<Map<String, Boolean>> checkEmail(@RequestParam String email) {
+        boolean exists = checkEmail.execute(email);
+        return ResponseEntity.ok(Map.of("available", !exists));
+    }
 
     @PostMapping(value = "/register/user", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, String>> registerUser(
@@ -77,13 +83,6 @@ public class AuthController {
         return ResponseEntity.status(201).body(Map.of(
                 "accountId", accountId.value().toString()
         ));
-    }
-
-    @GetMapping("/check-email")
-    public ResponseEntity<Map<String, Boolean>> checkEmail(@RequestParam String email) {
-        boolean exists = getEmailUseCase.existsByEmail(email);
-
-        return ResponseEntity.ok(Map.of("available", !exists));
     }
 
     @PostMapping("/login")

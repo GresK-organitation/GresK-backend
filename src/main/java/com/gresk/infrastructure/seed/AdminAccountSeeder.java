@@ -1,8 +1,8 @@
 package com.gresk.infrastructure.seed;
 
-import com.gresk.modules.account.application.port.out.PasswordHasherPort;
+import com.gresk.modules.account.domain.port.out.PasswordHasherPort;
 import com.gresk.modules.account.infrastructure.persistence.AccountEntity;
-import com.gresk.modules.account.infrastructure.persistence.AccountJpaRepository;
+import com.gresk.modules.account.infrastructure.persistence.jpa.AccountJpaRepository;
 import com.gresk.shared.domain.AccountStatus;
 import com.gresk.shared.domain.Role;
 import lombok.RequiredArgsConstructor;

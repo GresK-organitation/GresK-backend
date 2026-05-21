@@ -2,9 +2,8 @@ package com.gresk.modules.account.application.usecase;
 
 import com.gresk.infrastructure.port.AuthToken;
 import com.gresk.modules.account.application.command.LoginCommand;
-import com.gresk.modules.account.application.port.in.LoginUseCase;
-import com.gresk.modules.account.application.port.out.JwtTokenGeneratorPort;
-import com.gresk.modules.account.application.port.out.PasswordHasherPort;
+import com.gresk.modules.account.domain.port.out.JwtTokenGeneratorPort;
+import com.gresk.modules.account.domain.port.out.PasswordHasherPort;
 import com.gresk.modules.account.domain.exception.InvalidAccountCredentialsException;
 import com.gresk.modules.account.domain.port.out.AccountRepositoryPort;
 import com.gresk.shared.domain.AccountStatus;
@@ -15,14 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class LoginUseCaseImpl implements LoginUseCase {
+public class LoginUseCase {
 
     private final AccountRepositoryPort accountRepositoryPort;
     private final PasswordHasherPort passwordHasherPort;
     private final JwtTokenGeneratorPort jwtTokenGeneratorPort;
 
     @Transactional(readOnly = true)
-    @Override
     public AuthToken execute(LoginCommand command) {
         Email email = new Email(command.email());
 

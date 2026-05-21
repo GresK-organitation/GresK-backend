@@ -1,6 +1,7 @@
 package com.gresk.modules.account.infrastructure.persistence;
 
 import com.gresk.modules.account.domain.exception.AccountNotFoundException;
+import com.gresk.modules.account.infrastructure.persistence.jpa.AccountJpaRepository;
 import com.gresk.shared.domain.AccountStatus;
 import com.gresk.shared.domain.port.out.AccountStatusPort;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +17,7 @@ public class AccountStatusAdapter implements AccountStatusPort {
 
     @Override
     public AccountStatus getStatus(UUID accountId) {
-        return jpaRepository.findById(accountId)
-                .map(AccountEntity::getStatus)
+        return jpaRepository.findStatusById(accountId)
                 .orElseThrow(() -> new AccountNotFoundException(accountId.toString()));
     }
 }
