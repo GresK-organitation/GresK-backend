@@ -1,12 +1,34 @@
 package com.gresk.modules.review.infrastructure.web;
 
+import com.gresk.modules.review.application.usecase.ReviewWithLikeContext;
 import com.gresk.modules.review.domain.model.Review;
+import com.gresk.modules.user.domain.model.UserId;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ReviewResponseMapper {
 
-    public ReviewResponse toResponse(Review review) {
+    /**
+     * For write operations (submit, update, addLike, removeLike):
+     * the likedBy set is already in memory — safe to use getLikedBy() directly.
+     */
+    public ReviewResponse toResponse(Review review, String currentUserId) {
+        boolean likedByCurrentUser = review.getLikedBy()
+                .contains(UserId.from(currentUserId));
+
+        return build(review, review.getLikeCount(), likedByCurrentUser);
+    }
+
+    /**
+     * For list read operations (getEventReviews, getUserReviews):
+     * like data comes from pre-computed batch queries — avoids triggering
+     * the lazy likedBy collection per review (N+1 prevention).
+     */
+    public ReviewResponse toResponse(ReviewWithLikeContext context) {
+        return build(context.review(), context.likeCount(), context.likedByCurrentUser());
+    }
+
+    private ReviewResponse build(Review review, int likeCount, boolean likedByCurrentUser) {
         return new ReviewResponse(
                 review.getId().value().toString(),
                 review.getEventId().value().toString(),
@@ -21,7 +43,9 @@ public class ReviewResponseMapper {
                 review.getPhotoUrl() != null ? review.getPhotoUrl().value() : null,
                 review.getPointsAwarded(),
                 review.getStatus().name(),
-                review.getCreatedAt().toString()
+                review.getCreatedAt().toString(),
+                likeCount,
+                likedByCurrentUser
         );
     }
 }

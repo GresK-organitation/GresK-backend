@@ -1,14 +1,18 @@
 package com.gresk.modules.review.infrastructure.web;
 
+import com.gresk.modules.review.application.port.in.AddReviewLikePort;
+import com.gresk.modules.review.application.port.in.RemoveReviewLikePort;
+import com.gresk.modules.review.application.port.in.SubmitReviewPort;
+import com.gresk.modules.review.application.port.in.UpdateReviewPort;
+import com.gresk.modules.review.application.usecase.AddReviewLikeCommand;
 import com.gresk.modules.review.application.usecase.GetEventRatingStatsQuery;
 import com.gresk.modules.review.application.usecase.GetEventRatingStatsUseCase;
 import com.gresk.modules.review.application.usecase.GetEventReviewsUseCase;
 import com.gresk.modules.review.application.usecase.GetUserReviewsQuery;
 import com.gresk.modules.review.application.usecase.GetUserReviewsUseCase;
+import com.gresk.modules.review.application.usecase.RemoveReviewLikeCommand;
 import com.gresk.modules.review.application.usecase.SubmitReviewCommand;
 import com.gresk.modules.review.application.usecase.UpdateReviewCommand;
-import com.gresk.modules.review.application.port.in.SubmitReviewPort;
-import com.gresk.modules.review.application.port.in.UpdateReviewPort;
 import com.gresk.modules.review.domain.model.Review;
 import com.gresk.modules.review.infrastructure.web.request.SubmitReviewRequest;
 import com.gresk.modules.review.infrastructure.web.request.UpdateReviewRequest;
@@ -20,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,13 +41,15 @@ import java.util.List;
 @Tag(name = "Reviews", description = "Post-concert review endpoints")
 public class ReviewController {
 
-    private final SubmitReviewPort submitReviewPort;
-    private final UpdateReviewPort updateReviewPort;
-    private final GetUserReviewsUseCase            getUserReviewsUseCase;
-    private final GetEventRatingStatsUseCase       getEventRatingStatsUseCase;
-    private final GetEventReviewsUseCase           getEventReviewsUseCase;
-    private final ReviewResponseMapper             mapper;
-    private final EventRatingStatsResponseMapper   statsMapper;
+    private final SubmitReviewPort              submitReviewPort;
+    private final UpdateReviewPort              updateReviewPort;
+    private final AddReviewLikePort             addReviewLikePort;
+    private final RemoveReviewLikePort          removeReviewLikePort;
+    private final GetUserReviewsUseCase         getUserReviewsUseCase;
+    private final GetEventRatingStatsUseCase    getEventRatingStatsUseCase;
+    private final GetEventReviewsUseCase        getEventReviewsUseCase;
+    private final ReviewResponseMapper          mapper;
+    private final EventRatingStatsResponseMapper statsMapper;
 
     // ── POST /api/v1/reviews ─────────────────────────────────────────────────
 
@@ -72,7 +79,7 @@ public class ReviewController {
         );
 
         Review review = submitReviewPort.execute(command);
-        return ResponseEntity.status(201).body(mapper.toResponse(review));
+        return ResponseEntity.status(201).body(mapper.toResponse(review, userId));
     }
 
     // ── PUT /api/v1/reviews/{id} ─────────────────────────────────────────────
@@ -97,7 +104,7 @@ public class ReviewController {
                 request.comment(), request.photoUrl()
         );
 
-        return ResponseEntity.ok(mapper.toResponse(updateReviewPort.execute(command)));
+        return ResponseEntity.ok(mapper.toResponse(updateReviewPort.execute(command), userId));
     }
 
     // ── GET /api/v1/reviews/users/me ─────────────────────────────────────────
@@ -125,10 +132,11 @@ public class ReviewController {
     @Operation(summary = "List all reviews for an event")
     @ApiResponse(responseCode = "200", description = "List of reviews for the event")
     public ResponseEntity<List<ReviewResponse>> listEventReviews(
-            @PathVariable String eventId) {
+            @PathVariable String eventId,
+            @AuthenticationPrincipal String userId) {
 
         List<ReviewResponse> responses = getEventReviewsUseCase
-                .execute(eventId)
+                .execute(eventId, userId)
                 .stream()
                 .map(mapper::toResponse)
                 .toList();
@@ -150,5 +158,36 @@ public class ReviewController {
                 statsMapper.toResponse(
                         getEventRatingStatsUseCase.execute(
                                 new GetEventRatingStatsQuery(eventId))));
+    }
+
+    // ── POST /api/v1/reviews/{reviewId}/likes ───────────────────────────────
+
+    @PostMapping("/{reviewId}/likes")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Like a review")
+    @ApiResponse(responseCode = "200", description = "Like added")
+    @ApiResponse(responseCode = "404", description = "Review not found")
+    @ApiResponse(responseCode = "409", description = "User has already liked this review")
+    public ResponseEntity<ReviewResponse> addLike(
+            @PathVariable String reviewId,
+            @AuthenticationPrincipal String userId) {
+
+        Review review = addReviewLikePort.execute(new AddReviewLikeCommand(reviewId, userId));
+        return ResponseEntity.ok(mapper.toResponse(review, userId));
+    }
+
+    // ── DELETE /api/v1/reviews/{reviewId}/likes ─────────────────────────────
+
+    @DeleteMapping("/{reviewId}/likes")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Remove a like from a review")
+    @ApiResponse(responseCode = "200", description = "Like removed")
+    @ApiResponse(responseCode = "404", description = "Review not found")
+    public ResponseEntity<ReviewResponse> removeLike(
+            @PathVariable String reviewId,
+            @AuthenticationPrincipal String userId) {
+
+        Review review = removeReviewLikePort.execute(new RemoveReviewLikeCommand(reviewId, userId));
+        return ResponseEntity.ok(mapper.toResponse(review, userId));
     }
 }

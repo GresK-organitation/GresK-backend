@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -64,4 +66,13 @@ public class ReviewEntity {
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    @Builder.Default
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "review_likes",
+            joinColumns = @JoinColumn(name = "review_id")
+    )
+    @Column(name = "user_id", nullable = false)
+    private Set<UUID> likedBy = new HashSet<>();
 }

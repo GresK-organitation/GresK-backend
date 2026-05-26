@@ -4,14 +4,20 @@ import com.gresk.modules.event.domain.model.EventId;
 import com.gresk.modules.review.domain.model.Review;
 import com.gresk.modules.review.domain.model.ReviewId;
 import com.gresk.modules.review.domain.port.out.ReviewRepository;
+import com.gresk.modules.review.infrastructure.persistence.SpringDataReviewRepository.LikeCountProjection;
 import com.gresk.modules.ticket.domain.model.TicketId;
 import com.gresk.modules.user.domain.model.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -29,7 +35,9 @@ public class JpaReviewAdapter implements ReviewRepository {
 
     @Override
     public Optional<Review> findById(ReviewId id) {
-        return repo.findById(id.value()).map(mapper::toDomain);
+        // toDomainWithLikes: triggers one lazy SELECT to load likedBy —
+        // acceptable on single-entity write paths (addLike, removeLike, update)
+        return repo.findById(id.value()).map(mapper::toDomainWithLikes);
     }
 
     @Override
@@ -54,5 +62,25 @@ public class JpaReviewAdapter implements ReviewRepository {
     @Override
     public boolean existsByTicketId(TicketId ticketId) {
         return repo.existsByTicketId(ticketId.value());
+    }
+
+    @Override
+    public Map<ReviewId, Integer> countLikesByReviewIds(List<ReviewId> ids) {
+        if (ids.isEmpty()) return Map.of();
+        List<UUID> uuids = ids.stream().map(ReviewId::value).toList();
+        return repo.countLikesByReviewIds(uuids).stream()
+                .collect(Collectors.toMap(
+                        p -> ReviewId.of(p.getReviewId()),
+                        p -> p.getLikeCount().intValue()
+                ));
+    }
+
+    @Override
+    public Set<ReviewId> findLikedReviewIdsByUser(List<ReviewId> ids, UserId userId) {
+        if (ids.isEmpty()) return new HashSet<>();
+        List<UUID> uuids = ids.stream().map(ReviewId::value).toList();
+        return repo.findReviewIdsLikedByUser(uuids, userId.value()).stream()
+                .map(ReviewId::of)
+                .collect(Collectors.toSet());
     }
 }
