@@ -46,6 +46,19 @@ public class EventEntity {
     @Column(name = "discounted_amount", precision = 10, scale = 2)
     private BigDecimal discountedAmount;
 
+    // ── Flash Deal ────────────────────────────────────────────────────────────
+    @Column(name = "flash_deal_enabled", nullable = false)
+    private boolean flashDealEnabled;
+
+    @Column(name = "flash_deal_hours_threshold")
+    private Integer flashDealHoursThreshold;
+
+    @Column(name = "flash_deal_discount_percent")
+    private Integer flashDealDiscountPercent;
+
+    @Column(name = "flash_deal_applied", nullable = false)
+    private boolean flashDealApplied;
+
     // ── Aforo ────────────────────────────────────────────────────────────────
     @Column(name = "total_capacity")
     private Integer totalCapacity;

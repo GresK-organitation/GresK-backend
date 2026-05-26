@@ -31,4 +31,21 @@ public interface EventJpaRepository
             ORDER BY event_date ASC
             """, nativeQuery = true)
     List<EventEntity> findLastMinuteEvents();
+
+    /**
+     * Candidatos para el flash deal: eventos publicados con flash deal activo,
+     * aún no aplicado, con entradas disponibles y dentro de su propia ventana temporal.
+     * El umbral es por fila (flash_deal_hours_threshold), lo que requiere SQL nativo.
+     */
+    @Query(value = """
+            SELECT * FROM events
+            WHERE  status                    = 'PUBLISHED'
+              AND  flash_deal_enabled        = true
+              AND  flash_deal_applied        = false
+              AND  available_capacity        > 0
+              AND  event_date                > NOW()
+              AND  event_date               <= NOW() + (flash_deal_hours_threshold * INTERVAL '1 hour')
+            ORDER BY event_date ASC
+            """, nativeQuery = true)
+    List<EventEntity> findEligibleForFlashDeal();
 }

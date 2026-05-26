@@ -14,4 +14,5 @@ public interface EventRepository {
     long count(EventFilter filter);
     boolean     existsById(EventId id);
     List<Event> findLastMinute();
+    List<Event> findEligibleForFlashDeal();
 }

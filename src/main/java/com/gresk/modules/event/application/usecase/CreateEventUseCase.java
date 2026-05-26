@@ -74,6 +74,13 @@ public class CreateEventUseCase {
         if (command.artistId() != null && !command.artistId().isBlank()) {
             event.withArtistId(UUID.fromString(command.artistId()));
         }
+        if (Boolean.TRUE.equals(command.flashDealEnabled())) {
+            event.configureFlashDeal(
+                    true,
+                    command.flashDealHoursThreshold(),
+                    command.flashDealDiscountPercent()
+            );
+        }
 
         return eventRepository.save(event);
     }

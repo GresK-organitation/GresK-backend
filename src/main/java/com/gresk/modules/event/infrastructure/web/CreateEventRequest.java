@@ -1,6 +1,7 @@
 package com.gresk.modules.event.infrastructure.web;
 
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,5 +28,10 @@ public record CreateEventRequest(
         @NotNull Double   latitude,
         @NotNull Double   longitude,
 
-        String            artistId
+        String            artistId,
+
+        // Flash Deal (opcional — omitir o enviar null para no activarlo)
+        Boolean           flashDealEnabled,
+        @Min(1)           Integer flashDealHoursThreshold,
+        @Min(1) @Max(99)  Integer flashDealDiscountPercent
 ) {}
