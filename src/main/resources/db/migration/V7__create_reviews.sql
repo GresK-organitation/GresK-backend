@@ -1,5 +1,5 @@
 -- ─────────────────────────────────────────────────────────────────────────────
--- V7: reviews + event community rating stats
+-- V7: reviews + review_likes + event community rating stats
 --
 -- Review aggregate:
 --   id, user_id (FK→users), event_id (FK→events), ticket_id (FK→tickets, UNIQUE),
@@ -11,6 +11,10 @@
 --   - One review per ticket (UNIQUE ticket_id)
 --   - Base points: 50 | comment bonus: 25 | photo bonus: 20
 --   - Reviews go directly to PUBLISHED status
+--
+-- Review likes:
+--   review_id + user_id (PK compuesta) — un usuario solo puede dar like una vez
+--   ON DELETE CASCADE en ambas FK — limpieza automática al borrar review o usuario
 --
 -- Event rating stats (denormalized running averages):
 --   review_count, avg_overall/artist/sound/ambience/venue/setlist_rating
@@ -57,6 +61,20 @@ CREATE TABLE reviews (
 CREATE INDEX idx_reviews_user_id  ON reviews (user_id);
 CREATE INDEX idx_reviews_event_id ON reviews (event_id);
 CREATE INDEX idx_reviews_status   ON reviews (status);
+
+
+-- ── Review likes ─────────────────────────────────────────────────────────────
+
+CREATE TABLE review_likes (
+    review_id UUID NOT NULL,
+    user_id   UUID NOT NULL,
+
+    CONSTRAINT pk_review_likes        PRIMARY KEY (review_id, user_id),
+    CONSTRAINT fk_review_likes_review FOREIGN KEY (review_id) REFERENCES reviews (id) ON DELETE CASCADE,
+    CONSTRAINT fk_review_likes_user   FOREIGN KEY (user_id)   REFERENCES users   (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_review_likes_review_id ON review_likes (review_id);
 
 
 -- ── Event community rating stats ──────────────────────────────────────────────
