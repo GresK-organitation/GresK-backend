@@ -33,5 +33,10 @@ public record EventResponse(
         // artista (id para referencias + datos resueltos para display)
         String     artistId,
         String     artistName,
-        String     artistImageUrl
+        String     artistImageUrl,
+        // flash deal (null si no está configurado)
+        Boolean    flashDealEnabled,
+        Integer    flashDealHoursThreshold,
+        Integer    flashDealDiscountPercent,
+        Boolean    flashDealApplied
 ) {}

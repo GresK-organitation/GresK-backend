@@ -58,4 +58,12 @@ public class JpaEventAdapter implements EventRepository {
                 .map(mapper::toDomain)
                 .toList();
     }
+
+    @Override
+    public List<Event> findEligibleForFlashDeal() {
+        return repo.findEligibleForFlashDeal()
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
 }

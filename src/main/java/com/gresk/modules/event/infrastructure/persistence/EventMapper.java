@@ -64,7 +64,11 @@ public class EventMapper {
                 artistId,
                 e.getStatus(),
                 e.getCreatedAt(),
-                ratingStats
+                ratingStats,
+                e.isFlashDealEnabled(),
+                e.getFlashDealHoursThreshold(),
+                e.getFlashDealDiscountPercent(),
+                e.isFlashDealApplied()
         );
     }
 
@@ -102,6 +106,11 @@ public class EventMapper {
                         ? event.getCoverImage().value() : null)
                 // artista (solo FK)
                 .artistId(event.getArtistId())
+                // flash deal
+                .flashDealEnabled(event.isFlashDealEnabled())
+                .flashDealHoursThreshold(event.getFlashDealHoursThreshold())
+                .flashDealDiscountPercent(event.getFlashDealDiscountPercent())
+                .flashDealApplied(event.isFlashDealApplied())
                 // rating stats
                 .reviewCount(event.getRatingStats().reviewCount())
                 .avgOverallRating(event.getRatingStats().avgOverallRating())

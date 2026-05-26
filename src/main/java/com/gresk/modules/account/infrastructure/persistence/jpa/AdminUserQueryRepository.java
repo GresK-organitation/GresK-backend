@@ -1,7 +1,7 @@
 package com.gresk.modules.account.infrastructure.persistence.jpa;
 
 import com.gresk.modules.account.infrastructure.web.queries.AccountsAdminDTO;
-import com.gresk.modules.user.infrastructure.persistence.UserEntity;
+import com.gresk.modules.user.infrastructure.persistence.entity.UserEntity;
 import com.gresk.shared.domain.AccountStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

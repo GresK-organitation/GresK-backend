@@ -11,6 +11,8 @@
 --   coverImage (cover_image_asset_id),
 --   artist_id (FK→artists, nullable — Artist is its own aggregate)
 --   + updatedAt (Hibernate infra)
+--   flash deal: flash_deal_enabled, flash_deal_hours_threshold,
+--               flash_deal_discount_percent, flash_deal_applied
 --
 -- EventStatus enum: DRAFT, PUBLISHED, FINISHED, CANCELLED
 -- MusicGenre enum: ROCK, POP, TECHNO, REGGAETON, HIP_HOP, HOUSE, INDIE,
@@ -60,6 +62,12 @@ CREATE TABLE events (
     -- artista (referencia FK al agregado Artist; null si no hay artista asignado)
     artist_id           UUID,
 
+    -- flash deal: descuento automático configurable por la promotora
+    flash_deal_enabled          BOOLEAN       NOT NULL DEFAULT false,
+    flash_deal_hours_threshold  INTEGER,                              -- horas antes del evento en que se activa
+    flash_deal_discount_percent INTEGER,                              -- porcentaje de descuento (1-99)
+    flash_deal_applied          BOOLEAN       NOT NULL DEFAULT false, -- true una vez aplicado por el scheduler
+
     CONSTRAINT pk_events              PRIMARY KEY (id),
     CONSTRAINT fk_events_promoter     FOREIGN KEY (promoter_id) REFERENCES promoters (id) ON DELETE RESTRICT,
     CONSTRAINT fk_events_artist       FOREIGN KEY (artist_id)   REFERENCES artists  (id) ON DELETE SET NULL,
@@ -76,3 +84,11 @@ CREATE INDEX idx_events_status       ON events (status);
 CREATE INDEX idx_events_genre_status ON events (genre, status);
 CREATE INDEX idx_events_city_date    ON events (city, event_date);
 CREATE INDEX idx_events_artist_id    ON events (artist_id);
+
+-- Partial index: cubre únicamente los candidatos del scheduler flash deal.
+-- El WHERE estrecho mantiene el índice pequeño independientemente del volumen de eventos.
+CREATE INDEX idx_events_flash_deal_candidates
+    ON events (event_date, flash_deal_hours_threshold)
+   WHERE status             = 'PUBLISHED'
+     AND flash_deal_enabled = true
+     AND flash_deal_applied = false;

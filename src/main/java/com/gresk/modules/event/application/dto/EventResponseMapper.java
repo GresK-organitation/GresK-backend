@@ -66,7 +66,12 @@ public class EventResponseMapper {
                 // artista
                 artistId,
                 artistName,
-                artistImageUrl
+                artistImageUrl,
+                // flash deal
+                event.isFlashDealEnabled(),
+                event.getFlashDealHoursThreshold(),
+                event.getFlashDealDiscountPercent(),
+                event.isFlashDealApplied()
         );
     }
 }

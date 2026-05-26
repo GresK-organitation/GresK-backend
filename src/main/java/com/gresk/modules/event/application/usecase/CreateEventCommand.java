@@ -21,5 +21,9 @@ public record CreateEventCommand(
         Double     latitude,
         Double     longitude,
         MultipartFile coverImageFile,
-        String     artistId
+        String     artistId,
+        // Flash Deal (opcional — null si no se configura en la creación)
+        Boolean    flashDealEnabled,
+        Integer    flashDealHoursThreshold,
+        Integer    flashDealDiscountPercent
 ) {}

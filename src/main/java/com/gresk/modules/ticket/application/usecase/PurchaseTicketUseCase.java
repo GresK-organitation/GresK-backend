@@ -46,7 +46,7 @@ public class PurchaseTicketUseCase implements PurchaseTicketPort {
 
         event.decrementCapacity();
 
-        PaymentResult paymentResult = paymentGateway.processPayment(userId, eventId, event.getPrice());
+        PaymentResult paymentResult = paymentGateway.processPayment(userId, eventId, event.effectivePrice());
         if (!paymentResult.success()) {
             throw new PaymentFailedException("Payment failed for transaction: " + paymentResult.transactionId());
         }

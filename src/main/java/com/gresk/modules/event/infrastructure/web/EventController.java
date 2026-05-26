@@ -11,6 +11,8 @@ import com.gresk.modules.event.application.usecase.GetEventUseCase;
 import com.gresk.modules.event.application.usecase.GetLastMinuteEventsUseCase;
 import com.gresk.modules.event.application.usecase.ListEventsUseCase;
 import com.gresk.modules.event.application.usecase.PublishEventUseCase;
+import com.gresk.modules.event.application.usecase.UpdateFlashDealCommand;
+import com.gresk.modules.event.application.usecase.UpdateFlashDealUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +39,7 @@ public class EventController {
     private final GetEventUseCase            getUseCase;
     private final ListEventsUseCase          listUseCase;
     private final GetLastMinuteEventsUseCase getLastMinuteUseCase;
+    private final UpdateFlashDealUseCase     updateFlashDealUseCase;
     private final EventResponseMapper        mapper;
 
     // ── POST /api/v1/events ──────────────────────────────────────────────────
@@ -63,7 +66,10 @@ public class EventController {
                 request.latitude(),
                 request.longitude(),
                 coverImage,
-                request.artistId()
+                request.artistId(),
+                request.flashDealEnabled(),
+                request.flashDealHoursThreshold(),
+                request.flashDealDiscountPercent()
         );
         return ResponseEntity.status(201).body(mapper.toResponse(createUseCase.execute(command)));
     }
@@ -114,5 +120,23 @@ public class EventController {
                 .map(mapper::toResponse)
                 .toList();
         return ResponseEntity.ok(result);
+    }
+
+    // ── PUT /api/v1/events/{id}/flash-deal ───────────────────────────────────
+    @PutMapping("/{id}/flash-deal")
+    @PreAuthorize("hasRole('PROMOTER')")
+    public ResponseEntity<EventResponse> updateFlashDeal(
+            @PathVariable String id,
+            @RequestBody @Valid FlashDealRequest request,
+            @AuthenticationPrincipal String promoterId) {
+
+        UpdateFlashDealCommand command = new UpdateFlashDealCommand(
+                id,
+                promoterId,
+                request.flashDealEnabled(),
+                request.flashDealHoursThreshold(),
+                request.flashDealDiscountPercent()
+        );
+        return ResponseEntity.ok(mapper.toResponse(updateFlashDealUseCase.execute(command)));
     }
 }
