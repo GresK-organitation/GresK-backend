@@ -6,6 +6,7 @@ import com.gresk.modules.artist.domain.model.valueobject.ArtistFee;
 import com.gresk.modules.artist.domain.model.valueobject.ArtistId;
 import com.gresk.modules.artist.domain.model.valueobject.FollowerCount;
 import com.gresk.modules.artist.domain.model.valueobject.SocialLinks;
+import com.gresk.modules.artist.domain.model.valueobject.SpotifyProfile;
 import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import com.gresk.shared.domain.valueobject.City;
 import com.gresk.shared.domain.valueobject.Description;
@@ -14,7 +15,9 @@ import com.gresk.shared.domain.valueobject.Name;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 @Component
 public class ArtistMapper {
@@ -34,6 +37,12 @@ public class ArtistMapper {
                 entity.getTags(),
                 ArtistContact.reconstitute(entity.getContact()),
                 SocialLinks.reconstitute(entity.getInstagramUrl(), entity.getSpotifyUrl()),
+                SpotifyProfile.of(
+                        entity.getSpotifyArtistId(),
+                        entity.getSpotifyName(),
+                        entity.getSpotifyImageUrl(),
+                        entity.getSpotifyGenres() != null ? new ArrayList<>(entity.getSpotifyGenres()) : List.of()
+                ),
                 entity.getEventsPlayed(),
                 entity.getAvgRating(),
                 entity.getCreatedAt()
@@ -56,6 +65,10 @@ public class ArtistMapper {
                 .contact(artist.getContact().value())
                 .instagramUrl(artist.getSocialLinks().hasInstagram() ? artist.getSocialLinks().instagramUrl() : null)
                 .spotifyUrl(artist.getSocialLinks().hasSpotify()    ? artist.getSocialLinks().spotifyUrl()   : null)
+                .spotifyArtistId(artist.getSpotifyProfile().isLinked()  ? artist.getSpotifyProfile().artistId()    : null)
+                .spotifyName(artist.getSpotifyProfile().isLinked()      ? artist.getSpotifyProfile().spotifyName() : null)
+                .spotifyImageUrl(artist.getSpotifyProfile().isLinked()  ? artist.getSpotifyProfile().imageUrl()    : null)
+                .spotifyGenres(artist.getSpotifyProfile().isLinked()    ? new ArrayList<>(artist.getSpotifyProfile().genres()) : new ArrayList<>())
                 .eventsPlayed(artist.getEventsPlayed())
                 .avgRating(artist.getAvgRating())
                 .createdAt(artist.getCreatedAt())

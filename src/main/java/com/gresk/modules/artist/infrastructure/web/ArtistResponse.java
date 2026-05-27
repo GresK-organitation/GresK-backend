@@ -17,6 +17,12 @@ public record ArtistResponse(
         String       contact,
         String       instagramUrl,
         String       spotifyUrl,
+        // Vinculación Spotify
+        String       spotifyArtistId,
+        String       spotifyName,
+        String       spotifyImageUrl,
+        List<String> spotifyGenres,
+        boolean      spotifyLinked,
         int          eventsPlayed,
         double       avgRating,
         String       createdAt

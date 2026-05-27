@@ -4,6 +4,8 @@ import com.gresk.modules.artist.application.command.CreateArtistCommand;
 import com.gresk.modules.artist.application.port.in.CreateArtistPort;
 import com.gresk.modules.artist.application.port.in.GetArtistByIdPort;
 import com.gresk.modules.artist.application.port.in.GetArtistsByPromoterPort;
+import com.gresk.modules.artist.application.dto.SpotifyArtistSuggestionDTO;
+import com.gresk.modules.artist.application.port.in.SearchSpotifyArtistsPort;
 import com.gresk.modules.artist.domain.model.Artist;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class ArtistController {
     private final CreateArtistPort          createArtistUseCase;
     private final GetArtistsByPromoterPort  getArtistsByPromoterUseCase;
     private final GetArtistByIdPort         getArtistByIdUseCase;
+    private final SearchSpotifyArtistsPort  searchSpotifyArtistsUseCase;
     private final ArtistResponseMapper      mapper;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -49,7 +52,11 @@ public class ArtistController {
                 request.tags(),
                 request.contact(),
                 request.instagramUrl(),
-                request.spotifyUrl()
+                request.spotifyUrl(),
+                request.spotifyArtistId(),
+                request.spotifyName(),
+                request.spotifyImageUrl(),
+                request.spotifyGenres()
         );
 
         Artist artist = createArtistUseCase.execute(command);
@@ -83,5 +90,18 @@ public class ArtistController {
         return ResponseEntity.ok(
                 mapper.toResponse(getArtistByIdUseCase.execute(id, promoterId))
         );
+    }
+
+    /**
+     * Busca artistas en Spotify por nombre para que el promotor pueda vincular
+     * su artista de GresK con el perfil correcto de Spotify.
+     * Devuelve los top 5 resultados con id, nombre, imagen y géneros.
+     */
+    @GetMapping("/spotify/search")
+    @PreAuthorize("hasRole('PROMOTER')")
+    public ResponseEntity<List<SpotifyArtistSuggestionDTO>> searchSpotifyArtist(
+            @RequestParam String name) {
+
+        return ResponseEntity.ok(searchSpotifyArtistsUseCase.execute(name));
     }
 }

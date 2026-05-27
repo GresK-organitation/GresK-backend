@@ -5,6 +5,8 @@ import com.gresk.shared.domain.port.out.ImageUrlResolverPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class ArtistResponseMapper {
@@ -12,6 +14,7 @@ public class ArtistResponseMapper {
     private final ImageUrlResolverPort imageUrlResolver;
 
     public ArtistResponse toResponse(Artist artist) {
+        var spotify = artist.getSpotifyProfile();
         return new ArtistResponse(
                 artist.getId().value().toString(),
                 artist.getPromoterId().value().toString(),
@@ -27,6 +30,11 @@ public class ArtistResponseMapper {
                 artist.getContact().value(),
                 artist.getSocialLinks().hasInstagram()  ? artist.getSocialLinks().instagramUrl() : null,
                 artist.getSocialLinks().hasSpotify()    ? artist.getSocialLinks().spotifyUrl()   : null,
+                spotify.isLinked() ? spotify.artistId()    : null,
+                spotify.isLinked() ? spotify.spotifyName() : null,
+                spotify.isLinked() ? spotify.imageUrl()    : null,
+                spotify.isLinked() ? spotify.genres()      : List.of(),
+                spotify.isLinked(),
                 artist.getEventsPlayed(),
                 artist.getAvgRating(),
                 artist.getCreatedAt().toString()

@@ -7,6 +7,8 @@ import lombok.*;
 
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 
@@ -69,6 +71,23 @@ public class ArtistEntity {
     @Column(name = "spotify_url", length = 500)
     private String spotifyUrl;
 
+    // ── Vinculación con Spotify ───────────────────────────────────────────────
+
+    @Column(name = "spotify_artist_id", length = 50, unique = true)
+    private String spotifyArtistId;
+
+    @Column(name = "spotify_name", length = 200)
+    private String spotifyName;
+
+    @Column(name = "spotify_image_url", length = 500)
+    private String spotifyImageUrl;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "artist_spotify_genres", joinColumns = @JoinColumn(name = "artist_id"))
+    @Column(name = "genre", length = 100)
+    @Builder.Default
+    private List<String> spotifyGenres = new ArrayList<>();
+
     @Column(name = "events_played", nullable = false)
     private int eventsPlayed;
 
@@ -117,6 +136,14 @@ public class ArtistEntity {
         this.contact      = contact;
         this.instagramUrl = instagramUrl;
         this.spotifyUrl   = spotifyUrl;
+    }
+
+    public void updateSpotifyLink(String spotifyArtistId, String spotifyName,
+                                  String spotifyImageUrl, List<String> spotifyGenres) {
+        this.spotifyArtistId  = spotifyArtistId;
+        this.spotifyName      = spotifyName;
+        this.spotifyImageUrl  = spotifyImageUrl;
+        this.spotifyGenres    = spotifyGenres != null ? new ArrayList<>(spotifyGenres) : new ArrayList<>();
     }
 
     public void updateStats(int eventsPlayed, double avgRating) {
