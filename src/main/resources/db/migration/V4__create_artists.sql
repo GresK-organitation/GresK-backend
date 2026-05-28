@@ -72,3 +72,24 @@ CREATE INDEX idx_artists_promoter_id       ON artists (promoter_id);
 CREATE INDEX idx_artists_status            ON artists (status);
 CREATE INDEX idx_artist_genres_genre       ON artist_genres (genre);
 CREATE INDEX idx_artists_spotify_artist_id ON artists (spotify_artist_id);
+
+-- ── Historial de métricas de Spotify por artista ──────────────────────────
+-- Recopiladas cada 3 días por ArtistMetricsSnapshotScheduler.
+-- Se retienen 365 días; registros más antiguos se purgan el 1º de cada mes.
+
+CREATE TABLE artist_metrics_snapshot (
+    id                  UUID             NOT NULL,
+    artist_id           UUID             NOT NULL,
+    snapshot_date       DATE             NOT NULL,
+    spotify_popularity  SMALLINT,
+    spotify_followers   INTEGER,
+    last_release_date   DATE,
+    total_releases      INTEGER,
+    created_at          TIMESTAMPTZ      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_artist_metrics_snapshot        PRIMARY KEY (id),
+    CONSTRAINT fk_metrics_snapshot_artist        FOREIGN KEY (artist_id) REFERENCES artists (id) ON DELETE CASCADE,
+    CONSTRAINT uq_metrics_artist_date            UNIQUE (artist_id, snapshot_date)
+);
+
+CREATE INDEX idx_metrics_snapshot_date ON artist_metrics_snapshot (snapshot_date);

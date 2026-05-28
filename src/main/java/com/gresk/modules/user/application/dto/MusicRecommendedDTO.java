@@ -10,7 +10,9 @@ public record MusicRecommendedDTO(
         String artistName,
         String spotifyUrl,
         String imageUrl,
-        MusicGenre genre
+        MusicGenre genre,
+        String label,
+        boolean isGresKArtist
 ) {
 
     public static MusicRecommendedDTO fromDomain(MusicRecommendation domain, String defaultImageUrl) {
@@ -24,6 +26,8 @@ public record MusicRecommendedDTO(
                 .spotifyUrl(domain.spotifyUrl())
                 .imageUrl(imageUrl)
                 .genre(domain.genre())
+                .label(domain.label() != null ? domain.label().name() : null)
+                .isGresKArtist(domain.isGresKArtist())
                 .build();
     }
 }

@@ -1,6 +1,8 @@
 package com.gresk.modules.user.domain.model;
 
 import com.gresk.shared.domain.MusicGenre;
+import com.gresk.shared.domain.recommendation.RecommendationLabel;
+
 import java.util.Objects;
 
 public record MusicRecommendation(
@@ -8,7 +10,9 @@ public record MusicRecommendation(
         String artistName,
         String spotifyUrl,
         String imageUrl,
-        MusicGenre genre
+        MusicGenre genre,
+        RecommendationLabel label,
+        boolean isGresKArtist
 ) {
     public MusicRecommendation {
         Objects.requireNonNull(trackName, "Track name is required");
@@ -21,6 +25,21 @@ public record MusicRecommendation(
         if (genre == null) {
             genre = MusicGenre.SURPRISE;
         }
+    }
+
+    public MusicRecommendation(String trackName, String artistName, String spotifyUrl,
+                               String imageUrl, MusicGenre genre) {
+        this(trackName, artistName, spotifyUrl, imageUrl, genre, null, false);
+    }
+
+    public MusicRecommendation withLabel(RecommendationLabel newLabel) {
+        return new MusicRecommendation(trackName, artistName, spotifyUrl, imageUrl,
+                genre, newLabel, isGresKArtist);
+    }
+
+    public MusicRecommendation withIsGresKArtist(boolean flag) {
+        return new MusicRecommendation(trackName, artistName, spotifyUrl, imageUrl,
+                genre, label, flag);
     }
 
     public String displayTitle() {

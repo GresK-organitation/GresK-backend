@@ -78,6 +78,13 @@ public class JpaArtistRepositoryAdapter implements ArtistRepositoryPort {
     }
 
     @Override
+    public List<Artist> findAllWithSpotifyId() {
+        return jpaRepository.findAllWithSpotifyId().stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+
+    @Override
     @Transactional
     public void deleteById(ArtistId id) {
         jpaRepository.deleteById(id.value());

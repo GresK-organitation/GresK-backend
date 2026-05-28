@@ -65,6 +65,30 @@ public class SpotifyDto {
             int total
     ) {}
 
+    // ── Artist detail (GET /artists/{id}) ────────────────────────────────────
+
+    public record ArtistDetailResponse(
+            int                  popularity,
+            SpotifyFollowersDTO  followers,
+            List<String>         genres,
+            String               name,
+            List<SpotifyImageDTO> images
+    ) {}
+
+    // ── Artist albums (GET /artists/{id}/albums) ──────────────────────────────
+
+    public record AlbumSearchResponse(
+            List<AlbumItemDTO> items,
+            int                total
+    ) {}
+
+    public record AlbumItemDTO(
+            String id,
+            String name,
+            @JsonProperty("release_date")           String releaseDate,
+            @JsonProperty("release_date_precision")  String releaseDatePrecision
+    ) {}
+
     // ── Shared ────────────────────────────────────────────────────────────────
 
     public record SpotifyArtistDTO(
