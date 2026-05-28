@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -48,4 +49,17 @@ public interface EventJpaRepository
             ORDER BY event_date ASC
             """, nativeQuery = true)
     List<EventEntity> findEligibleForFlashDeal();
+
+    @Query("""
+            SELECT e FROM EventEntity e
+            WHERE e.promoterId = :promoterId
+              AND e.eventDate >= :from
+              AND e.eventDate < :to
+            ORDER BY e.eventDate ASC
+            """)
+    List<EventEntity> findByPromoterAndDateRange(
+            @Param("promoterId") UUID promoterId,
+            @Param("from") Instant from,
+            @Param("to") Instant to
+    );
 }

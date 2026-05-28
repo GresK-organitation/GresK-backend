@@ -1,14 +1,17 @@
 package com.gresk.modules.event.infrastructure.persistence;
 
+import com.gresk.modules.event.domain.model.CalendarEvent;
 import com.gresk.modules.event.domain.model.Event;
 import com.gresk.modules.event.domain.model.EventId;
 import com.gresk.modules.event.domain.port.out.EventFilter;
 import com.gresk.modules.event.domain.port.out.EventRepository;
+import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +22,7 @@ public class JpaEventAdapter implements EventRepository {
 
     private final EventJpaRepository repo;
     private final EventMapper mapper;
+    private final CalendarEventMapper calendarMapper;
 
     @Override
     @Transactional
@@ -64,6 +68,14 @@ public class JpaEventAdapter implements EventRepository {
         return repo.findEligibleForFlashDeal()
                 .stream()
                 .map(mapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<CalendarEvent> findCalendarEventsByPromoter(PromoterId promoterId, Instant from, Instant to) {
+        return repo.findByPromoterAndDateRange(promoterId.value(), from, to)
+                .stream()
+                .map(calendarMapper::toDomain)
                 .toList();
     }
 }

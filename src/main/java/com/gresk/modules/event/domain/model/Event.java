@@ -138,6 +138,19 @@ public final class Event {
             throw new IllegalStateException("Event has no capacity set");
         }
         this.capacity = capacity.reserve(1);
+        if (this.capacity.available() == 0 && this.status == EventStatus.PUBLISHED) {
+            this.status = EventStatus.SOLD_OUT;
+        }
+    }
+
+    public void restoreCapacity() {
+        if (capacity == null) {
+            throw new IllegalStateException("Event has no capacity set");
+        }
+        this.capacity = new Capacity(capacity.total(), capacity.available() + 1);
+        if (this.status == EventStatus.SOLD_OUT) {
+            this.status = EventStatus.PUBLISHED;
+        }
     }
 
     /**

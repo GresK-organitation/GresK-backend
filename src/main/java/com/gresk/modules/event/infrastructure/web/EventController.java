@@ -1,13 +1,20 @@
 package com.gresk.modules.event.infrastructure.web;
 
+import com.gresk.modules.event.application.dto.CalendarEventsResponse;
+import com.gresk.modules.event.application.dto.CalendarResponseMapper;
 import com.gresk.modules.event.application.dto.EventResponse;
 import com.gresk.modules.event.application.dto.EventResponseMapper;
+import com.gresk.modules.event.application.dto.HeatmapResponse;
 import com.gresk.modules.event.application.dto.PageResponse;
+import com.gresk.modules.event.application.query.CalendarEventsQuery;
 import com.gresk.modules.event.application.query.GetEventQuery;
+import com.gresk.modules.event.application.query.HeatmapQuery;
 import com.gresk.modules.event.application.query.ListEventsQuery;
 import com.gresk.modules.event.application.usecase.CreateEventCommand;
 import com.gresk.modules.event.application.usecase.CreateEventUseCase;
+import com.gresk.modules.event.application.usecase.GetCalendarEventsUseCase;
 import com.gresk.modules.event.application.usecase.GetEventUseCase;
+import com.gresk.modules.event.application.usecase.GetHeatmapUseCase;
 import com.gresk.modules.event.application.usecase.GetLastMinuteEventsUseCase;
 import com.gresk.modules.event.application.usecase.ListEventsUseCase;
 import com.gresk.modules.event.application.usecase.PublishEventUseCase;
@@ -17,6 +24,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,6 +34,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @Slf4j
@@ -40,7 +50,10 @@ public class EventController {
     private final ListEventsUseCase          listUseCase;
     private final GetLastMinuteEventsUseCase getLastMinuteUseCase;
     private final UpdateFlashDealUseCase     updateFlashDealUseCase;
+    private final GetCalendarEventsUseCase   getCalendarEventsUseCase;
+    private final GetHeatmapUseCase          getHeatmapUseCase;
     private final EventResponseMapper        mapper;
+    private final CalendarResponseMapper     calendarMapper;
 
     // ── POST /api/v1/events ──────────────────────────────────────────────────
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -138,5 +151,32 @@ public class EventController {
                 request.flashDealDiscountPercent()
         );
         return ResponseEntity.ok(mapper.toResponse(updateFlashDealUseCase.execute(command)));
+    }
+
+    // ── GET /api/v1/events/calendar ──────────────────────────────────────────
+    @GetMapping("/calendar")
+    @PreAuthorize("hasRole('PROMOTER')")
+    public ResponseEntity<CalendarEventsResponse> getCalendar(
+            @AuthenticationPrincipal String promoterId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+
+        Instant fromInstant = from.atStartOfDay(ZoneOffset.UTC).toInstant();
+        Instant toInstant   = to.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+
+        CalendarEventsQuery query = new CalendarEventsQuery(promoterId, fromInstant, toInstant);
+        return ResponseEntity.ok(calendarMapper.toCalendarResponse(getCalendarEventsUseCase.execute(query)));
+    }
+
+    // ── GET /api/v1/events/calendar/heatmap ──────────────────────────────────
+    @GetMapping("/calendar/heatmap")
+    @PreAuthorize("hasRole('PROMOTER')")
+    public ResponseEntity<HeatmapResponse> getHeatmap(
+            @AuthenticationPrincipal String promoterId,
+            @RequestParam int year,
+            @RequestParam int month) {
+
+        HeatmapQuery query = new HeatmapQuery(promoterId, year, month);
+        return ResponseEntity.ok(calendarMapper.toHeatmapResponse(year, month, getHeatmapUseCase.execute(query)));
     }
 }
