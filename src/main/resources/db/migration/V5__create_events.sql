@@ -14,7 +14,7 @@
 --   flash deal: flash_deal_enabled, flash_deal_hours_threshold,
 --               flash_deal_discount_percent, flash_deal_applied
 --
--- EventStatus enum: DRAFT, PUBLISHED, FINISHED, CANCELLED
+-- EventStatus enum: DRAFT, PUBLISHED, SOLD_OUT, FINISHED, CANCELLED
 -- MusicGenre enum: ROCK, POP, TECHNO, REGGAETON, HIP_HOP, HOUSE, INDIE,
 --                  METAL, TRAP, JAZZ, CLASSICAL, FLAMENCO, R_AND_B,
 --                  PUNK, LATIN_JAZZ, ELECTRONIC, SURPRISE
@@ -71,7 +71,7 @@ CREATE TABLE events (
     CONSTRAINT pk_events              PRIMARY KEY (id),
     CONSTRAINT fk_events_promoter     FOREIGN KEY (promoter_id) REFERENCES promoters (id) ON DELETE RESTRICT,
     CONSTRAINT fk_events_artist       FOREIGN KEY (artist_id)   REFERENCES artists  (id) ON DELETE SET NULL,
-    CONSTRAINT chk_events_status      CHECK (status IN ('DRAFT', 'PUBLISHED', 'FINISHED', 'CANCELLED')),
+    CONSTRAINT chk_events_status      CHECK (status IN ('DRAFT', 'PUBLISHED', 'SOLD_OUT', 'FINISHED', 'CANCELLED')),
     CONSTRAINT chk_events_genre       CHECK (genre IN (
         'ROCK', 'POP', 'TECHNO', 'REGGAETON', 'HIP_HOP', 'HOUSE',
         'INDIE', 'METAL', 'TRAP', 'JAZZ', 'CLASSICAL', 'FLAMENCO',
@@ -84,6 +84,7 @@ CREATE INDEX idx_events_status       ON events (status);
 CREATE INDEX idx_events_genre_status ON events (genre, status);
 CREATE INDEX idx_events_city_date    ON events (city, event_date);
 CREATE INDEX idx_events_artist_id    ON events (artist_id);
+CREATE INDEX idx_events_promoter_date ON events (promoter_id, event_date);
 
 -- Partial index: cubre únicamente los candidatos del scheduler flash deal.
 -- El WHERE estrecho mantiene el índice pequeño independientemente del volumen de eventos.
