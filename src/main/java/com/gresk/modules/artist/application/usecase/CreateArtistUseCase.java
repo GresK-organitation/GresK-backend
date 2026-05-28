@@ -9,6 +9,7 @@ import com.gresk.modules.artist.domain.model.valueobject.ArtistFee;
 import com.gresk.modules.artist.domain.model.valueobject.ArtistStatus;
 import com.gresk.modules.artist.domain.model.valueobject.FollowerCount;
 import com.gresk.modules.artist.domain.model.valueobject.SocialLinks;
+import com.gresk.modules.artist.domain.model.valueobject.SpotifyProfile;
 import com.gresk.modules.artist.domain.port.out.ArtistRepositoryPort;
 import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import com.gresk.shared.domain.MusicGenre;
@@ -63,6 +64,13 @@ public class CreateArtistUseCase implements CreateArtistPort {
                 ? new LinkedHashSet<>(command.tags())
                 : new LinkedHashSet<>();
 
+        SpotifyProfile spotifyProfile = SpotifyProfile.of(
+                command.spotifyArtistId(),
+                command.spotifyName(),
+                command.spotifyImageUrl(),
+                command.spotifyGenres()
+        );
+
         Artist artist = Artist.create(
                 promoterId,
                 Name.of(command.name()),
@@ -75,7 +83,8 @@ public class CreateArtistUseCase implements CreateArtistPort {
                 FollowerCount.of(command.followers()),
                 tags,
                 ArtistContact.of(command.contact()),
-                SocialLinks.of(command.instagramUrl(), command.spotifyUrl())
+                SocialLinks.of(command.instagramUrl(), command.spotifyUrl()),
+                spotifyProfile
         );
 
         return artistRepository.save(artist);

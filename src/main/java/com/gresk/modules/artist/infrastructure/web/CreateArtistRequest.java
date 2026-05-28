@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
+import java.util.List;
 import java.util.Set;
 
 public record CreateArtistRequest(
@@ -38,5 +39,11 @@ public record CreateArtistRequest(
 
         String instagramUrl,
 
-        String spotifyUrl
+        String spotifyUrl,
+
+        // Campos opcionales de vinculación Spotify (rellenados desde la búsqueda previa)
+        String       spotifyArtistId,
+        String       spotifyName,
+        String       spotifyImageUrl,
+        List<String> spotifyGenres
 ) {}

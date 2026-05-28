@@ -47,7 +47,7 @@ public class GetUserDashboardUseCaseImpl implements GetUserDashboardUseCase {
                 .collect(Collectors.toSet());
 
         Set<MusicRecommendedDTO> topTracks = musicRecommendationProvider
-                .getSpotifyTopTracks(user.getMusicGenres(), user.getCity().value())
+                .getSpotifyTopTracks(user.getMusicGenres(), user.getCity().value(), id)
                 .stream()
                 .map(domain -> MusicRecommendedDTO.fromDomain(domain, defaultImageUrl))
                 .collect(Collectors.toSet());

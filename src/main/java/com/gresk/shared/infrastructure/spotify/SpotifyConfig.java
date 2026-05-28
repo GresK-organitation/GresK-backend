@@ -1,4 +1,4 @@
-package com.gresk.modules.user.infrastructure.config;
+package com.gresk.shared.infrastructure.spotify;
 
 import lombok.Getter;
 import lombok.Setter;

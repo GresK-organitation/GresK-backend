@@ -6,6 +6,7 @@ import com.gresk.modules.artist.domain.model.valueobject.ArtistId;
 import com.gresk.modules.artist.domain.model.valueobject.ArtistStatus;
 import com.gresk.modules.artist.domain.model.valueobject.FollowerCount;
 import com.gresk.modules.artist.domain.model.valueobject.SocialLinks;
+import com.gresk.modules.artist.domain.model.valueobject.SpotifyProfile;
 import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import com.gresk.shared.domain.MusicGenre;
 import com.gresk.shared.domain.valueobject.City;
@@ -34,6 +35,7 @@ public final class Artist {
     private Set<String>          tags;
     private ArtistContact        contact;
     private SocialLinks          socialLinks;
+    private SpotifyProfile       spotifyProfile;
     private int                  eventsPlayed;
     private double               avgRating;
     private final Instant        createdAt;
@@ -42,23 +44,25 @@ public final class Artist {
                    Set<MusicGenre> genres, AssetId imageAssetId, Description bio,
                    ArtistStatus status, ArtistFee fee, FollowerCount followers,
                    Set<String> tags, ArtistContact contact, SocialLinks socialLinks,
+                   SpotifyProfile spotifyProfile,
                    int eventsPlayed, double avgRating, Instant createdAt) {
-        this.id           = Objects.requireNonNull(id,         "ArtistId is required");
-        this.promoterId   = Objects.requireNonNull(promoterId, "PromoterId is required");
-        this.name         = Objects.requireNonNull(name,       "Name is required");
-        this.origin       = Objects.requireNonNull(origin,     "Origin is required");
-        this.bio          = Objects.requireNonNull(bio,        "Bio is required");
-        this.status       = Objects.requireNonNull(status,     "Status is required");
-        this.contact      = Objects.requireNonNull(contact,    "Contact is required");
-        this.createdAt    = Objects.requireNonNull(createdAt,  "CreatedAt is required");
-        this.genres       = genres      != null ? new LinkedHashSet<>(genres)    : new LinkedHashSet<>();
-        this.imageAssetId = imageAssetId != null ? imageAssetId : new AssetId("");
-        this.fee          = fee         != null ? fee         : ArtistFee.empty();
-        this.followers    = followers   != null ? followers   : FollowerCount.empty();
-        this.tags         = tags        != null ? new LinkedHashSet<>(tags)      : new LinkedHashSet<>();
-        this.socialLinks  = socialLinks != null ? socialLinks : SocialLinks.empty();
-        this.eventsPlayed = eventsPlayed;
-        this.avgRating    = avgRating;
+        this.id              = Objects.requireNonNull(id,         "ArtistId is required");
+        this.promoterId      = Objects.requireNonNull(promoterId, "PromoterId is required");
+        this.name            = Objects.requireNonNull(name,       "Name is required");
+        this.origin          = Objects.requireNonNull(origin,     "Origin is required");
+        this.bio             = Objects.requireNonNull(bio,        "Bio is required");
+        this.status          = Objects.requireNonNull(status,     "Status is required");
+        this.contact         = Objects.requireNonNull(contact,    "Contact is required");
+        this.createdAt       = Objects.requireNonNull(createdAt,  "CreatedAt is required");
+        this.genres          = genres       != null ? new LinkedHashSet<>(genres) : new LinkedHashSet<>();
+        this.imageAssetId    = imageAssetId != null ? imageAssetId : new AssetId("");
+        this.fee             = fee          != null ? fee          : ArtistFee.empty();
+        this.followers       = followers    != null ? followers    : FollowerCount.empty();
+        this.tags            = tags         != null ? new LinkedHashSet<>(tags)   : new LinkedHashSet<>();
+        this.socialLinks     = socialLinks  != null ? socialLinks  : SocialLinks.empty();
+        this.spotifyProfile  = spotifyProfile != null ? spotifyProfile : SpotifyProfile.empty();
+        this.eventsPlayed    = eventsPlayed;
+        this.avgRating       = avgRating;
     }
 
     // ── Factoría: creación por la promotora ──────────────────────────────────
@@ -66,10 +70,11 @@ public final class Artist {
     public static Artist create(PromoterId promoterId, Name name, City origin,
                                 Set<MusicGenre> genres, AssetId imageAssetId, Description bio,
                                 ArtistStatus status, ArtistFee fee, FollowerCount followers,
-                                Set<String> tags, ArtistContact contact, SocialLinks socialLinks) {
+                                Set<String> tags, ArtistContact contact, SocialLinks socialLinks,
+                                SpotifyProfile spotifyProfile) {
         return new Artist(
                 ArtistId.generate(), promoterId, name, origin, genres, imageAssetId, bio,
-                status, fee, followers, tags, contact, socialLinks,
+                status, fee, followers, tags, contact, socialLinks, spotifyProfile,
                 0, 0.0, Instant.now()
         );
     }
@@ -80,9 +85,10 @@ public final class Artist {
                                       Set<MusicGenre> genres, AssetId imageAssetId, Description bio,
                                       ArtistStatus status, ArtistFee fee, FollowerCount followers,
                                       Set<String> tags, ArtistContact contact, SocialLinks socialLinks,
+                                      SpotifyProfile spotifyProfile,
                                       int eventsPlayed, double avgRating, Instant createdAt) {
         return new Artist(id, promoterId, name, origin, genres, imageAssetId, bio,
-                status, fee, followers, tags, contact, socialLinks,
+                status, fee, followers, tags, contact, socialLinks, spotifyProfile,
                 eventsPlayed, avgRating, createdAt);
     }
 
@@ -134,8 +140,9 @@ public final class Artist {
     public FollowerCount     getFollowers()    { return followers; }
     public Set<String>       getTags()         { return Collections.unmodifiableSet(tags); }
     public ArtistContact     getContact()      { return contact; }
-    public SocialLinks       getSocialLinks()  { return socialLinks; }
-    public int               getEventsPlayed() { return eventsPlayed; }
+    public SocialLinks       getSocialLinks()    { return socialLinks; }
+    public SpotifyProfile    getSpotifyProfile() { return spotifyProfile; }
+    public int               getEventsPlayed()   { return eventsPlayed; }
     public double            getAvgRating()    { return avgRating; }
     public Instant           getCreatedAt()    { return createdAt; }
 }

@@ -1,4 +1,4 @@
-package com.gresk.modules.user.infrastructure.adapters.external.spotify;
+package com.gresk.shared.infrastructure.spotify;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;

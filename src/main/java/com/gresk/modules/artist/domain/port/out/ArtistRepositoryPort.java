@@ -19,5 +19,7 @@ public interface ArtistRepositoryPort {
 
     boolean existsByContactAndPromoterId(String contact, PromoterId promoterId);
 
+    List<Artist> findAllWithSpotifyId();
+
     void deleteById(ArtistId id);
 }

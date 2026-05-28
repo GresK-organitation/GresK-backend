@@ -58,4 +58,20 @@ public interface UserEventQueryRepository extends Repository<EventEntity, UUID> 
             @Param("status") EventStatus            status,
             Pageable                                pageable
     );
+
+    @Query("""
+            SELECT CASE WHEN COUNT(e) > 0 THEN true ELSE false END
+            FROM EventEntity e
+            WHERE e.artistId = :artistId
+              AND e.city     = :city
+              AND e.eventDate BETWEEN :from AND :to
+              AND e.status   = :status
+            """)
+    boolean existsUpcomingConcertForArtist(
+            @Param("artistId") UUID    artistId,
+            @Param("city")     String  city,
+            @Param("from")     Instant from,
+            @Param("to")       Instant to,
+            @Param("status")   EventStatus status
+    );
 }
