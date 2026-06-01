@@ -7,6 +7,7 @@ import com.gresk.modules.user.domain.port.out.ShownArtistsPort;
 import com.gresk.shared.domain.MusicGenre;
 import com.gresk.shared.infrastructure.spotify.SpotifyApiClient;
 import com.gresk.shared.infrastructure.spotify.SpotifyDto;
+import com.gresk.shared.domain.recommendation.RecommendationLabel;
 import com.gresk.shared.infrastructure.spotify.SpotifyTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,10 +20,40 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+// ── Fallback search categories ────────────────────────────────────────────────
+// Orientadas a música local/española, underground y artistas emergentes,
+// alineadas con el espíritu de GresK (escenas locales, sala pequeña, pocos plays).
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class SpotifyMusicProviderAdapter implements MusicRecommendationProvider {
+
+    // Categoría de búsqueda adicional: query Spotify + género destino + popularidad máxima
+    private record FallbackCategory(String query, MusicGenre genre, int maxPopularity) {}
+
+    private static final List<FallbackCategory> EXTRA_FALLBACKS = List.of(
+        // 1. Indie local — escena de sala pequeña
+        new FallbackCategory("genre:\"indie\" year:2023-2026",          MusicGenre.INDIE,       35),
+        // 2. Flamenco moderno — raíz española contemporánea
+        new FallbackCategory("genre:\"flamenco\" year:2022-2026",       MusicGenre.FLAMENCO,    40),
+        // 3. Spanish rock reciente — grupos emergentes
+        new FallbackCategory("genre:\"spanish rock\" year:2022-2026",   MusicGenre.ROCK,        40),
+        // 4. Trap en castellano — underground urbano
+        new FallbackCategory("genre:\"trap\" year:2024-2026",           MusicGenre.TRAP,        40),
+        // 5. Electronic nuevo — producciones recientes de baja notoriedad
+        new FallbackCategory("genre:\"electronic\" year:2025-2026",     MusicGenre.ELECTRONIC,  30),
+        // 6. House de club — sesiones de sala local
+        new FallbackCategory("genre:\"house\" year:2024-2026",          MusicGenre.HOUSE,       35),
+        // 7. Punk underground — escena de local pequeño
+        new FallbackCategory("genre:\"punk\" year:2020-2026",           MusicGenre.PUNK,        30),
+        // 8. Latin jazz — fusión emergente iberoamericana
+        new FallbackCategory("genre:\"latin jazz\" year:2021-2026",     MusicGenre.LATIN_JAZZ,  25),
+        // 9. Hip-hop en castellano — flows sin sello grande
+        new FallbackCategory("genre:\"hip-hop\" year:2024-2026",        MusicGenre.HIP_HOP,     40),
+        // 10. Reggaeton de nueva generación — no mainstream
+        new FallbackCategory("genre:\"reggaeton\" year:2025-2026",      MusicGenre.REGGAETON,   45)
+    );
 
     private final SpotifyApiClient         apiClient;
     private final SpotifyTokenService      tokenService;
@@ -46,8 +77,8 @@ public class SpotifyMusicProviderAdapter implements MusicRecommendationProvider 
             Set<String> newlyShown = new HashSet<>();
 
             for (var candidate : candidates) {
-                if (recommendations.size() >= 10) break;
-                SpotifyDto.SpotifyTrackDTO track = fetchTopTrackForArtist(token, candidate.spotifyArtistId());
+                if (recommendations.size() >= 3) break;
+                SpotifyDto.SpotifyTrackDTO track = fetchTopTrackForArtist(token, candidate.artistName());
                 if (track != null) {
                     recommendations.add(
                             mapToDomain(track, genres)
@@ -58,10 +89,26 @@ public class SpotifyMusicProviderAdapter implements MusicRecommendationProvider 
                 }
             }
 
-            if (recommendations.size() < 10) {
+            if (recommendations.size() < 3) {
                 for (MusicGenre genre : genres) {
-                    if (recommendations.size() >= 10) break;
+                    if (recommendations.size() >= 3) break;
                     recommendations.addAll(findTracksByGenre(token, genre, city));
+                }
+            }
+
+            // Nivel 3 — categorías extra: música local/española, underground, emergente
+            if (recommendations.size() < 3) {
+                log.info("nivel 3: usando {} categorías extra de fallback", EXTRA_FALLBACKS.size());
+                for (FallbackCategory fb : EXTRA_FALLBACKS) {
+                    if (recommendations.size() >= 3) break;
+                    var resp = executeSearch(token, fb.query());
+                    if (!isResponseEmpty(resp)) {
+                        resp.tracks().items().stream()
+                                .filter(t -> t.popularity() < fb.maxPopularity())
+                                .limit(1)
+                                .map(t -> mapToDomain(t, Set.of(fb.genre())).withLabel(RecommendationLabel.ESCENA_UNDERGROUND))
+                                .forEach(recommendations::add);
+                    }
                 }
             }
 
@@ -76,14 +123,14 @@ public class SpotifyMusicProviderAdapter implements MusicRecommendationProvider 
         }
     }
 
-    private SpotifyDto.SpotifyTrackDTO fetchTopTrackForArtist(String token, String spotifyArtistId) {
+    private SpotifyDto.SpotifyTrackDTO fetchTopTrackForArtist(String token, String artistName) {
         try {
             var response = apiClient.searchTracks(
-                    token, "artist:" + spotifyArtistId, "track", "ES", 5);
+                    token, "artist:\"" + artistName + "\"", "track", "ES", 5);
             if (isResponseEmpty(response)) return null;
             return response.tracks().items().get(0);
         } catch (Exception e) {
-            log.warn("Failed to fetch track for GresK artist {}: {}", spotifyArtistId, e.getMessage());
+            log.warn("Failed to fetch top track for GresK artist {}: {}", artistName, e.getMessage());
             return null;
         }
     }
@@ -111,8 +158,8 @@ public class SpotifyMusicProviderAdapter implements MusicRecommendationProvider 
 
         return response.tracks().items().stream()
                 .filter(t -> t.popularity() < 50)
-                .limit(3)
-                .map(t -> mapToDomain(t, Set.of(genre)))
+                .limit(1)
+                .map(t -> mapToDomain(t, Set.of(genre)).withLabel(RecommendationLabel.ACORDE_A_TUS_GUSTOS))
                 .collect(Collectors.toSet());
     }
 

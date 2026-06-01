@@ -48,8 +48,7 @@ cloudinary:
 
 gresk:
   cors:
-    allowed-origins:
-      - "http://localhost:*"
+    allowed-origins: "http://localhost:3000,http://localhost:3001,http://localhost:8080"
   images:
     default-url: "https://res.cloudinary.com/dzfgoh6hu/image/upload/c_fill,g_auto,w_1200,h_675/arde-bogota_98.jpg_bmbxtw.png"
     # Añadimos la extensión al final del template para asegurar que el navegador la lea bien
