@@ -144,6 +144,12 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Agenda: email reminders -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<dependencyManagement>
