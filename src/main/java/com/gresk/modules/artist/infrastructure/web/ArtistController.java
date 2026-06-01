@@ -7,6 +7,9 @@ import com.gresk.modules.artist.application.port.in.GetArtistsByPromoterPort;
 import com.gresk.modules.artist.application.dto.SpotifyArtistSuggestionDTO;
 import com.gresk.modules.artist.application.port.in.SearchSpotifyArtistsPort;
 import com.gresk.modules.artist.domain.model.Artist;
+import com.gresk.modules.rider.application.usecase.GetArtistRidersUseCase;
+import com.gresk.modules.rider.infrastructure.web.RiderResponse;
+import com.gresk.modules.rider.infrastructure.web.RiderResponseMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +33,9 @@ public class ArtistController {
     private final GetArtistsByPromoterPort  getArtistsByPromoterUseCase;
     private final GetArtistByIdPort         getArtistByIdUseCase;
     private final SearchSpotifyArtistsPort  searchSpotifyArtistsUseCase;
+    private final GetArtistRidersUseCase    getArtistRidersUseCase;
     private final ArtistResponseMapper      mapper;
+    private final RiderResponseMapper       riderMapper;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('PROMOTER')")
@@ -103,5 +108,16 @@ public class ArtistController {
             @RequestParam String name) {
 
         return ResponseEntity.ok(searchSpotifyArtistsUseCase.execute(name));
+    }
+
+    @GetMapping("/{artistId}/riders")
+    @PreAuthorize("hasRole('PROMOTER')")
+    public ResponseEntity<List<RiderResponse>> getArtistRiders(
+            @PathVariable String artistId) {
+
+        List<RiderResponse> riders = getArtistRidersUseCase.execute(artistId).stream()
+                .map(riderMapper::toResponse)
+                .toList();
+        return ResponseEntity.ok(riders);
     }
 }

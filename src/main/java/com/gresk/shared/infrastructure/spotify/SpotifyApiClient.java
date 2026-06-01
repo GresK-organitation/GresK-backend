@@ -34,6 +34,17 @@ public interface SpotifyApiClient {
     );
 
     /**
+     * Obtiene el top de canciones de un artista por su Spotify ID.
+     * Usado para recomendaciones de artistas GresK.
+     */
+    @GetMapping("/artists/{id}/top-tracks")
+    SpotifyDto.ArtistTopTracksResponse getArtistTopTracks(
+            @RequestHeader("Authorization") String bearerToken,
+            @PathVariable("id") String artistId,
+            @RequestParam("market") String market
+    );
+
+    /**
      * Obtiene el detalle de un artista (popularidad, seguidores, géneros).
      * Usado por el job de métricas para recopilar datos periódicos.
      */

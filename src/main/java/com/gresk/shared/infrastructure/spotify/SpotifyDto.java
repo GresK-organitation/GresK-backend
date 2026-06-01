@@ -89,6 +89,12 @@ public class SpotifyDto {
             @JsonProperty("release_date_precision")  String releaseDatePrecision
     ) {}
 
+    // ── Artist top-tracks (GET /artists/{id}/top-tracks) ─────────────────────
+
+    public record ArtistTopTracksResponse(
+            List<SpotifyTrackDTO> tracks
+    ) {}
+
     // ── Shared ────────────────────────────────────────────────────────────────
 
     public record SpotifyArtistDTO(

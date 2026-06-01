@@ -40,12 +40,15 @@ public record UserDashboardResponseDTO(
             String artistName,
             String spotifyUrl,
             String imageUrl,
-            String genre
+            String genre,
+            String label,
+            boolean isGresKArtist
     ) {
         public static MusicResponseDTO from(MusicRecommendedDTO dto) {
             return new MusicResponseDTO(
                     dto.trackName(), dto.artistName(), dto.spotifyUrl(),
-                    dto.imageUrl(), dto.genre().name()
+                    dto.imageUrl(), dto.genre().name(),
+                    dto.label(), dto.isGresKArtist()
             );
         }
     }
