@@ -13,5 +13,10 @@ public interface EmailMessageJpaRepository extends JpaRepository<EmailMessageEnt
 
     List<EmailMessageEntity> findByPromoterIdOrderByReceivedAtDesc(UUID promoterId);
 
+    List<EmailMessageEntity> findByEventIdAndPromoterIdOrderByReceivedAtDesc(UUID eventId, UUID promoterId);
+
+    Optional<EmailMessageEntity> findFirstByPromoterIdAndExternalThreadIdAndEventIdIsNotNullOrderByReceivedAtDesc(
+            UUID promoterId, String externalThreadId);
+
     boolean existsByExternalMessageId(String externalMessageId);
 }

@@ -1,5 +1,6 @@
 package com.gresk.modules.email.domain.model;
 
+import com.gresk.modules.email.domain.exception.InvalidDraftReplyStatusException;
 import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 
 import java.time.Instant;
@@ -59,6 +60,47 @@ public final class EmailDraftReply {
             Instant createdAt) {
         return new EmailDraftReply(id, emailId, promoterId, draftType, subject, body,
                 editedBody, status, approvedAt, sentAt, createdAt);
+    }
+
+    // ── Transiciones de estado ────────────────────────────────────────────────
+
+    /** La promotora aprueba el borrador, opcionalmente con su texto editado. */
+    public void approve(String editedBody) {
+        if (status != DraftReplyStatus.PENDING_REVIEW) {
+            throw new InvalidDraftReplyStatusException(
+                    "Cannot approve a draft in status: " + status);
+        }
+        if (editedBody != null && !editedBody.isBlank()) {
+            this.editedBody = editedBody;
+        }
+        this.status     = DraftReplyStatus.APPROVED;
+        this.approvedAt = Instant.now();
+    }
+
+    public void markSent() {
+        if (status != DraftReplyStatus.APPROVED) {
+            throw new InvalidDraftReplyStatusException(
+                    "Cannot send a draft in status: " + status);
+        }
+        this.status = DraftReplyStatus.SENT;
+        this.sentAt = Instant.now();
+    }
+
+    public void discard() {
+        if (status != DraftReplyStatus.PENDING_REVIEW) {
+            throw new InvalidDraftReplyStatusException(
+                    "Cannot discard a draft in status: " + status);
+        }
+        this.status = DraftReplyStatus.DISCARDED;
+    }
+
+    /** Cuerpo definitivo a enviar: el editado por la promotora si existe. */
+    public String effectiveBody() {
+        return editedBody != null && !editedBody.isBlank() ? editedBody : body;
+    }
+
+    public boolean isOwnedBy(PromoterId promoterId) {
+        return this.promoterId.equals(promoterId);
     }
 
     // ── Getters ───────────────────────────────────────────────────────────────

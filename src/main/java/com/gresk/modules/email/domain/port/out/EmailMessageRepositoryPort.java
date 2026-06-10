@@ -6,11 +6,13 @@ import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface EmailMessageRepositoryPort {
     EmailMessage           save(EmailMessage message);
     Optional<EmailMessage> findById(EmailMessageId id);
     Optional<EmailMessage> findByExternalMessageId(String externalMessageId);
     List<EmailMessage>     findByPromoterId(PromoterId promoterId);
+    List<EmailMessage>     findByEventIdAndPromoterId(UUID eventId, PromoterId promoterId);
     boolean                existsByExternalMessageId(String externalMessageId);
 }

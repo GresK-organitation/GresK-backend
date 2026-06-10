@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -40,6 +41,12 @@ public class JpaEmailMessageRepositoryAdapter implements EmailMessageRepositoryP
     @Override
     public List<EmailMessage> findByPromoterId(PromoterId promoterId) {
         return repo.findByPromoterIdOrderByReceivedAtDesc(promoterId.value())
+                .stream().map(mapper::toDomain).toList();
+    }
+
+    @Override
+    public List<EmailMessage> findByEventIdAndPromoterId(UUID eventId, PromoterId promoterId) {
+        return repo.findByEventIdAndPromoterIdOrderByReceivedAtDesc(eventId, promoterId.value())
                 .stream().map(mapper::toDomain).toList();
     }
 

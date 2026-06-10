@@ -9,7 +9,7 @@
 --
 -- ProcessingStatus:    PENDING, PROCESSING, DONE, FAILED, DEAD_LETTER
 -- EmailClassification: RIDER, CACHE, HORARIO, CONTRATO, LOGISTICA,
---                      CONFIRMACION, CAMBIO, OTRO
+--                      CONFIRMACION, CAMBIO, CONTINUATION, OTRO
 -- ExtractedEntityType: DATE, AMOUNT, RIDER_ITEM, ARTIST_NAME, VENUE_NAME,
 --                      CONTACT_NAME, SCHEDULE_ITEM, CONDITION, ACCOMMODATION,
 --                      TRANSPORT, CHANGE_DETECTED
@@ -59,7 +59,7 @@ CREATE TABLE email_messages (
                                               ('PENDING', 'PROCESSING', 'DONE', 'FAILED', 'DEAD_LETTER')),
     CONSTRAINT chk_email_classification CHECK (classification IN
                                               ('RIDER', 'CACHE', 'HORARIO', 'CONTRATO', 'LOGISTICA',
-                                               'CONFIRMACION', 'CAMBIO', 'OTRO')
+                                               'CONFIRMACION', 'CAMBIO', 'CONTINUATION', 'OTRO')
                                               OR classification IS NULL)
 );
 

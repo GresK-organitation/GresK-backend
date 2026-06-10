@@ -3,6 +3,7 @@ package com.gresk.modules.email.domain.model;
 import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,6 +105,38 @@ public final class EmailMessage {
                 processingStatus, processingAttempts,
                 lastAttemptAt, processedAt,
                 receivedAt, createdAt);
+    }
+
+    // ── Transiciones del pipeline ─────────────────────────────────────────────
+
+    public void linkToEvent(UUID eventId) {
+        this.eventId = eventId;
+    }
+
+    /** El worker toma el correo: cuenta el intento y lo marca en curso. */
+    public void markProcessing() {
+        this.processingStatus = ProcessingStatus.PROCESSING;
+        this.processingAttempts++;
+        this.lastAttemptAt = Instant.now();
+    }
+
+    public void completeProcessing(ClassificationResult result) {
+        this.classification           = result.classification();
+        this.classificationConfidence = BigDecimal.valueOf(result.confidence())
+                                                  .setScale(2, RoundingMode.HALF_UP);
+        this.processingStatus = ProcessingStatus.DONE;
+        this.processedAt      = Instant.now();
+    }
+
+    /** Marca el intento como fallido; pasa a DEAD_LETTER si se agotaron los reintentos. */
+    public void markFailed(int maxAttempts) {
+        this.processingStatus = processingAttempts >= maxAttempts
+                ? ProcessingStatus.DEAD_LETTER
+                : ProcessingStatus.FAILED;
+    }
+
+    public boolean isProcessed() {
+        return processingStatus == ProcessingStatus.DONE;
     }
 
     // ── Getters ───────────────────────────────────────────────────────────────

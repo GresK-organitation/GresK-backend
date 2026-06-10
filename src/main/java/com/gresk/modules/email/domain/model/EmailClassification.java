@@ -8,5 +8,7 @@ public enum EmailClassification {
     LOGISTICA,
     CONFIRMACION,
     CAMBIO,
+    /** Continuación de un hilo ya vinculado a un evento conocido. */
+    CONTINUATION,
     OTRO
 }
