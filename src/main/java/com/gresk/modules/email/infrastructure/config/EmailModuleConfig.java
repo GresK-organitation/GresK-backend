@@ -5,12 +5,13 @@ import com.gresk.modules.email.domain.port.out.LocalEmailClassifierPort;
 import com.gresk.modules.email.domain.service.EmailClassificationPipeline;
 import com.gresk.modules.email.domain.service.RuleBasedClassifier;
 import com.gresk.modules.email.infrastructure.ai.EmailAiProperties;
+import com.gresk.modules.email.infrastructure.gmail.GmailProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableConfigurationProperties(EmailAiProperties.class)
+@EnableConfigurationProperties({EmailAiProperties.class, GmailProperties.class})
 public class EmailModuleConfig {
 
     /**

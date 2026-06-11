@@ -16,6 +16,7 @@ public class PromoterGmailTokenMapper {
                 e.getTokenExpiry(),
                 e.getGmailAddress(),
                 e.getWatchExpiry(),
+                e.getLastHistoryId(),
                 e.getConnectedAt()
         );
     }
@@ -28,6 +29,7 @@ public class PromoterGmailTokenMapper {
                 .tokenExpiry(t.getTokenExpiry())
                 .gmailAddress(t.getGmailAddress())
                 .watchExpiry(t.getWatchExpiry())
+                .lastHistoryId(t.getLastHistoryId())
                 .connectedAt(t.getConnectedAt())
                 .build();
     }

@@ -1,5 +1,6 @@
 package com.gresk.modules.email.infrastructure.persistence.repository;
 
+import com.gresk.modules.email.domain.model.ProcessingStatus;
 import com.gresk.modules.email.infrastructure.persistence.entity.EmailMessageEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -19,4 +20,10 @@ public interface EmailMessageJpaRepository extends JpaRepository<EmailMessageEnt
             UUID promoterId, String externalThreadId);
 
     boolean existsByExternalMessageId(String externalMessageId);
+
+    List<EmailMessageEntity> findByProcessingStatusAndProcessingAttemptsLessThan(
+            ProcessingStatus status, int maxAttempts);
+
+    List<EmailMessageEntity> findByProcessingStatusAndProcessingAttemptsGreaterThanEqual(
+            ProcessingStatus status, int maxAttempts);
 }

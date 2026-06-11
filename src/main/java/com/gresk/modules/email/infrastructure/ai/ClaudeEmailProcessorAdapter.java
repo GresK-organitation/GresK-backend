@@ -9,6 +9,8 @@ import com.gresk.modules.email.domain.model.EmailProcessingResult.ExtractedEntit
 import com.gresk.modules.email.domain.model.EventContext;
 import com.gresk.modules.email.domain.model.ExtractedEntityType;
 import com.gresk.modules.email.domain.port.out.AiEmailProcessorPort;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.anthropic.AnthropicChatModel;
@@ -32,26 +34,64 @@ import java.util.List;
 public class ClaudeEmailProcessorAdapter implements AiEmailProcessorPort {
 
     private static final String SYSTEM_PROMPT = """
-            Eres el asistente de email de una promotora de conciertos. Analiza el email y devuelve SOLO JSON válido con esta estructura exacta:
+            Eres el Email Intelligence Engine de GresK, una plataforma de gestión de eventos musicales.
+            Tu función es analizar emails de producción de conciertos y extraer información estructurada.
+
+            CLASIFICACIONES POSIBLES:
+            - RIDER: Email que contiene o actualiza requisitos técnicos o de hospitalidad del artista
+            - CACHE: Email que menciona honorarios, cachés, pagos o condiciones económicas
+            - HORARIO: Email sobre soundcheck, hora de llegada, hora de show, cambios de horario
+            - CONTRATO: Email que adjunta, menciona o modifica condiciones contractuales
+            - LOGISTICA: Alojamiento, transporte, dietas, camerino, acreditaciones
+            - CONFIRMACION: Confirmación de cualquier dato previamente acordado
+            - CAMBIO: Modificación de algo ya acordado
+            - OTRO: Emails que no encajan en ninguna categoría anterior
+
+            TIPOS DE ENTIDADES A EXTRAER:
+            - DATE: Cualquier fecha o hora relevante
+            - AMOUNT: Cualquier importe económico con su moneda
+            - RIDER_ITEM: Cada ítem técnico o de hospitalidad del rider
+            - ARTIST_NAME: Nombre del artista o grupo
+            - VENUE_NAME: Nombre de la sala o recinto
+            - CONTACT_NAME: Persona de contacto mencionada
+            - SCHEDULE_ITEM: Elemento de horario de producción
+            - CONDITION: Condición o requisito contractual
+            - ACCOMMODATION: Detalles de alojamiento
+            - CHANGE_DETECTED: Cuando algo ha cambiado respecto al contexto del evento
+
+            FORMATO DE RESPUESTA (dentro de <response></response>):
             {
-              "classification": "RIDER|CACHE|HORARIO|CONTRATO|LOGISTICA|CONFIRMACION|CAMBIO|OTRO",
+              "classification": "<CATEGORIA>",
               "confidence": 0.0,
               "entities": [
-                {"type": "DATE|AMOUNT|RIDER_ITEM|ARTIST_NAME|VENUE_NAME|CONTACT_NAME|SCHEDULE_ITEM|CONDITION|ACCOMMODATION|TRANSPORT|CHANGE_DETECTED",
-                 "key": "nombre corto del dato", "value": "valor literal", "confidence": 0.0,
-                 "source_snippet": "fragmento del email donde aparece", "requires_action": false}
+                {"type": "<TIPO>", "key": "nombre_del_dato", "value": "valor literal",
+                 "confidence": 0.0, "source_snippet": "fragmento del email",
+                 "requires_action": false}
               ],
               "suggested_reply_subject": null,
               "suggested_reply_body": null
             }
-            Extrae solo entidades presentes en el texto. Sugiere respuesta únicamente si el email pide algo concreto que la promotora deba contestar; escríbela en el idioma del email, profesional y breve.
+
+            REGLAS CRÍTICAS:
+            1. Responde ÚNICAMENTE con JSON válido dentro de <response></response>.
+            2. No incluyas texto fuera de esas etiquetas.
+            3. Si no estás seguro de un valor, usa confidence < 0.6 y requires_action: true.
+            4. Para RIDER_ITEM usa entity_key en snake_case consistente.
+            5. Si detectas un cambio respecto al contexto del evento, añade entidad CHANGE_DETECTED.
+            6. Genera suggested_reply solo para RIDER, CACHE, HORARIO o CONFIRMACION rutinarios.
             """;
 
     private final AnthropicChatModel chatModel;
     private final AiResponseParser   parser;
     private final EmailAiProperties  properties;
 
+    /**
+     * Protegido con rate limiter y circuit breaker (instancia "claudeApi",
+     * configurada en application.yml) para acotar coste y fallos en cascada.
+     */
     @Override
+    @RateLimiter(name = "claudeApi")
+    @CircuitBreaker(name = "claudeApi")
     public EmailProcessingResult process(EmailMessage message, EventContext context) {
         try {
             Prompt prompt = new Prompt(
@@ -74,7 +114,8 @@ public class ClaudeEmailProcessorAdapter implements AiEmailProcessorPort {
         }
     }
 
-    private EmailProcessingResult toResult(JsonNode node) {
+    // Package-private para el test golden-file (parseo sin llamar a la API)
+    EmailProcessingResult toResult(JsonNode node) {
         ClassificationResult classification = new ClassificationResult(
                 parser.classification(node),
                 parser.confidence(node),

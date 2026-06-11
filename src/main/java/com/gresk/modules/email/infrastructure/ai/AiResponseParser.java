@@ -17,7 +17,17 @@ public class AiResponseParser {
     private final ObjectMapper objectMapper;
 
     public JsonNode parse(String rawResponse) throws Exception {
-        return objectMapper.readTree(stripMarkdownFences(rawResponse));
+        return objectMapper.readTree(stripMarkdownFences(extractResponseTag(rawResponse)));
+    }
+
+    /** Claude responde con el JSON envuelto en <response></response>. */
+    private String extractResponseTag(String text) {
+        int start = text.indexOf("<response>");
+        int end   = text.lastIndexOf("</response>");
+        if (start >= 0 && end > start) {
+            return text.substring(start + "<response>".length(), end).trim();
+        }
+        return text;
     }
 
     public EmailClassification classification(JsonNode node) {

@@ -25,6 +25,13 @@
 		<spring-cloud.version>2024.0.0</spring-cloud.version>
 		<spring-ai.version>1.0.0</spring-ai.version>
 		<archunit.version>1.4.1</archunit.version>
+		<google-api-client.version>2.8.0</google-api-client.version>
+		<google-api-gmail.version>v1-rev20260525-2.0.0</google-api-gmail.version>
+		<google-auth.version>1.47.0</google-auth.version>
+		<!-- 2.3.0 falla al arrancar sin RxJava3 en el classpath (introspección de
+		     FallbackConfigurationOnMissingBean); 2.2.0 no tiene ese problema -->
+		<resilience4j.version>2.2.0</resilience4j.version>
+		<wiremock.version>3.13.0</wiremock.version>
 	</properties>
 
 	<dependencies>
@@ -160,6 +167,40 @@
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-model-anthropic</artifactId>
+		</dependency>
+
+		<!-- Email Intelligence Engine: Gmail OAuth + API -->
+		<dependency>
+			<groupId>com.google.api-client</groupId>
+			<artifactId>google-api-client</artifactId>
+			<version>${google-api-client.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.apis</groupId>
+			<artifactId>google-api-services-gmail</artifactId>
+			<version>${google-api-gmail.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.auth</groupId>
+			<artifactId>google-auth-library-oauth2-http</artifactId>
+			<version>${google-auth.version}</version>
+		</dependency>
+
+		<!-- Email Intelligence Engine: resiliencia para la capa Claude -->
+		<dependency>
+			<groupId>io.github.resilience4j</groupId>
+			<artifactId>resilience4j-spring-boot3</artifactId>
+			<version>${resilience4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.wiremock</groupId>
+			<artifactId>wiremock-standalone</artifactId>
+			<version>${wiremock.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.tngtech.archunit</groupId>

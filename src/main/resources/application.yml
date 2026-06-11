@@ -80,10 +80,38 @@ gresk:
       confidence-threshold: 0.85
       claude-model: claude-haiku-4-5-20251001
       max-attempts: 3
+    gmail:
+      client-id: ${GMAIL_CLIENT_ID:}
+      client-secret: ${GMAIL_CLIENT_SECRET:}
+      redirect-uri: ${APP_BASE_URL:http://localhost:8080}/api/v1/email/gmail/callback
+      pubsub-topic: ${GMAIL_PUBSUB_TOPIC:}
+      pubsub-verification-token: ${GMAIL_PUBSUB_TOKEN:}
+    encryption:
+      key: ${EMAIL_TOKEN_ENCRYPTION_KEY:}   # 256-bit en base64 (openssl rand -base64 32)
   images:
     default-url: "https://res.cloudinary.com/dzfgoh6hu/image/upload/c_fill,g_auto,w_1200,h_675/arde-bogota_98.jpg_bmbxtw.png"
     # Añadimos la extensión al final del template para asegurar que el navegador la lea bien
     asset-url-template: "https://res.cloudinary.com/dzfgoh6hu/image/upload/c_fill,g_auto,w_1200,h_675/{assetId}.png"
+
+# ── Resiliencia de la capa Claude (capa 3 del pipeline) ──────────────────────
+resilience4j:
+  ratelimiter:
+    instances:
+      claudeApi:
+        limit-for-period: 50
+        limit-refresh-period: 60s
+        timeout-duration: 5s
+  circuitbreaker:
+    instances:
+      claudeApi:
+        failure-rate-threshold: 50
+        # mínimo 5 llamadas para evaluar la tasa de fallo: con 5 fallos
+        # consecutivos el breaker abre (el issue omitía este parámetro y
+        # con el default de la ventana nunca abriría con 5 fallos)
+        minimum-number-of-calls: 5
+        sliding-window-size: 10
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 3
 
 spotify:
   client-id: ${SPOTIFY_CLIENT_ID}

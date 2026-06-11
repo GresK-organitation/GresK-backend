@@ -35,6 +35,9 @@ public class PromoterGmailTokenEntity {
     @Column(name = "watch_expiry")
     private Instant watchExpiry;
 
+    @Column(name = "last_history_id")
+    private Long lastHistoryId;
+
     @Column(name = "connected_at", nullable = false, updatable = false)
     private Instant connectedAt;
 

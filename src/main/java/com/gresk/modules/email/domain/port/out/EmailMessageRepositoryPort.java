@@ -15,4 +15,10 @@ public interface EmailMessageRepositoryPort {
     List<EmailMessage>     findByPromoterId(PromoterId promoterId);
     List<EmailMessage>     findByEventIdAndPromoterId(UUID eventId, PromoterId promoterId);
     boolean                existsByExternalMessageId(String externalMessageId);
+
+    /** FAILED con intentos restantes: candidatos a reintento. */
+    List<EmailMessage>     findFailedWithAttemptsLessThan(int maxAttempts);
+
+    /** FAILED con los intentos agotados: candidatos a DEAD_LETTER. */
+    List<EmailMessage>     findFailedWithAttemptsAtLeast(int maxAttempts);
 }

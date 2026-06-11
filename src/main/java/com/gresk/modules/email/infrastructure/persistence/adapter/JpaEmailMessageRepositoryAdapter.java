@@ -2,6 +2,7 @@ package com.gresk.modules.email.infrastructure.persistence.adapter;
 
 import com.gresk.modules.email.domain.model.EmailMessage;
 import com.gresk.modules.email.domain.model.EmailMessageId;
+import com.gresk.modules.email.domain.model.ProcessingStatus;
 import com.gresk.modules.email.domain.port.out.EmailMessageRepositoryPort;
 import com.gresk.modules.email.infrastructure.persistence.mapper.EmailMessageMapper;
 import com.gresk.modules.email.infrastructure.persistence.repository.EmailMessageJpaRepository;
@@ -53,5 +54,17 @@ public class JpaEmailMessageRepositoryAdapter implements EmailMessageRepositoryP
     @Override
     public boolean existsByExternalMessageId(String externalMessageId) {
         return repo.existsByExternalMessageId(externalMessageId);
+    }
+
+    @Override
+    public List<EmailMessage> findFailedWithAttemptsLessThan(int maxAttempts) {
+        return repo.findByProcessingStatusAndProcessingAttemptsLessThan(ProcessingStatus.FAILED, maxAttempts)
+                .stream().map(mapper::toDomain).toList();
+    }
+
+    @Override
+    public List<EmailMessage> findFailedWithAttemptsAtLeast(int maxAttempts) {
+        return repo.findByProcessingStatusAndProcessingAttemptsGreaterThanEqual(ProcessingStatus.FAILED, maxAttempts)
+                .stream().map(mapper::toDomain).toList();
     }
 }

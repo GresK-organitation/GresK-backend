@@ -8,5 +8,6 @@ import java.util.Optional;
 public interface PromoterGmailTokenRepositoryPort {
     PromoterGmailToken           save(PromoterGmailToken token);
     Optional<PromoterGmailToken> findByPromoterId(PromoterId promoterId);
+    Optional<PromoterGmailToken> findByGmailAddress(String gmailAddress);
     void                         deleteByPromoterId(PromoterId promoterId);
 }

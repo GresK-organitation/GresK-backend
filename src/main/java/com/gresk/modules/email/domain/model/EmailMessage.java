@@ -135,6 +135,11 @@ public final class EmailMessage {
                 : ProcessingStatus.FAILED;
     }
 
+    /** Descarta el correo definitivamente: no se reintentará más. */
+    public void markDeadLetter() {
+        this.processingStatus = ProcessingStatus.DEAD_LETTER;
+    }
+
     public boolean isProcessed() {
         return processingStatus == ProcessingStatus.DONE;
     }
