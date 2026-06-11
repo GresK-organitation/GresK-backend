@@ -36,6 +36,10 @@
       "requires_action": true
     }
   ],
+  "rider_data": {
+    "monitores_escenario": "6 wedge",
+    "pa_system": "Line Array 10kW"
+  },
   "suggested_reply_subject": "Re: Rider actualizado — Arde Bogotá 18/07",
   "suggested_reply_body": "Hola,\n\nRecibido el rider actualizado. Tomamos nota del cambio a 6 monitores de escenario y lo trasladamos a producción.\n\nUn saludo,\nEquipo GresK"
 }

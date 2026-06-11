@@ -52,6 +52,14 @@ public class JpaEmailMessageRepositoryAdapter implements EmailMessageRepositoryP
     }
 
     @Override
+    public List<EmailMessage> findByEventIdAndPromoterId(UUID eventId, PromoterId promoterId,
+                                                         int page, int size) {
+        return repo.findByEventIdAndPromoterIdOrderByReceivedAtDesc(eventId, promoterId.value(),
+                        org.springframework.data.domain.PageRequest.of(page, size))
+                .stream().map(mapper::toDomain).toList();
+    }
+
+    @Override
     public boolean existsByExternalMessageId(String externalMessageId) {
         return repo.existsByExternalMessageId(externalMessageId);
     }

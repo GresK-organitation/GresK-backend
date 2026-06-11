@@ -68,9 +68,16 @@ public class ClaudeEmailProcessorAdapter implements AiEmailProcessorPort {
                  "confidence": 0.0, "source_snippet": "fragmento del email",
                  "requires_action": false}
               ],
+              "rider_data": null,
               "suggested_reply_subject": null,
               "suggested_reply_body": null
             }
+
+            CAMPO rider_data:
+            Solo si el email contiene o actualiza un rider (clasificación RIDER o CAMBIO
+            sobre rider): objeto JSON plano clave→valor con cada ítem en snake_case,
+            p. ej. {"pa_system": "Line Array 10kW", "monitores_escenario": "6 wedge"}.
+            En cualquier otro caso, null.
 
             REGLAS CRÍTICAS:
             1. Responde ÚNICAMENTE con JSON válido dentro de <response></response>.
@@ -140,6 +147,7 @@ public class ClaudeEmailProcessorAdapter implements AiEmailProcessorPort {
         return new EmailProcessingResult(
                 classification,
                 entities,
+                parser.riderData(node),
                 node.path("suggested_reply_subject").asText(null),
                 node.path("suggested_reply_body").asText(null)
         );

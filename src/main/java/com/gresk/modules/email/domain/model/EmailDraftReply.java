@@ -94,6 +94,18 @@ public final class EmailDraftReply {
         this.status = DraftReplyStatus.DISCARDED;
     }
 
+    /** Edición del cuerpo por la promotora antes de aprobar. */
+    public void edit(String newBody) {
+        if (status != DraftReplyStatus.PENDING_REVIEW) {
+            throw new InvalidDraftReplyStatusException(
+                    "Cannot edit a draft in status: " + status);
+        }
+        if (newBody == null || newBody.isBlank()) {
+            throw new IllegalArgumentException("Draft body must not be blank");
+        }
+        this.editedBody = newBody;
+    }
+
     /** Cuerpo definitivo a enviar: el editado por la promotora si existe. */
     public String effectiveBody() {
         return editedBody != null && !editedBody.isBlank() ? editedBody : body;

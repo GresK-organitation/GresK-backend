@@ -46,6 +46,15 @@ public class JpaEmailEntityRecordRepositoryAdapter implements EmailEntityRecordR
     }
 
     @Override
+    public List<EmailEntityRecord> findByEmailIds(java.util.Collection<java.util.UUID> emailIds) {
+        if (emailIds.isEmpty()) {
+            return List.of();
+        }
+        return repo.findByEmailIdIn(emailIds)
+                .stream().map(mapper::toDomain).toList();
+    }
+
+    @Override
     public List<EmailEntityRecord> findPendingAction() {
         return repo.findByRequiresActionTrueAndActionedAtIsNull()
                 .stream().map(mapper::toDomain).toList();

@@ -50,6 +50,11 @@ class ClaudeEmailProcessorAdapterGoldenTest {
         assertTrue(change.requiresAction());
         assertEquals(0.55, change.confidence());
 
+        // Datos de rider para el versionado
+        assertTrue(result.hasRiderData());
+        assertEquals("6 wedge", result.riderData().get("monitores_escenario"));
+        assertEquals("Line Array 10kW", result.riderData().get("pa_system"));
+
         // Borrador sugerido
         assertTrue(result.hasSuggestedReply());
         assertEquals("Re: Rider actualizado — Arde Bogotá 18/07", result.suggestedReplySubject());

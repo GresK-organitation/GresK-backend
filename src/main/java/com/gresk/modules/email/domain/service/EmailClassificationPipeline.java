@@ -3,6 +3,7 @@ package com.gresk.modules.email.domain.service;
 import com.gresk.modules.email.domain.exception.EmailClassificationException;
 import com.gresk.modules.email.domain.model.ClassificationResult;
 import com.gresk.modules.email.domain.model.ClassificationSource;
+import com.gresk.modules.email.domain.model.EmailClassification;
 import com.gresk.modules.email.domain.model.EmailMessage;
 import com.gresk.modules.email.domain.model.EmailProcessingResult;
 import com.gresk.modules.email.domain.model.EventContext;
@@ -44,11 +45,24 @@ public class EmailClassificationPipeline {
         this.confidenceThreshold = confidenceThreshold;
     }
 
+    /**
+     * Clasificaciones que requieren extracción profunda (entidades, rider,
+     * borrador): aunque una capa barata las resuelva, se escala a Claude,
+     * porque solo la capa 3 extrae datos estructurados. El ahorro de tokens
+     * viene del resto de categorías (la gran mayoría del volumen).
+     */
+    private static final java.util.Set<EmailClassification> NEEDS_DEEP_EXTRACTION =
+            java.util.Set.of(EmailClassification.RIDER, EmailClassification.CAMBIO,
+                             EmailClassification.CONTINUATION);
+
     public EmailProcessingResult process(EmailMessage message, EventContext context) {
 
         // Capa 1 — reglas deterministas (coste 0)
         ClassificationResult rules = ruleClassifier.classify(message, context);
         if (rules.meetsThreshold(confidenceThreshold)) {
+            if (NEEDS_DEEP_EXTRACTION.contains(rules.classification())) {
+                return processWithAi(message, context);
+            }
             return EmailProcessingResult.classificationOnly(
                     rules.withSource(ClassificationSource.RULES));
         }
@@ -56,11 +70,18 @@ public class EmailClassificationPipeline {
         // Capa 2 — modelo local Ollama (coste 0)
         ClassificationResult local = classifyLocally(message, context);
         if (local.meetsThreshold(confidenceThreshold)) {
+            if (NEEDS_DEEP_EXTRACTION.contains(local.classification())) {
+                return processWithAi(message, context);
+            }
             return EmailProcessingResult.classificationOnly(
                     local.withSource(ClassificationSource.OLLAMA));
         }
 
-        // Capa 3 — Claude API (solo si las anteriores no son suficientes)
+        // Capa 3 — Claude API (las capas baratas no resolvieron)
+        return processWithAi(message, context);
+    }
+
+    private EmailProcessingResult processWithAi(EmailMessage message, EventContext context) {
         try {
             return aiProcessor.process(message, context);
         } catch (Exception e) {

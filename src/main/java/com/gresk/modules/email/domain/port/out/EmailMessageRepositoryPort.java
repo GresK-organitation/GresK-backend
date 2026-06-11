@@ -14,6 +14,7 @@ public interface EmailMessageRepositoryPort {
     Optional<EmailMessage> findByExternalMessageId(String externalMessageId);
     List<EmailMessage>     findByPromoterId(PromoterId promoterId);
     List<EmailMessage>     findByEventIdAndPromoterId(UUID eventId, PromoterId promoterId);
+    List<EmailMessage>     findByEventIdAndPromoterId(UUID eventId, PromoterId promoterId, int page, int size);
     boolean                existsByExternalMessageId(String externalMessageId);
 
     /** FAILED con intentos restantes: candidatos a reintento. */

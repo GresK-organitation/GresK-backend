@@ -44,14 +44,30 @@ class EmailClassificationPipelineTest {
     @Test
     void siLasReglasSuperanElUmbral_ollamaNoSeLlama() {
         when(ruleClassifier.classify(any(), any()))
-                .thenReturn(ClassificationResult.of(EmailClassification.RIDER, 0.92));
+                .thenReturn(ClassificationResult.of(EmailClassification.HORARIO, 0.90));
 
         EmailProcessingResult result = pipeline.process(email, EventContext.empty());
 
-        assertEquals(EmailClassification.RIDER, result.classification().classification());
+        assertEquals(EmailClassification.HORARIO, result.classification().classification());
         assertEquals(ClassificationSource.RULES, result.classification().source());
         verify(localClassifier, never()).classify(any(), any());
         verify(aiProcessor, never()).process(any(), any());
+    }
+
+    @Test
+    void unRiderResueltoPorReglasEscalaAClaudeParaExtraccion_sinPasarPorOllama() {
+        when(ruleClassifier.classify(any(), any()))
+                .thenReturn(ClassificationResult.of(EmailClassification.RIDER, 0.92));
+        when(aiProcessor.process(any(), any())).thenReturn(
+                EmailProcessingResult.classificationOnly(
+                        new ClassificationResult(EmailClassification.RIDER, 0.95,
+                                ClassificationSource.CLAUDE)));
+
+        EmailProcessingResult result = pipeline.process(email, EventContext.empty());
+
+        assertEquals(ClassificationSource.CLAUDE, result.classification().source());
+        verify(localClassifier, never()).classify(any(), any());
+        verify(aiProcessor).process(any(), any());
     }
 
     @Test

@@ -1,0 +1,42 @@
+# ─────────────────────────────────────────────────────────────────────────
+# Perfil para tests de integración E2E:
+#   · PostgreSQL real vía Testcontainers (datasource inyectado con
+#     @DynamicPropertySource desde el test)
+#   · Flyway habilitado: las migraciones reales se aplican en el contenedor
+#   · SMTP apuntando a GreenMail (puerto 3025)
+#   · Credenciales dummy para los placeholders obligatorios de application.yml
+# ─────────────────────────────────────────────────────────────────────────
+
+spring:
+  mail:
+    host: localhost
+    port: 3025
+    # Sin username: JavaMailSender no intenta autenticarse contra GreenMail
+    username: ""
+    password: ""
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+  ai:
+    anthropic:
+      api-key: test-key-not-used   # los tests mockean AiEmailProcessorPort
+
+jwt:
+  secret: test-secret-key-with-enough-length-0123456789
+  expiration-ms: 3600000
+
+cloudinary:
+  cloud-name: test
+  api-key: test
+  api-secret: test
+
+spotify:
+  client-id: test
+  client-secret: test
+
+logging:
+  level:
+    com.gresk: INFO

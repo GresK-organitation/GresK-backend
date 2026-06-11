@@ -45,6 +45,16 @@ public class AiResponseParser {
         return Math.clamp(confidence, 0.0, 1.0);
     }
 
+    /** Campo rider_data: objeto plano clave→valor con los ítems del rider. */
+    public java.util.Map<String, Object> riderData(JsonNode node) {
+        JsonNode riderData = node.path("rider_data");
+        if (!riderData.isObject() || riderData.isEmpty()) {
+            return null;
+        }
+        return objectMapper.convertValue(riderData,
+                new com.fasterxml.jackson.core.type.TypeReference<>() {});
+    }
+
     public ExtractedEntityType entityType(String value) {
         try {
             return ExtractedEntityType.valueOf(value.trim().toUpperCase());

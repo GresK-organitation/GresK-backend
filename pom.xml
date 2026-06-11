@@ -32,6 +32,12 @@
 		     FallbackConfigurationOnMissingBean); 2.2.0 no tiene ese problema -->
 		<resilience4j.version>2.2.0</resilience4j.version>
 		<wiremock.version>3.13.0</wiremock.version>
+		<greenmail.version>2.1.3</greenmail.version>
+		<jacoco.version>0.8.12</jacoco.version>
+		<!-- Override del BOM de Boot 3.4: el docker-java de Testcontainers 1.20.x
+		     devuelve 400 contra los Docker Desktop recientes -->
+		<testcontainers.version>1.21.3</testcontainers.version>
+		<docker-java.version>3.5.1</docker-java.version>
 	</properties>
 
 	<dependencies>
@@ -209,6 +215,34 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Email Intelligence Engine: tests de integración E2E -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-testcontainers</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.icegreen</groupId>
+			<artifactId>greenmail-junit5</artifactId>
+			<version>${greenmail.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.awaitility</groupId>
+			<artifactId>awaitility</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<dependencyManagement>
@@ -226,6 +260,23 @@
 				<version>${spring-ai.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+			<!-- docker-java 3.4.x devuelve "400 Bad Request" contra los
+			     Docker Desktop recientes; Testcontainers aún no lo actualiza -->
+			<dependency>
+				<groupId>com.github.docker-java</groupId>
+				<artifactId>docker-java-api</artifactId>
+				<version>${docker-java.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.docker-java</groupId>
+				<artifactId>docker-java-transport-zerodep</artifactId>
+				<version>${docker-java.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.docker-java</groupId>
+				<artifactId>docker-java-transport</artifactId>
+				<version>${docker-java.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -265,6 +316,27 @@
 						</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+
+			<!-- Cobertura: informe en target/site/jacoco tras 'mvn test' -->
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
