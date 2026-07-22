@@ -4,6 +4,7 @@ import com.gresk.infrastructure.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -46,6 +47,7 @@ public class SecurityConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/events").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/events/last-minute").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/events/{id}").permitAll()
@@ -59,10 +61,15 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOriginPatterns(allowedOrigins);
+        config.setAllowedOriginPatterns(List.of(
+                "http://localhost:*",
+                "https://*.vercel.app"
+        ));
+
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(false);
+        config.setExposedHeaders(List.of("Authorization", "Content-Type", "X-Total-Count"));
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
