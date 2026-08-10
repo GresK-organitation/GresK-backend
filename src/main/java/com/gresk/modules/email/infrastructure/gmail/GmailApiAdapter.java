@@ -88,6 +88,23 @@ public class GmailApiAdapter {
         }
     }
 
+    /** Ids de los N mensajes más recientes (sin historyId — para sync manual en dev). */
+    public List<String> listRecentMessageIds(Gmail gmail, int maxResults) {
+        try {
+            List<com.google.api.services.gmail.model.Message> messages =
+                    gmail.users().messages().list(ME)
+                            .setMaxResults((long) maxResults)
+                            .execute()
+                            .getMessages();
+            return messages == null ? List.of()
+                    : messages.stream()
+                              .map(com.google.api.services.gmail.model.Message::getId)
+                              .toList();
+        } catch (Exception e) {
+            throw new IllegalStateException("Cannot list recent Gmail messages", e);
+        }
+    }
+
     /** Ids de mensajes añadidos desde startHistoryId (sync incremental). */
     public List<String> listNewMessageIds(Gmail gmail, BigInteger startHistoryId) {
         try {

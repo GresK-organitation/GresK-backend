@@ -2,6 +2,7 @@ package com.gresk.modules.email.infrastructure.web;
 
 import com.gresk.modules.email.domain.model.PromoterGmailToken;
 import com.gresk.modules.email.infrastructure.gmail.GmailOAuthService;
+import com.gresk.modules.email.infrastructure.gmail.GmailSyncService;
 import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import java.util.Map;
 public class GmailOAuthController {
 
     private final GmailOAuthService oauthService;
+    private final GmailSyncService  syncService;
 
     @GetMapping("/connect")
     @PreAuthorize("hasRole('PROMOTER')")
@@ -44,5 +46,15 @@ public class GmailOAuthController {
     public ResponseEntity<Void> disconnect(@AuthenticationPrincipal String promoterId) {
         oauthService.disconnect(PromoterId.of(promoterId));
         return ResponseEntity.noContent().build();
+    }
+
+    /** Ingesta manual de los N emails más recientes — solo para dev/test (sin Pub/Sub). */
+    @PostMapping("/sync-now")
+    @PreAuthorize("hasRole('PROMOTER')")
+    public ResponseEntity<Map<String, Object>> syncNow(
+            @AuthenticationPrincipal String promoterId,
+            @RequestParam(defaultValue = "50") int max) {
+        int ingested = syncService.syncRecent(PromoterId.of(promoterId), max);
+        return ResponseEntity.ok(Map.of("ingested", ingested));
     }
 }

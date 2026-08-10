@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
+
 import java.math.BigInteger;
 import java.util.List;
 
@@ -27,6 +29,30 @@ public class GmailSyncService {
     private final PromoterGmailTokenRepositoryPort tokenRepository;
     private final GmailApiAdapter                  gmailApiAdapter;
     private final IngestEmailUseCase               ingestEmailUseCase;
+
+    /** Ingesta los N emails más recientes del promoter sin necesitar historyId (dev/test). */
+    public int syncRecent(PromoterId promoterId, int maxMessages) {
+        return tokenRepository.findByPromoterId(promoterId)
+                .map(token -> {
+                    Gmail gmail = gmailApiAdapter.clientFor(token);
+                    List<String> ids = gmailApiAdapter.listRecentMessageIds(gmail, maxMessages);
+                    int count = 0;
+                    for (String messageId : ids) {
+                        try {
+                            IngestEmailCommand cmd = gmailApiAdapter.fetchMessage(
+                                    gmail, token.getPromoterId().value(), messageId);
+                            ingestEmailUseCase.execute(cmd);
+                            count++;
+                        } catch (Exception e) {
+                            log.error("Manual sync: failed to ingest message {}: {}", messageId, e.getMessage());
+                        }
+                    }
+                    log.info("Manual sync for promoter {}: {}/{} messages ingested",
+                            promoterId.value(), count, ids.size());
+                    return count;
+                })
+                .orElseThrow(() -> new IllegalStateException("No Gmail token linked for this promoter"));
+    }
 
     @Async
     public void sync(String emailAddress, Long notifiedHistoryId) {

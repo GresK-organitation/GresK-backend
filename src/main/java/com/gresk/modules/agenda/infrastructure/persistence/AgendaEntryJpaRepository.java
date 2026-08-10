@@ -86,7 +86,7 @@ public interface AgendaEntryJpaRepository extends JpaRepository<AgendaEntryEntit
             SELECT * FROM agenda_entries
             WHERE reminder_minutes_before IS NOT NULL
               AND reminder_sent = false
-              AND start_at <= :now + (reminder_minutes_before * INTERVAL '1 minute')
+              AND start_at <= CAST(:now AS timestamptz) + (reminder_minutes_before * INTERVAL '1 minute')
             """, nativeQuery = true)
     List<AgendaEntryEntity> findPendingReminders(@Param("now") Instant now);
 }
