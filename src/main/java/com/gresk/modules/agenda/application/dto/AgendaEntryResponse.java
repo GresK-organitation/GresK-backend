@@ -1,0 +1,30 @@
+package com.gresk.modules.agenda.application.dto;
+
+public record AgendaEntryResponse(
+        String  id,
+        String  promoterId,
+        String  type,
+        String  title,
+        String  description,
+        String  startAt,
+        String  endAt,
+        boolean allDay,
+        boolean completed,
+        boolean cancelled,
+        String  color,
+        String  label,
+        String  linkedEntityType,
+        String  linkedEntityId,
+        // Recurrencia
+        String  recurrenceFrequency,
+        Integer recurrenceInterval,
+        Integer recurrenceCount,
+        String  recurrenceUntil,
+        String  recurrenceByDay,
+        Integer recurrenceByMonthDay,
+        String  seriesId,
+        String  exceptionDate,
+        // Recordatorio
+        Integer reminderMinutesBefore,
+        String  createdAt
+) {}

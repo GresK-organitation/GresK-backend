@@ -1,0 +1,46 @@
+<response>
+{
+  "classification": "RIDER",
+  "confidence": 0.93,
+  "entities": [
+    {
+      "type": "RIDER_ITEM",
+      "key": "monitores_escenario",
+      "value": "6 monitores de escenario",
+      "confidence": 0.95,
+      "source_snippet": "necesitaremos 6 monitores de escenario en lugar de los 4 acordados",
+      "requires_action": false
+    },
+    {
+      "type": "ARTIST_NAME",
+      "key": "artista",
+      "value": "Arde Bogotá",
+      "confidence": 0.97,
+      "source_snippet": "el rider actualizado de Arde Bogotá",
+      "requires_action": false
+    },
+    {
+      "type": "DATE",
+      "key": "fecha_concierto",
+      "value": "18 de julio de 2026",
+      "confidence": 0.91,
+      "source_snippet": "para el concierto del 18 de julio",
+      "requires_action": false
+    },
+    {
+      "type": "CHANGE_DETECTED",
+      "key": "cambio_monitores",
+      "value": "monitores de escenario: 4 → 6",
+      "confidence": 0.55,
+      "source_snippet": "en lugar de los 4 acordados",
+      "requires_action": true
+    }
+  ],
+  "rider_data": {
+    "monitores_escenario": "6 wedge",
+    "pa_system": "Line Array 10kW"
+  },
+  "suggested_reply_subject": "Re: Rider actualizado — Arde Bogotá 18/07",
+  "suggested_reply_body": "Hola,\n\nRecibido el rider actualizado. Tomamos nota del cambio a 6 monitores de escenario y lo trasladamos a producción.\n\nUn saludo,\nEquipo GresK"
+}
+</response>

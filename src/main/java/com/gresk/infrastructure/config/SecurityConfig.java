@@ -47,7 +47,9 @@ public class SecurityConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // Gmail: push de Pub/Sub (token compartido) y callback OAuth (state anti-CSRF)
+                        .requestMatchers("/api/v1/email/gmail/webhook").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/email/gmail/callback").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/events").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/events/last-minute").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/events/{id}").permitAll()
