@@ -5,7 +5,7 @@ import com.gresk.modules.event.application.dto.CalendarResponseMapper;
 import com.gresk.modules.event.application.dto.EventResponse;
 import com.gresk.modules.event.application.dto.EventResponseMapper;
 import com.gresk.modules.event.application.dto.HeatmapResponse;
-import com.gresk.modules.event.application.dto.PageResponse;
+import com.gresk.shared.application.dto.PageResponse;
 import com.gresk.modules.event.application.query.CalendarEventsQuery;
 import com.gresk.modules.event.application.query.GetEventQuery;
 import com.gresk.modules.event.application.query.HeatmapQuery;

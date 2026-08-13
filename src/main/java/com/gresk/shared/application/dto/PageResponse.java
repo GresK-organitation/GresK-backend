@@ -1,4 +1,4 @@
-package com.gresk.modules.event.application.dto;
+package com.gresk.shared.application.dto;
 
 import org.springframework.data.domain.PageRequest;
 
