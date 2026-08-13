@@ -1,5 +1,6 @@
 package com.gresk.modules.journal.application.command;
 
+import com.gresk.modules.journal.domain.model.JournalVisibility;
 import com.gresk.shared.domain.MusicGenre;
 
 import java.time.LocalDate;
@@ -17,5 +18,6 @@ public record UpdateJournalEntryCommand(
         String              eventId,        // nullable, catalog link
         String              notes,          // nullable
         List<RatingCriterionInput> criteria,
-        MusicGenre          genre           // nullable
+        MusicGenre          genre,          // nullable
+        JournalVisibility   visibility
 ) {}

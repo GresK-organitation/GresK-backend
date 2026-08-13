@@ -9,6 +9,7 @@ import com.gresk.modules.journal.domain.exception.JournalEntryNotFoundException;
 import com.gresk.modules.journal.domain.model.ApproxDate;
 import com.gresk.modules.journal.domain.model.JournalEntry;
 import com.gresk.modules.journal.domain.model.JournalEntryId;
+import com.gresk.modules.journal.domain.model.JournalVisibility;
 import com.gresk.modules.journal.domain.model.RatingCriterion;
 import com.gresk.modules.journal.domain.port.out.JournalEntryRepository;
 import com.gresk.modules.user.domain.model.UserId;
@@ -46,6 +47,12 @@ public class UpdateJournalEntryUseCase implements UpdateJournalEntryPort {
 
         entry.update(command.artistName(), artistId, date, command.venueName(), command.city(),
                 eventId, command.notes(), criteria, command.genre());
+
+        if (command.visibility() == JournalVisibility.PUBLIC) {
+            entry.makePublic();
+        } else {
+            entry.makePrivate();
+        }
 
         return repository.save(entry);
     }
