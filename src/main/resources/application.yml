@@ -94,6 +94,10 @@ gresk:
     asset-url-template: "https://res.cloudinary.com/dzfgoh6hu/image/upload/c_fill,g_auto,w_1200,h_675/{assetId}.png"
   videos:
     asset-url-template: "https://res.cloudinary.com/dzfgoh6hu/video/upload/{assetId}.mp4"
+  tendencias:
+    chronicle:
+      polling-interval-ms: 1800000   # 30 min
+      max-entries-per-fetch: 30
 
 # ── Resiliencia de la capa Claude (capa 3 del pipeline) ──────────────────────
 resilience4j:
@@ -101,6 +105,11 @@ resilience4j:
     instances:
       claudeApi:
         limit-for-period: 50
+        limit-refresh-period: 60s
+        timeout-duration: 5s
+      # Módulo Tendencias: fetch de feeds RSS de medios externos
+      rssFeed:
+        limit-for-period: 10
         limit-refresh-period: 60s
         timeout-duration: 5s
   circuitbreaker:
@@ -114,6 +123,12 @@ resilience4j:
         sliding-window-size: 10
         wait-duration-in-open-state: 30s
         permitted-number-of-calls-in-half-open-state: 3
+      rssFeed:
+        failure-rate-threshold: 50
+        minimum-number-of-calls: 3
+        sliding-window-size: 6
+        wait-duration-in-open-state: 5m
+        permitted-number-of-calls-in-half-open-state: 2
 
 spotify:
   client-id: ${SPOTIFY_CLIENT_ID}
