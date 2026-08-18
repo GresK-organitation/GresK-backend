@@ -38,6 +38,8 @@
 		     devuelve 400 contra los Docker Desktop recientes -->
 		<testcontainers.version>1.21.3</testcontainers.version>
 		<docker-java.version>3.5.1</docker-java.version>
+		<!-- Módulo Tendencias: parsing de feeds RSS/Atom para el agregador de crónicas -->
+		<rome.version>2.1.0</rome.version>
 	</properties>
 
 	<dependencies>
@@ -241,6 +243,19 @@
 			<groupId>org.awaitility</groupId>
 			<artifactId>awaitility</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<!-- Módulo Tendencias: agregador de crónicas editoriales (RSS/Atom) -->
+		<dependency>
+			<groupId>com.rometools</groupId>
+			<artifactId>rome</artifactId>
+			<version>${rome.version}</version>
+		</dependency>
+		<!-- Módulo Tendencias: caché con TTL para las queries de datos propios,
+		     aislada del ConcurrentMapCacheManager por defecto (sin expiración) -->
+		<dependency>
+			<groupId>com.github.ben-manes.caffeine</groupId>
+			<artifactId>caffeine</artifactId>
 		</dependency>
 
 	</dependencies>

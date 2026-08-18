@@ -53,6 +53,13 @@ public class SecurityConfig {
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/events").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/events/last-minute").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/events/{id}").permitAll()
+                        // Tendencias: crónicas publicadas y fichas de datos propios son públicas;
+                        // /api/v1/tendencias/admin/** queda fuera a propósito (requiere ADMIN)
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/tendencias/chronicles").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/tendencias/artists/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/tendencias/venues/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/tendencias/genres/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/tendencias/events/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
