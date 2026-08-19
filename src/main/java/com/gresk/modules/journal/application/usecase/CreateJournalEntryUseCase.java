@@ -4,6 +4,7 @@ import com.gresk.modules.artist.domain.model.valueobject.ArtistId;
 import com.gresk.modules.event.domain.model.EventId;
 import com.gresk.modules.journal.application.command.CreateJournalEntryCommand;
 import com.gresk.modules.journal.application.command.RatingCriterionInput;
+import com.gresk.modules.journal.application.event.JournalEntryCreatedEvent;
 import com.gresk.modules.journal.application.port.in.CreateJournalEntryPort;
 import com.gresk.modules.journal.domain.exception.InvalidJournalEntryException;
 import com.gresk.modules.journal.domain.model.ApproxDate;
@@ -13,6 +14,7 @@ import com.gresk.modules.journal.domain.model.RatingCriterion;
 import com.gresk.modules.journal.domain.port.out.JournalEntryRepository;
 import com.gresk.modules.user.domain.model.UserId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,8 +24,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CreateJournalEntryUseCase implements CreateJournalEntryPort {
 
-    private final JournalEntryRepository repository;
-    private final CatalogLinkResolver    catalogLinkResolver;
+    private final JournalEntryRepository    repository;
+    private final CatalogLinkResolver       catalogLinkResolver;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -42,7 +45,9 @@ public class CreateJournalEntryUseCase implements CreateJournalEntryPort {
                 command.visibility(), command.source()
         );
 
-        return repository.save(entry);
+        JournalEntry saved = repository.save(entry);
+        eventPublisher.publishEvent(new JournalEntryCreatedEvent(userId.value()));
+        return saved;
     }
 
     static DatePrecision parsePrecision(String value) {

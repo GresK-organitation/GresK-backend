@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,15 +30,16 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CreateJournalEntryUseCaseTest {
 
-    @Mock private JournalEntryRepository repository;
-    @Mock private ArtistLookupPort       artistLookupPort;
-    @Mock private EventLookupPort        eventLookupPort;
+    @Mock private JournalEntryRepository    repository;
+    @Mock private ArtistLookupPort          artistLookupPort;
+    @Mock private EventLookupPort           eventLookupPort;
+    @Mock private ApplicationEventPublisher eventPublisher;
 
     private CreateJournalEntryUseCase useCase;
 
     @BeforeEach
     void setUp() {
-        useCase = new CreateJournalEntryUseCase(repository, new CatalogLinkResolver(artistLookupPort, eventLookupPort));
+        useCase = new CreateJournalEntryUseCase(repository, new CatalogLinkResolver(artistLookupPort, eventLookupPort), eventPublisher);
     }
 
     private CreateJournalEntryCommand command(String artistName, String artistId) {
