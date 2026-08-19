@@ -1,6 +1,7 @@
 package com.gresk.modules.review.application.usecase;
 
 import com.gresk.modules.event.domain.model.EventId;
+import com.gresk.modules.review.application.event.ReviewSubmittedEvent;
 import com.gresk.modules.review.application.port.in.SubmitReviewPort;
 import com.gresk.modules.review.domain.exception.ReviewAlreadyExistsException;
 import com.gresk.modules.review.domain.exception.ReviewForbiddenException;
@@ -18,6 +19,7 @@ import com.gresk.modules.ticket.domain.port.out.TicketRepository;
 import com.gresk.modules.user.domain.model.UserId;
 import com.gresk.shared.domain.valueobject.ImageUrl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,7 @@ public class SubmitReviewUseCase implements SubmitReviewPort {
     private final UserPointsPort    userPointsPort;
     private final EventRatingPort   eventRatingPort;
     private final ArtistRatingPort  artistRatingPort;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -88,6 +91,8 @@ public class SubmitReviewUseCase implements SubmitReviewPort {
 
         // Recalcular avgRating en el Artist vinculado (sólo artist_rating)
         artistRatingPort.recalculateForEvent(eventId);
+
+        eventPublisher.publishEvent(new ReviewSubmittedEvent(userId.value()));
 
         return review;
     }
