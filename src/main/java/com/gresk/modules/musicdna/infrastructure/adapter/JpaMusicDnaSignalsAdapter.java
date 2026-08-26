@@ -57,4 +57,9 @@ public class JpaMusicDnaSignalsAdapter implements MusicDnaSignalsPort {
     public List<UserId> findUserIdsWithActivitySince(Instant since) {
         return queryRepository.findUserIdsWithActivitySince(since).stream().map(UserId::of).toList();
     }
+
+    @Override
+    public List<String> findTopGenres(UserId userId, int limit) {
+        return queryRepository.findTopGenres(userId.value(), limit);
+    }
 }

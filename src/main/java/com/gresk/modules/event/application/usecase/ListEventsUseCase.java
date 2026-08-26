@@ -39,7 +39,8 @@ public class ListEventsUseCase {
                 Optional.ofNullable(query.minPrice()),
                 Optional.ofNullable(query.maxPrice()),
                 Optional.ofNullable(query.artistName()),
-                Optional.of(EventStatus.PUBLISHED)
+                Optional.of(EventStatus.PUBLISHED),
+                Optional.empty()
         );
     }
 }

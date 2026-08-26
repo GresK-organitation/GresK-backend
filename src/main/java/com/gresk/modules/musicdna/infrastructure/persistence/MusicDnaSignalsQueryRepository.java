@@ -81,4 +81,18 @@ public interface MusicDnaSignalsQueryRepository extends Repository<UserEntity, U
         SELECT user_id FROM journal_entries WHERE created_at >= :since
         """, nativeQuery = true)
     List<UUID> findUserIdsWithActivitySince(@Param("since") Instant since);
+
+    @Query(value = """
+        SELECT genre FROM (
+          SELECT e.genre AS genre FROM reviews r JOIN events e ON e.id = r.event_id
+            WHERE r.user_id = :userId AND e.genre IS NOT NULL
+          UNION ALL
+          SELECT je.genre AS genre FROM journal_entries je
+            WHERE je.user_id = :userId AND je.genre IS NOT NULL
+        ) combined
+        GROUP BY genre
+        ORDER BY COUNT(*) DESC
+        LIMIT :limit
+        """, nativeQuery = true)
+    List<String> findTopGenres(@Param("userId") UUID userId, @Param("limit") int limit);
 }
