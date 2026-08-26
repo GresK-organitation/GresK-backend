@@ -47,6 +47,10 @@ public class EventSpecifications {
                     predicates.add(cb.like(cb.lower(root.get("artistName")),
                             "%" + a.toLowerCase() + "%")));
 
+            // artista (FK exacta, usado por Discovery para el próximo evento de un artista)
+            filter.artistId().ifPresent(id ->
+                    predicates.add(cb.equal(root.get("artistId"), id)));
+
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }

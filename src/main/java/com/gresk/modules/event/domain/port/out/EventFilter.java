@@ -6,6 +6,7 @@ import com.gresk.shared.domain.MusicGenre;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 
 public record EventFilter(
         Optional<MusicGenre>  genre,
@@ -15,7 +16,8 @@ public record EventFilter(
         Optional<BigDecimal>  minPrice,
         Optional<BigDecimal>  maxPrice,
         Optional<String>      artistName,
-        Optional<EventStatus> status
+        Optional<EventStatus> status,
+        Optional<UUID>        artistId
 ) {
     public static EventFilter empty() {
         return new EventFilter(
@@ -26,7 +28,16 @@ public record EventFilter(
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
-                Optional.of(EventStatus.PUBLISHED)
+                Optional.of(EventStatus.PUBLISHED),
+                Optional.empty()
+        );
+    }
+
+    public static EventFilter forArtist(UUID artistId, Instant from) {
+        return new EventFilter(
+                Optional.empty(), Optional.empty(), Optional.of(from), Optional.empty(),
+                Optional.empty(), Optional.empty(), Optional.empty(),
+                Optional.of(EventStatus.PUBLISHED), Optional.of(artistId)
         );
     }
 

@@ -21,5 +21,8 @@ public interface ArtistRepositoryPort {
 
     List<Artist> findAllWithSpotifyId();
 
+    /** Todos los artistas del catálogo, sin acotar por promotora — usado por Discovery. */
+    List<Artist> findAll();
+
     void deleteById(ArtistId id);
 }

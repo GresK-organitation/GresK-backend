@@ -112,6 +112,11 @@ resilience4j:
         limit-for-period: 10
         limit-refresh-period: 60s
         timeout-duration: 5s
+      # Módulo Discovery: MusicBrainz exige 1 req/s como máximo
+      musicbrainz:
+        limit-for-period: 1
+        limit-refresh-period: 1s
+        timeout-duration: 2s
   circuitbreaker:
     instances:
       claudeApi:
@@ -129,9 +134,19 @@ resilience4j:
         sliding-window-size: 6
         wait-duration-in-open-state: 5m
         permitted-number-of-calls-in-half-open-state: 2
+      musicbrainz:
+        failure-rate-threshold: 50
+        minimum-number-of-calls: 3
+        sliding-window-size: 6
+        wait-duration-in-open-state: 5m
+        permitted-number-of-calls-in-half-open-state: 2
 
 spotify:
   client-id: ${SPOTIFY_CLIENT_ID}
   client-secret: ${SPOTIFY_CLIENT_SECRET}
   auth-url: https://accounts.spotify.com/api/token
   api-url: https://api.spotify.com/v1
+
+musicbrainz:
+  api-url: https://musicbrainz.org/ws/2
+  user-agent: "gresk-backend/1.0 (contacto@gresk.app)"

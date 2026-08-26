@@ -85,6 +85,13 @@ public class JpaArtistRepositoryAdapter implements ArtistRepositoryPort {
     }
 
     @Override
+    public List<Artist> findAll() {
+        return jpaRepository.findAll().stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+
+    @Override
     @Transactional
     public void deleteById(ArtistId id) {
         jpaRepository.deleteById(id.value());
