@@ -10,5 +10,7 @@ public record CreateContractCommand(
         String       partyAAddress,
         String       partyASignatoryName,
         String       partyASignatoryRole,
-        String       partyAEmail
+        String       partyAEmail,
+        String       partyACountry,
+        Boolean      partyATaxResident
 ) {}

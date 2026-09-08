@@ -88,68 +88,10 @@ public final class EventRiderChecklist {
 
     private static List<ChecklistEntry> generateEntries(TechnicalRider rider) {
         List<ChecklistEntry> entries = new ArrayList<>();
-
-        // Sound system entries
-        if (rider.getSoundSystem() != null) {
-            SoundSystemRequirements ss = rider.getSoundSystem();
-            entries.add(new ChecklistEntry(UUID.randomUUID(), BacklineCategory.SOUND,
-                    "Mesa FOH " + (ss.consoleBrand() != null ? ss.consoleBrand() : "") +
-                    " — " + (ss.consoleChannels() != null ? ss.consoleChannels() + " canales" : ""),
-                    true, false, null, null));
-            if (ss.monitorMixes() != null && ss.monitorMixes() > 0) {
-                entries.add(new ChecklistEntry(UUID.randomUUID(), BacklineCategory.SOUND,
-                        "Sistema de monitores — " + ss.monitorMixes() + " mezclas",
-                        true, false, null, null));
-            }
-            if (ss.paDescription() != null && !ss.paDescription().isBlank()) {
-                entries.add(new ChecklistEntry(UUID.randomUUID(), BacklineCategory.SOUND,
-                        "PA: " + ss.paDescription(), true, false, null, null));
-            }
+        for (RiderLineItem item : rider.getLineItems()) {
+            entries.add(new ChecklistEntry(UUID.randomUUID(), item.getCategory(), item.getDescription(),
+                    item.isRequired(), false, null, null));
         }
-
-        // Backline items
-        for (BacklineItem item : rider.getBacklineItems()) {
-            String desc = item.description();
-            if (item.brand() != null) desc += " (" + item.brand() + (item.model() != null ? " " + item.model() : "") + ")";
-            entries.add(new ChecklistEntry(UUID.randomUUID(), item.category(), desc,
-                    item.required(), false, null, null));
-        }
-
-        // Hospitality entries
-        if (rider.getHospitality() != null) {
-            HospitalityRequirements h = rider.getHospitality();
-            if (h.dressingRoomCapacity() != null) {
-                entries.add(new ChecklistEntry(UUID.randomUUID(), BacklineCategory.HOSPITALITY,
-                        "Camerino para " + h.dressingRoomCapacity() + " personas",
-                        false, false, null, null));
-            }
-            if (h.waterBottlesOnStage() != null && h.waterBottlesOnStage() > 0) {
-                entries.add(new ChecklistEntry(UUID.randomUUID(), BacklineCategory.HOSPITALITY,
-                        h.waterBottlesOnStage() + " botellas de agua en escenario",
-                        false, false, null, null));
-            }
-            if (h.cateringNotes() != null && !h.cateringNotes().isBlank()) {
-                entries.add(new ChecklistEntry(UUID.randomUUID(), BacklineCategory.HOSPITALITY,
-                        "Catering: " + h.cateringNotes(), false, false, null, null));
-            }
-            if (h.passesCount() != null && h.passesCount() > 0) {
-                entries.add(new ChecklistEntry(UUID.randomUUID(), BacklineCategory.HOSPITALITY,
-                        h.passesCount() + " acreditaciones / free passes",
-                        false, false, null, null));
-            }
-        }
-
-        // Transport entry
-        if (rider.getTransport() != null) {
-            TransportRequirements t = rider.getTransport();
-            if (t.vehicleType() != null && !t.vehicleType().isBlank()) {
-                String desc = "Transporte: " + t.vehicleType();
-                if (t.passengerCapacity() != null) desc += " (" + t.passengerCapacity() + " personas)";
-                entries.add(new ChecklistEntry(UUID.randomUUID(), BacklineCategory.TRANSPORT,
-                        desc, false, false, null, null));
-            }
-        }
-
         return entries;
     }
 

@@ -75,6 +75,10 @@ cloudinary:
 gresk:
   cors:
     allowed-origins: "http://localhost:3000,http://localhost:3001,http://localhost:8080"
+  contract:
+    # Token compartido que el proveedor de firma (Signaturit/DocuSign/stub) añade
+    # como query param al webhook de cambio de estado
+    signature-webhook-token: ${CONTRACT_SIGNATURE_WEBHOOK_TOKEN:}
   email:
     ai:
       confidence-threshold: 0.85
@@ -98,6 +102,20 @@ gresk:
     chronicle:
       polling-interval-ms: 1800000   # 30 min
       max-entries-per-fetch: 30
+  agenda:
+    google-calendar:
+      client-id: ${GOOGLE_CALENDAR_CLIENT_ID:}
+      client-secret: ${GOOGLE_CALENDAR_CLIENT_SECRET:}
+      redirect-uri: ${APP_BASE_URL:http://localhost:8080}/api/v1/agenda/calendar-sync/google/callback
+      webhook-url: ${GOOGLE_CALENDAR_WEBHOOK_URL:}
+    outlook:
+      client-id: ${OUTLOOK_CLIENT_ID:}
+      client-secret: ${OUTLOOK_CLIENT_SECRET:}
+      tenant-id: ${OUTLOOK_TENANT_ID:common}
+      redirect-uri: ${APP_BASE_URL:http://localhost:8080}/api/v1/agenda/calendar-sync/outlook/callback
+      webhook-url: ${OUTLOOK_WEBHOOK_URL:}
+    calendar-sync:
+      encryption-key: ${CALENDAR_TOKEN_ENCRYPTION_KEY:}   # 256-bit en base64 (openssl rand -base64 32)
 
 # ── Resiliencia de la capa Claude (capa 3 del pipeline) ──────────────────────
 resilience4j:
@@ -150,3 +168,7 @@ spotify:
 musicbrainz:
   api-url: https://musicbrainz.org/ws/2
   user-agent: "gresk-backend/1.0 (contacto@gresk.app)"
+
+bandsintown:
+  app-id: ${BANDSINTOWN_APP_ID}
+  api-url: https://rest.bandsintown.com

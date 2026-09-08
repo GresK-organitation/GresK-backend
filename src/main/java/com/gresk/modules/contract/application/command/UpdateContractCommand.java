@@ -15,6 +15,8 @@ public record UpdateContractCommand(
         String             partyBSignatoryName,
         String             partyBSignatoryRole,
         String             partyBEmail,
+        String             partyBCountry,
+        Boolean            partyBTaxResident,
         // Performance details
         String             perfVenue,
         LocalDate          perfEventDate,
@@ -24,6 +26,7 @@ public record UpdateContractCommand(
         BigDecimal         feeAmount,
         String             feeCurrency,
         List<PaymentTermData> paymentTerms,
+        WithholdingTaxData withholdingTax,
         // Clauses
         List<ClauseData>   clauses,
         // Administrative
@@ -37,4 +40,6 @@ public record UpdateContractCommand(
 ) {
     public record PaymentTermData(BigDecimal percentage, String description, String method, boolean paid) {}
     public record ClauseData(int order, String title, String content) {}
+    public record WithholdingTaxData(String type, BigDecimal ratePercentage, BigDecimal taxBase,
+                                      BigDecimal withheldAmount, String exemptionReason) {}
 }

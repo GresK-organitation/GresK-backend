@@ -39,6 +39,7 @@ public class ContractController {
     private final CancelContractUseCase              cancelUseCase;
     private final CloneContractUseCase               cloneUseCase;
     private final GenerateContractPdfUseCase         pdfUseCase;
+    private final RenderContractFromTemplateUseCase  renderFromTemplateUseCase;
     private final UploadSignedPdfUseCase             uploadPdfUseCase;
     private final GenerateShareLinkUseCase           shareLinkUseCase;
     private final GetContractStatsUseCase            statsUseCase;
@@ -54,7 +55,8 @@ public class ContractController {
         var contract = createUseCase.execute(new CreateContractCommand(
                 promoterId, request.type(),
                 request.partyAName(), request.partyATaxId(), request.partyAAddress(),
-                request.partyASignatoryName(), request.partyASignatoryRole(), request.partyAEmail()));
+                request.partyASignatoryName(), request.partyASignatoryRole(), request.partyAEmail(),
+                request.partyACountry(), request.partyATaxResident()));
 
         return ResponseEntity
                 .created(URI.create("/api/v1/contracts/" + contract.getId()))
@@ -184,6 +186,22 @@ public class ContractController {
                 .body(pdf);
     }
 
+    // ── GET /api/v1/contracts/{id}/pdf/template/{templateId} ─────────────────
+    @GetMapping("/{contractId}/pdf/template/{templateId}")
+    @PreAuthorize("hasRole('PROMOTER')")
+    public ResponseEntity<byte[]> downloadTemplatePdf(
+            @PathVariable String contractId,
+            @PathVariable String templateId,
+            @AuthenticationPrincipal String promoterId) {
+
+        byte[] pdf = renderFromTemplateUseCase.execute(contractId, templateId, promoterId);
+        String filename = "contract-" + contractId + "-template.pdf";
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
+    }
+
     // ── POST /api/v1/contracts/{id}/signed-pdf ────────────────────────────────
     @PostMapping(value = "/{contractId}/signed-pdf", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('PROMOTER')")
@@ -222,6 +240,12 @@ public class ContractController {
                         .map(c -> new UpdateContractCommand.ClauseData(c.order(), c.title(), c.content()))
                         .toList();
 
+        UpdateContractCommand.WithholdingTaxData wht = r.withholdingTax() == null ? null :
+                new UpdateContractCommand.WithholdingTaxData(
+                        r.withholdingTax().type(), r.withholdingTax().ratePercentage(),
+                        r.withholdingTax().taxBase(), r.withholdingTax().withheldAmount(),
+                        r.withholdingTax().exemptionReason());
+
         return new UpdateContractCommand(
                 contractId, promoterId,
                 r.partyB() != null ? r.partyB().name()          : null,
@@ -230,8 +254,10 @@ public class ContractController {
                 r.partyB() != null ? r.partyB().signatoryName() : null,
                 r.partyB() != null ? r.partyB().signatoryRole() : null,
                 r.partyB() != null ? r.partyB().email()         : null,
+                r.partyB() != null ? r.partyB().country()       : null,
+                r.partyB() != null ? r.partyB().taxResident()   : null,
                 r.perfVenue(), r.perfEventDate(), r.perfDurationMinutes(), r.perfShowTime(),
-                r.feeAmount(), r.feeCurrency(), terms,
+                r.feeAmount(), r.feeCurrency(), terms, wht,
                 clauses,
                 r.jurisdiction(), r.contractCity(), r.contractDate(),
                 r.linkedEventId(), r.linkedArtistId(), r.linkedRiderId()

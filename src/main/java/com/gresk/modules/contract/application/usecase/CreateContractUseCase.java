@@ -24,7 +24,8 @@ public class CreateContractUseCase {
 
         ContractParty partyA = new ContractParty(
                 cmd.partyAName(), cmd.partyATaxId(), cmd.partyAAddress(),
-                cmd.partyASignatoryName(), cmd.partyASignatoryRole(), cmd.partyAEmail());
+                cmd.partyASignatoryName(), cmd.partyASignatoryRole(), cmd.partyAEmail(),
+                cmd.partyACountry(), cmd.partyATaxResident() == null || cmd.partyATaxResident());
 
         Contract contract = Contract.create(cmd.type(), promoterId, partyA, referenceNumber);
         return contractRepository.save(contract);

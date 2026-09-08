@@ -63,21 +63,29 @@ public class JpaContractRepositoryAdapter implements ContractRepositoryPort {
     }
 
     @Override
+    public List<Contract> findByLinkedEventId(java.util.UUID eventId) {
+        return repo.findByLinkedEventId(eventId).stream()
+                .map(mapper::toDomain).toList();
+    }
+
+    @Override
     public ContractStats statsForPromoter(PromoterId promoterId) {
         List<Object[]> statusCounts = repo.countGroupedByStatus(promoterId.value());
         List<Object[]> typeCounts   = repo.countGroupedByType(promoterId.value());
         BigDecimal     totalFee     = repo.sumSignedFeeByPromoter(promoterId.value());
 
-        long draft = 0, sent = 0, signed = 0, archived = 0, cancelled = 0;
+        long draft = 0, sent = 0, delivered = 0, signed = 0, archived = 0, cancelled = 0, voided = 0;
         for (Object[] row : statusCounts) {
             ContractStatus s = (ContractStatus) row[0];
             long count = (long) row[1];
             switch (s) {
-                case DRAFT     -> draft     = count;
-                case SENT      -> sent      = count;
-                case SIGNED    -> signed    = count;
-                case ARCHIVED  -> archived  = count;
-                case CANCELLED -> cancelled = count;
+                case DRAFT      -> draft     = count;
+                case SENT       -> sent      = count;
+                case DELIVERED  -> delivered = count;
+                case SIGNED     -> signed    = count;
+                case ARCHIVED   -> archived  = count;
+                case CANCELLED  -> cancelled = count;
+                case VOIDED     -> voided    = count;
             }
         }
 
@@ -86,7 +94,7 @@ public class JpaContractRepositoryAdapter implements ContractRepositoryPort {
             byType.put((ContractType) row[0], (long) row[1]);
         }
 
-        return new ContractStats(draft, sent, signed, archived, cancelled,
+        return new ContractStats(draft, sent, delivered, signed, archived, cancelled, voided,
                 totalFee != null ? totalFee : BigDecimal.ZERO, byType);
     }
 

@@ -47,22 +47,6 @@ public class TechnicalRiderEntity {
     @Column(name = "sound_check_notes", columnDefinition = "TEXT")
     private String soundCheckNotes;
 
-    // ── Sound system (flattened) ─────────────────────────────────────────────
-    @Column(name = "console_brand", length = 100)
-    private String consoleBrand;
-
-    @Column(name = "console_channels")
-    private Integer consoleChannels;
-
-    @Column(name = "monitor_mixes")
-    private Integer monitorMixes;
-
-    @Column(name = "pa_description", columnDefinition = "TEXT")
-    private String paDescription;
-
-    @Column(name = "processor_notes", columnDefinition = "TEXT")
-    private String processorNotes;
-
     // ── Stage dimensions (flattened) ─────────────────────────────────────────
     @Column(name = "stage_width_meters", precision = 6, scale = 2)
     private BigDecimal stageWidthMeters;
@@ -83,29 +67,6 @@ public class TechnicalRiderEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     private String stageElementsJson;
 
-    // ── Hospitality (flattened) ──────────────────────────────────────────────
-    @Column(name = "dressing_room_capacity")
-    private Integer dressingRoomCapacity;
-
-    @Column(name = "catering_notes", columnDefinition = "TEXT")
-    private String cateringNotes;
-
-    @Column(name = "water_bottles_on_stage")
-    private Integer waterBottlesOnStage;
-
-    @Column(name = "passes_count")
-    private Integer passesCount;
-
-    // ── Transport (flattened) ────────────────────────────────────────────────
-    @Column(name = "vehicle_type", length = 100)
-    private String vehicleType;
-
-    @Column(name = "passenger_capacity")
-    private Integer passengerCapacity;
-
-    @Column(name = "transport_notes", columnDefinition = "TEXT")
-    private String transportNotes;
-
     @Column(name = "additional_notes", columnDefinition = "TEXT")
     private String additionalNotes;
 
@@ -119,15 +80,9 @@ public class TechnicalRiderEntity {
     @Builder.Default
     private List<StaffMemberEmbeddable> staff = new ArrayList<>();
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "rider_input_channels", joinColumns = @JoinColumn(name = "rider_id"))
+    @OneToMany(mappedBy = "rider", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Builder.Default
-    private List<InputChannelEmbeddable> inputChannels = new ArrayList<>();
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "rider_backline_items", joinColumns = @JoinColumn(name = "rider_id"))
-    @Builder.Default
-    private List<BacklineItemEmbeddable> backlineItems = new ArrayList<>();
+    private List<TechnicalRiderLineItemEntity> lineItems = new ArrayList<>();
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

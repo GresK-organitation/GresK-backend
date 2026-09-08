@@ -23,6 +23,7 @@ public record ContractResponse(
         BigDecimal     feeAmount,
         String         feeCurrency,
         List<PaymentTermResponse> paymentTerms,
+        WithholdingTaxResponse withholdingTax,
         // Clauses
         List<ClauseResponse> clauses,
         // Admin
@@ -36,19 +37,27 @@ public record ContractResponse(
         // Files & sharing
         String         signedPdfAssetId,
         String         shareToken,
+        // Firma digital y versionado
+        String         activeSignatureEnvelopeId,
+        int            currentVersionNumber,
         // Timestamps
         Instant        createdAt,
         Instant        updatedAt
 ) {
     public record PartyResponse(
             String name, String taxId, String address,
-            String signatoryName, String signatoryRole, String email) {}
+            String signatoryName, String signatoryRole, String email,
+            String country, boolean taxResident) {}
 
     public record PerformanceResponse(
             String venue, LocalDate eventDate, Integer durationMinutes, String showTime) {}
 
     public record PaymentTermResponse(
             BigDecimal percentage, String description, String method, boolean paid) {}
+
+    public record WithholdingTaxResponse(
+            String type, BigDecimal ratePercentage, BigDecimal taxBase,
+            BigDecimal withheldAmount, String exemptionReason) {}
 
     public record ClauseResponse(int order, String title, String content) {}
 }

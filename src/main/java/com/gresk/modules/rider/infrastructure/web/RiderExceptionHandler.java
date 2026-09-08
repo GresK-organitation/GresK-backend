@@ -44,4 +44,19 @@ public class RiderExceptionHandler {
     ResponseEntity<Map<String, String>> handleChecklistExists(ChecklistAlreadyExistsException ex) {
         return ResponseEntity.status(409).body(Map.of("error", ex.getMessage()));
     }
+
+    @ExceptionHandler(LineItemNotFoundException.class)
+    ResponseEntity<Map<String, String>> handleLineItemNotFound(LineItemNotFoundException ex) {
+        return ResponseEntity.status(404).body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidLineItemCategoryException.class)
+    ResponseEntity<Map<String, String>> handleInvalidLineItemCategory(InvalidLineItemCategoryException ex) {
+        return ResponseEntity.status(400).body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(SubstitutionNotProposedException.class)
+    ResponseEntity<Map<String, String>> handleSubstitutionNotProposed(SubstitutionNotProposedException ex) {
+        return ResponseEntity.status(409).body(Map.of("error", ex.getMessage()));
+    }
 }

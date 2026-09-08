@@ -27,6 +27,7 @@
 		<archunit.version>1.4.1</archunit.version>
 		<google-api-client.version>2.8.0</google-api-client.version>
 		<google-api-gmail.version>v1-rev20260525-2.0.0</google-api-gmail.version>
+		<google-api-calendar.version>v3-rev20260708-2.0.0</google-api-calendar.version>
 		<google-auth.version>1.47.0</google-auth.version>
 		<!-- 2.3.0 falla al arrancar sin RxJava3 en el classpath (introspección de
 		     FallbackConfigurationOnMissingBean); 2.2.0 no tiene ese problema -->
@@ -150,6 +151,33 @@
 			<version>1.3.35</version>
 		</dependency>
 
+		<!-- Contract templates: Markdown -> HTML for {{variable}} placeholder bodies -->
+		<dependency>
+			<groupId>org.commonmark</groupId>
+			<artifactId>commonmark</artifactId>
+			<version>0.24.0</version>
+		</dependency>
+
+		<!-- Contract templates: coerce commonmark's HTML into well-formed XHTML before Flying Saucer -->
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.18.1</version>
+		</dependency>
+
+		<!-- Contract templates: XHTML/CSS -> PDF, backed by the same openpdf pinned above -->
+		<dependency>
+			<groupId>org.xhtmlrenderer</groupId>
+			<artifactId>flying-saucer-pdf-openpdf</artifactId>
+			<version>9.3.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.github.librepdf</groupId>
+					<artifactId>openpdf</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -192,6 +220,15 @@
 			<groupId>com.google.auth</groupId>
 			<artifactId>google-auth-library-oauth2-http</artifactId>
 			<version>${google-auth.version}</version>
+		</dependency>
+
+		<!-- Agenda: sync bidireccional con Google Calendar. Outlook/Microsoft Graph se
+		     implementa con HttpClient + Jackson (REST plano) en vez del SDK microsoft-graph,
+		     así que no añade dependencias nuevas. -->
+		<dependency>
+			<groupId>com.google.apis</groupId>
+			<artifactId>google-api-services-calendar</artifactId>
+			<version>${google-api-calendar.version}</version>
 		</dependency>
 
 		<!-- Email Intelligence Engine: resiliencia para la capa Claude -->

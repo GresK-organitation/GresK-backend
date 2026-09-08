@@ -1,6 +1,6 @@
 package com.gresk.modules.rider.infrastructure.persistence.entity;
 
-import com.gresk.modules.rider.domain.model.BacklineCategory;
+import com.gresk.modules.rider.domain.model.RiderItemCategory;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,7 +25,7 @@ public class ChecklistEntryEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category", length = 20, nullable = false)
-    private BacklineCategory category;
+    private RiderItemCategory category;
 
     @Column(name = "description", length = 255, nullable = false)
     private String description;

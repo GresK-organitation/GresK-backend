@@ -42,4 +42,11 @@ public class JpaTicketAdapter implements TicketRepository {
     public boolean existsByUserIdAndEventId(UserId userId, EventId eventId) {
         return repo.existsByUserIdAndEventId(userId.value(), eventId.value());
     }
+
+    @Override
+    public List<Ticket> findByEventId(EventId eventId) {
+        return repo.findByEventId(eventId.value()).stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
 }

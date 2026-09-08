@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gresk.modules.contract.domain.model.Contract;
 import com.gresk.modules.contract.domain.model.ContractId;
+import com.gresk.modules.contract.domain.model.SignatureEnvelopeId;
 import com.gresk.modules.contract.domain.model.valueobject.*;
 import com.gresk.modules.contract.infrastructure.persistence.entity.ContractEntity;
 import com.gresk.modules.promoter.domain.model.valueobject.PromoterId;
@@ -24,14 +25,16 @@ public class ContractMapper {
         if (e.getPartyAName() != null) {
             partyA = new ContractParty(
                     e.getPartyAName(), e.getPartyATaxId(), e.getPartyAAddress(),
-                    e.getPartyASignatoryName(), e.getPartyASignatoryRole(), e.getPartyAEmail());
+                    e.getPartyASignatoryName(), e.getPartyASignatoryRole(), e.getPartyAEmail(),
+                    e.getPartyACountry(), e.isPartyATaxResident());
         }
 
         ContractParty partyB = null;
         if (e.getPartyBName() != null) {
             partyB = new ContractParty(
                     e.getPartyBName(), e.getPartyBTaxId(), e.getPartyBAddress(),
-                    e.getPartyBSignatoryName(), e.getPartyBSignatoryRole(), e.getPartyBEmail());
+                    e.getPartyBSignatoryName(), e.getPartyBSignatoryRole(), e.getPartyBEmail(),
+                    e.getPartyBCountry(), e.isPartyBTaxResident());
         }
 
         PerformanceDetails performanceDetails = null;
@@ -43,10 +46,15 @@ public class ContractMapper {
 
         FinancialTerms financialTerms = null;
         if (e.getFeeAmount() != null) {
+            WithholdingTax wht = e.getWhtType() != null
+                    ? new WithholdingTax(WithholdingTaxType.valueOf(e.getWhtType()), e.getWhtRatePercentage(),
+                        e.getWhtTaxBase(), e.getWhtWithheldAmount(), e.getWhtExemptionReason())
+                    : null;
             financialTerms = new FinancialTerms(
                     e.getFeeAmount(),
                     e.getFeeCurrency() != null ? e.getFeeCurrency() : "EUR",
-                    deserializePaymentTerms(e.getPaymentTermsJson()));
+                    deserializePaymentTerms(e.getPaymentTermsJson()),
+                    wht);
         }
 
         return Contract.reconstitute(
@@ -61,7 +69,9 @@ public class ContractMapper {
                 e.getJurisdiction(), e.getContractCity(), e.getContractDate(),
                 e.getLinkedEventId(), e.getLinkedArtistId(), e.getLinkedRiderId(),
                 e.getSignedPdfAssetId(), e.getShareToken(),
-                e.getCreatedAt(), e.getUpdatedAt()
+                e.getCreatedAt(), e.getUpdatedAt(),
+                e.getActiveSignatureEnvelopeId() != null ? SignatureEnvelopeId.of(e.getActiveSignatureEnvelopeId()) : null,
+                e.getCurrentVersionNumber()
         );
     }
 
@@ -79,6 +89,8 @@ public class ContractMapper {
                 .partyASignatoryName(  c.getPartyA() != null ? c.getPartyA().signatoryName()  : null)
                 .partyASignatoryRole(  c.getPartyA() != null ? c.getPartyA().signatoryRole()  : null)
                 .partyAEmail(          c.getPartyA() != null ? c.getPartyA().email()          : null)
+                .partyACountry(        c.getPartyA() != null ? c.getPartyA().country()        : null)
+                .partyATaxResident(    c.getPartyA() == null || c.getPartyA().taxResident())
                 // Party B
                 .partyBName(           c.getPartyB() != null ? c.getPartyB().name()          : null)
                 .partyBTaxId(          c.getPartyB() != null ? c.getPartyB().taxId()          : null)
@@ -86,6 +98,8 @@ public class ContractMapper {
                 .partyBSignatoryName(  c.getPartyB() != null ? c.getPartyB().signatoryName()  : null)
                 .partyBSignatoryRole(  c.getPartyB() != null ? c.getPartyB().signatoryRole()  : null)
                 .partyBEmail(          c.getPartyB() != null ? c.getPartyB().email()          : null)
+                .partyBCountry(        c.getPartyB() != null ? c.getPartyB().country()        : null)
+                .partyBTaxResident(    c.getPartyB() == null || c.getPartyB().taxResident())
                 // Performance
                 .perfVenue(            c.getPerformanceDetails() != null ? c.getPerformanceDetails().venue()            : null)
                 .perfEventDate(        c.getPerformanceDetails() != null ? c.getPerformanceDetails().eventDate()        : null)
@@ -96,6 +110,12 @@ public class ContractMapper {
                 .feeCurrency(          c.getFinancialTerms() != null ? c.getFinancialTerms().feeCurrency() : "EUR")
                 .paymentTermsJson(     c.getFinancialTerms() != null ? serializePaymentTerms(c.getFinancialTerms().paymentTerms()) : null)
                 .clausesJson(          serializeClauses(c.getClauses()))
+                // Withholding tax
+                .whtType(              whtOrNone(c).type().name())
+                .whtRatePercentage(    whtOrNone(c).ratePercentage())
+                .whtTaxBase(           whtOrNone(c).taxBase())
+                .whtWithheldAmount(    whtOrNone(c).withheldAmount())
+                .whtExemptionReason(   whtOrNone(c).exemptionReason())
                 // Admin
                 .jurisdiction(c.getJurisdiction())
                 .contractCity(c.getContractCity())
@@ -107,10 +127,19 @@ public class ContractMapper {
                 // Files
                 .signedPdfAssetId(c.getSignedPdfAssetId())
                 .shareToken(c.getShareToken())
+                .activeSignatureEnvelopeId(c.getActiveSignatureEnvelopeId() != null ? c.getActiveSignatureEnvelopeId().value() : null)
+                .currentVersionNumber(c.getCurrentVersionNumber())
                 // Timestamps
                 .createdAt(c.getCreatedAt())
                 .updatedAt(c.getUpdatedAt())
                 .build();
+    }
+
+    private WithholdingTax whtOrNone(Contract c) {
+        if (c.getFinancialTerms() == null || c.getFinancialTerms().withholdingTax() == null) {
+            return WithholdingTax.none();
+        }
+        return c.getFinancialTerms().withholdingTax();
     }
 
     // ── JSON helpers ──────────────────────────────────────────────────────────

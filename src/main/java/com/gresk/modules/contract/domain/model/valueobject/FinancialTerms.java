@@ -6,5 +6,10 @@ import java.util.List;
 public record FinancialTerms(
         BigDecimal        feeAmount,
         String            feeCurrency,
-        List<PaymentTerm> paymentTerms
-) {}
+        List<PaymentTerm> paymentTerms,
+        WithholdingTax    withholdingTax   // nullable = no evaluada todavía
+) {
+    public FinancialTerms(BigDecimal feeAmount, String feeCurrency, List<PaymentTerm> paymentTerms) {
+        this(feeAmount, feeCurrency, paymentTerms, null);
+    }
+}

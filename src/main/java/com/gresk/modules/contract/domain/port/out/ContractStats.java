@@ -8,9 +8,11 @@ import java.util.Map;
 public record ContractStats(
         long                      draftCount,
         long                      sentCount,
+        long                      deliveredCount,
         long                      signedCount,
         long                      archivedCount,
         long                      cancelledCount,
+        long                      voidedCount,
         BigDecimal                totalSignedFeeValue,
         Map<ContractType, Long>   countByType
 ) {}

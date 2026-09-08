@@ -10,4 +10,6 @@ public interface SpringDataTicketRepository extends JpaRepository<JpaTicketEntit
     List<JpaTicketEntity> findByUserId(UUID userId);
 
     boolean existsByUserIdAndEventId(UUID userId, UUID eventId);
+
+    List<JpaTicketEntity> findByEventId(UUID eventId);
 }

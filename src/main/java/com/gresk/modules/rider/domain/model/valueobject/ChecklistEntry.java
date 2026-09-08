@@ -1,13 +1,13 @@
 package com.gresk.modules.rider.domain.model.valueobject;
 
-import com.gresk.modules.rider.domain.model.BacklineCategory;
+import com.gresk.modules.rider.domain.model.RiderItemCategory;
 
 import java.time.Instant;
 import java.util.UUID;
 
 public record ChecklistEntry(
         UUID entryId,
-        BacklineCategory category,
+        RiderItemCategory category,
         String description,
         boolean required,
         boolean confirmed,

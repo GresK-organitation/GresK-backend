@@ -32,7 +32,8 @@ public class UpdateContractUseCase {
         if (cmd.partyBName() != null) {
             contract.withPartyB(new ContractParty(
                     cmd.partyBName(), cmd.partyBTaxId(), cmd.partyBAddress(),
-                    cmd.partyBSignatoryName(), cmd.partyBSignatoryRole(), cmd.partyBEmail()));
+                    cmd.partyBSignatoryName(), cmd.partyBSignatoryRole(), cmd.partyBEmail(),
+                    cmd.partyBCountry(), cmd.partyBTaxResident() == null || cmd.partyBTaxResident()));
         }
 
         if (cmd.perfVenue() != null || cmd.perfEventDate() != null) {
@@ -46,10 +47,15 @@ public class UpdateContractUseCase {
                     cmd.paymentTerms().stream()
                             .map(p -> new PaymentTerm(p.percentage(), p.description(), p.method(), p.paid()))
                             .toList();
+            WithholdingTax wht = cmd.withholdingTax() != null
+                    ? new WithholdingTax(WithholdingTaxType.valueOf(cmd.withholdingTax().type()),
+                        cmd.withholdingTax().ratePercentage(), cmd.withholdingTax().taxBase(),
+                        cmd.withholdingTax().withheldAmount(), cmd.withholdingTax().exemptionReason())
+                    : null;
             contract.withFinancialTerms(new FinancialTerms(
                     cmd.feeAmount(),
                     cmd.feeCurrency() != null ? cmd.feeCurrency() : "EUR",
-                    terms));
+                    terms, wht));
         }
 
         if (cmd.clauses() != null) {

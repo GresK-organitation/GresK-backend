@@ -16,6 +16,7 @@ public record UpdateContractRequest(
         BigDecimal feeAmount,
         String     feeCurrency,
         List<PaymentTermRequest> paymentTerms,
+        WithholdingTaxRequest withholdingTax,
         // Clauses
         List<ClauseRequest> clauses,
         // Administrative
@@ -29,4 +30,6 @@ public record UpdateContractRequest(
 ) {
     public record PaymentTermRequest(BigDecimal percentage, String description, String method, boolean paid) {}
     public record ClauseRequest(int order, String title, String content) {}
+    public record WithholdingTaxRequest(String type, BigDecimal ratePercentage, BigDecimal taxBase,
+                                         BigDecimal withheldAmount, String exemptionReason) {}
 }

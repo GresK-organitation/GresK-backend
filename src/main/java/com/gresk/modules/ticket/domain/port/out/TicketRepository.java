@@ -17,4 +17,6 @@ public interface TicketRepository {
     List<Ticket> findByUserId(UserId userId);
 
     boolean existsByUserIdAndEventId(UserId userId, EventId eventId);
+
+    List<Ticket> findByEventId(EventId eventId);
 }

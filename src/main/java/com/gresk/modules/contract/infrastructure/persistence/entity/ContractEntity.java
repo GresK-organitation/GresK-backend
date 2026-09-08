@@ -46,6 +46,8 @@ public class ContractEntity {
     @Column(name = "party_a_signatory_name", length = 255) private String partyASignatoryName;
     @Column(name = "party_a_signatory_role", length = 100) private String partyASignatoryRole;
     @Column(name = "party_a_email",          length = 255) private String partyAEmail;
+    @Column(name = "party_a_country",        length = 2)   private String partyACountry;
+    @Column(name = "party_a_tax_resident")                 private boolean partyATaxResident = true;
 
     // ── Party B ───────────────────────────────────────────────────────────────
     @Column(name = "party_b_name",           length = 255) private String partyBName;
@@ -54,6 +56,8 @@ public class ContractEntity {
     @Column(name = "party_b_signatory_name", length = 255) private String partyBSignatoryName;
     @Column(name = "party_b_signatory_role", length = 100) private String partyBSignatoryRole;
     @Column(name = "party_b_email",          length = 255) private String partyBEmail;
+    @Column(name = "party_b_country",        length = 2)   private String partyBCountry;
+    @Column(name = "party_b_tax_resident")                 private boolean partyBTaxResident = true;
 
     // ── Performance details ───────────────────────────────────────────────────
     @Column(name = "perf_venue",            length = 255) private String    perfVenue;
@@ -73,6 +77,13 @@ public class ContractEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     private String clausesJson;
 
+    // ── Withholding tax (IRNR / IRPF / EU reverse charge), entrada manual ────────
+    @Column(name = "wht_type", length = 30, nullable = false) private String whtType = "NONE";
+    @Column(name = "wht_rate_percentage",  precision = 5, scale = 2)  private BigDecimal whtRatePercentage;
+    @Column(name = "wht_tax_base",         precision = 12, scale = 2) private BigDecimal whtTaxBase;
+    @Column(name = "wht_withheld_amount",  precision = 12, scale = 2) private BigDecimal whtWithheldAmount;
+    @Column(name = "wht_exemption_reason", length = 255)              private String     whtExemptionReason;
+
     // ── Administrative ────────────────────────────────────────────────────────
     @Column(name = "jurisdiction",   length = 255) private String    jurisdiction;
     @Column(name = "contract_city",  length = 100) private String    contractCity;
@@ -86,6 +97,9 @@ public class ContractEntity {
     // ── Files & sharing ───────────────────────────────────────────────────────
     @Column(name = "signed_pdf_asset_id", length = 512) private String signedPdfAssetId;
     @Column(name = "share_token",         length = 36, unique = true) private String shareToken;
+
+    @Column(name = "active_signature_envelope_id") private UUID activeSignatureEnvelopeId;
+    @Column(name = "current_version_number", nullable = false)  private int currentVersionNumber = 1;
 
     @Column(name = "created_at", nullable = false, updatable = false) private Instant createdAt;
     @Column(name = "updated_at", nullable = false)                    private Instant updatedAt;

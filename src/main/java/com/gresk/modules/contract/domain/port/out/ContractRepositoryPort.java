@@ -16,6 +16,7 @@ public interface ContractRepositoryPort {
     List<Contract>          findByPromoterId(PromoterId promoterId);
     List<Contract>          findByPromoterIdAndStatus(PromoterId promoterId, ContractStatus status);
     List<Contract>          findByPromoterIdAndType(PromoterId promoterId, ContractType type);
+    List<Contract>          findByLinkedEventId(java.util.UUID eventId);
     ContractStats           statsForPromoter(PromoterId promoterId);
     int                     countByPromoterIdForYear(PromoterId promoterId, int year);
 }

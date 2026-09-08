@@ -38,6 +38,8 @@ public final class Contract {
     private String               signedPdfAssetId;
     private String               shareToken;
     private Instant              updatedAt;
+    private SignatureEnvelopeId  activeSignatureEnvelopeId;
+    private int                  currentVersionNumber;
 
     private Contract(ContractId id, PromoterId promoterId, ContractType type,
                      String referenceNumber, ContractStatus status,
@@ -47,7 +49,8 @@ public final class Contract {
                      String contractCity, LocalDate contractDate,
                      UUID linkedEventId, UUID linkedArtistId, UUID linkedRiderId,
                      String signedPdfAssetId, String shareToken,
-                     Instant createdAt, Instant updatedAt) {
+                     Instant createdAt, Instant updatedAt,
+                     SignatureEnvelopeId activeSignatureEnvelopeId, int currentVersionNumber) {
         this.id                 = id;
         this.promoterId         = promoterId;
         this.type               = type;
@@ -68,6 +71,8 @@ public final class Contract {
         this.shareToken         = shareToken;
         this.createdAt          = createdAt;
         this.updatedAt          = updatedAt;
+        this.activeSignatureEnvelopeId = activeSignatureEnvelopeId;
+        this.currentVersionNumber      = currentVersionNumber == 0 ? 1 : currentVersionNumber;
     }
 
     // ── Factories ─────────────────────────────────────────────────────────────
@@ -81,8 +86,25 @@ public final class Contract {
                 partyA, null, null, null,
                 List.of(), null, null, null,
                 null, null, null, null, null,
-                now, now
+                now, now, null, 1
         );
+    }
+
+    /** Compatibilidad: reconstituye sin envelope de firma activo y en versión 1. */
+    public static Contract reconstitute(
+            ContractId id, PromoterId promoterId, ContractType type,
+            String referenceNumber, ContractStatus status,
+            ContractParty partyA, ContractParty partyB,
+            PerformanceDetails performanceDetails, FinancialTerms financialTerms,
+            List<ContractClause> clauses, String jurisdiction,
+            String contractCity, LocalDate contractDate,
+            UUID linkedEventId, UUID linkedArtistId, UUID linkedRiderId,
+            String signedPdfAssetId, String shareToken,
+            Instant createdAt, Instant updatedAt) {
+        return reconstitute(id, promoterId, type, referenceNumber, status, partyA, partyB,
+                performanceDetails, financialTerms, clauses, jurisdiction, contractCity, contractDate,
+                linkedEventId, linkedArtistId, linkedRiderId, signedPdfAssetId, shareToken,
+                createdAt, updatedAt, null, 1);
     }
 
     public static Contract reconstitute(
@@ -94,12 +116,14 @@ public final class Contract {
             String contractCity, LocalDate contractDate,
             UUID linkedEventId, UUID linkedArtistId, UUID linkedRiderId,
             String signedPdfAssetId, String shareToken,
-            Instant createdAt, Instant updatedAt) {
+            Instant createdAt, Instant updatedAt,
+            SignatureEnvelopeId activeSignatureEnvelopeId, int currentVersionNumber) {
         return new Contract(id, promoterId, type, referenceNumber, status,
                 partyA, partyB, performanceDetails, financialTerms, clauses,
                 jurisdiction, contractCity, contractDate,
                 linkedEventId, linkedArtistId, linkedRiderId,
-                signedPdfAssetId, shareToken, createdAt, updatedAt);
+                signedPdfAssetId, shareToken, createdAt, updatedAt,
+                activeSignatureEnvelopeId, currentVersionNumber);
     }
 
     // ── Status transitions ────────────────────────────────────────────────────
@@ -114,11 +138,30 @@ public final class Contract {
     }
 
     public void sign() {
-        if (status != ContractStatus.SENT) {
+        if (status != ContractStatus.SENT && status != ContractStatus.DELIVERED) {
             throw new InvalidContractStatusTransitionException(
                     "Cannot sign a contract in status: " + status);
         }
         this.status    = ContractStatus.SIGNED;
+        this.updatedAt = Instant.now();
+    }
+
+    public void markDelivered() {
+        if (status != ContractStatus.SENT) {
+            throw new InvalidContractStatusTransitionException(
+                    "Cannot mark delivered a contract in status: " + status);
+        }
+        this.status    = ContractStatus.DELIVERED;
+        this.updatedAt = Instant.now();
+    }
+
+    /** Anulación dirigida por el proveedor de firma (Signaturit/DocuSign), distinta de un cancel() manual. */
+    public void voidContract() {
+        if (status != ContractStatus.SENT && status != ContractStatus.DELIVERED) {
+            throw new InvalidContractStatusTransitionException(
+                    "Cannot void a contract in status: " + status);
+        }
+        this.status    = ContractStatus.VOIDED;
         this.updatedAt = Instant.now();
     }
 
@@ -133,7 +176,7 @@ public final class Contract {
 
     public void cancel() {
         if (status == ContractStatus.SIGNED || status == ContractStatus.ARCHIVED
-                || status == ContractStatus.CANCELLED) {
+                || status == ContractStatus.CANCELLED || status == ContractStatus.VOIDED) {
             throw new InvalidContractStatusTransitionException(
                     "Cannot cancel a contract in status: " + status);
         }
@@ -236,6 +279,21 @@ public final class Contract {
         return this;
     }
 
+    public Contract attachSignatureEnvelope(SignatureEnvelopeId envelopeId) {
+        this.activeSignatureEnvelopeId = envelopeId;
+        this.updatedAt                 = Instant.now();
+        return this;
+    }
+
+    public int nextVersionNumber() {
+        return currentVersionNumber + 1;
+    }
+
+    public void advanceVersion() {
+        this.currentVersionNumber = nextVersionNumber();
+        this.updatedAt            = Instant.now();
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private void guardEditable() {
@@ -271,4 +329,6 @@ public final class Contract {
     public String                getShareToken()          { return shareToken; }
     public Instant               getCreatedAt()           { return createdAt; }
     public Instant               getUpdatedAt()           { return updatedAt; }
+    public SignatureEnvelopeId   getActiveSignatureEnvelopeId() { return activeSignatureEnvelopeId; }
+    public int                   getCurrentVersionNumber()      { return currentVersionNumber; }
 }

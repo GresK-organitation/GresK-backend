@@ -1,6 +1,8 @@
 package com.gresk.modules.rider.infrastructure.web;
 
-import com.gresk.modules.rider.domain.model.valueobject.*;
+import com.gresk.modules.rider.domain.model.valueobject.StageDimensions;
+import com.gresk.modules.rider.domain.model.valueobject.StageElement;
+import com.gresk.modules.rider.domain.model.valueobject.StaffMember;
 import java.time.Instant;
 import java.util.List;
 
@@ -14,14 +16,10 @@ public record RiderResponse(
         String shareToken,
         Integer soundCheckDurationMinutes,
         String soundCheckNotes,
-        SoundSystemRequirements soundSystem,
         StageDimensions stageDimensions,
-        HospitalityRequirements hospitality,
-        TransportRequirements transport,
-        List<StaffMember> staff,
-        List<InputChannel> inputChannels,
-        List<BacklineItem> backlineItems,
         List<StageElement> stageElements,
+        List<StaffMember> staff,
+        List<RiderLineItemResponse> lineItems,
         String additionalNotes,
         Instant createdAt,
         Instant updatedAt

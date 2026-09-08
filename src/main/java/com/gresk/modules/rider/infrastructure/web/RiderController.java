@@ -1,6 +1,8 @@
 package com.gresk.modules.rider.infrastructure.web;
 
+import com.gresk.modules.rider.application.command.AddLineItemCommand;
 import com.gresk.modules.rider.application.command.CreateRiderCommand;
+import com.gresk.modules.rider.application.command.ProposeEquipmentSubstitutionCommand;
 import com.gresk.modules.rider.application.command.UpdateRiderCommand;
 import com.gresk.modules.rider.application.usecase.*;
 import jakarta.validation.Valid;
@@ -32,6 +34,11 @@ public class RiderController {
     private final GenerateShareLinkUseCase       shareLinkUseCase;
     private final GetPublicRiderUseCase          publicRiderUseCase;
     private final CreateRiderFromTemplateUseCase fromTemplateUseCase;
+    private final AddTechnicalLineItemUseCase    addLineItemUseCase;
+    private final RemoveTechnicalLineItemUseCase removeLineItemUseCase;
+    private final SetTechnicalLineItemFulfillmentUseCase setFulfillmentUseCase;
+    private final ProposeEquipmentSubstitutionUseCase proposeSubstitutionUseCase;
+    private final DecideEquipmentSubstitutionUseCase decideSubstitutionUseCase;
     private final RiderResponseMapper            mapper;
 
     // ── POST /api/v1/riders ──────────────────────────────────────────────────
@@ -135,24 +142,76 @@ public class RiderController {
                 .body(mapper.toResponse(rider));
     }
 
+    // ── POST /api/v1/riders/{riderId}/line-items ─────────────────────────────
+    @PostMapping("/{riderId}/line-items")
+    @PreAuthorize("hasRole('PROMOTER')")
+    public ResponseEntity<RiderLineItemResponse> addLineItem(
+            @PathVariable String riderId,
+            @RequestBody @Valid AddLineItemRequest request,
+            @AuthenticationPrincipal String promoterId) {
+
+        var item = addLineItemUseCase.execute(new AddLineItemCommand(riderId, promoterId, request.category(),
+                request.description(), request.quantity(), request.required(), request.attributes(), request.notes()));
+        return ResponseEntity.status(201).body(mapper.toLineItemResponse(item));
+    }
+
+    // ── DELETE /api/v1/riders/{riderId}/line-items/{lineItemId} ──────────────
+    @DeleteMapping("/{riderId}/line-items/{lineItemId}")
+    @PreAuthorize("hasRole('PROMOTER')")
+    public ResponseEntity<Void> removeLineItem(
+            @PathVariable String riderId,
+            @PathVariable String lineItemId,
+            @AuthenticationPrincipal String promoterId) {
+
+        removeLineItemUseCase.execute(riderId, promoterId, lineItemId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // ── POST /api/v1/riders/{riderId}/line-items/{lineItemId}/fulfillment ────
+    @PostMapping("/{riderId}/line-items/{lineItemId}/fulfillment")
+    @PreAuthorize("hasRole('PROMOTER')")
+    public ResponseEntity<RiderResponse> setFulfillment(
+            @PathVariable String riderId,
+            @PathVariable String lineItemId,
+            @RequestBody @Valid SetFulfillmentRequest request,
+            @AuthenticationPrincipal String promoterId) {
+
+        var rider = setFulfillmentUseCase.execute(riderId, promoterId, lineItemId, request.fulfillmentSource());
+        return ResponseEntity.ok(mapper.toResponse(rider));
+    }
+
+    // ── POST /api/v1/riders/{riderId}/line-items/{lineItemId}/substitution ───
+    @PostMapping("/{riderId}/line-items/{lineItemId}/substitution")
+    @PreAuthorize("hasRole('PROMOTER')")
+    public ResponseEntity<RiderResponse> proposeSubstitution(
+            @PathVariable String riderId,
+            @PathVariable String lineItemId,
+            @RequestBody @Valid ProposeSubstitutionRequest request,
+            @AuthenticationPrincipal String promoterId) {
+
+        var rider = proposeSubstitutionUseCase.execute(new ProposeEquipmentSubstitutionCommand(
+                riderId, promoterId, lineItemId, request.proposedAlternative(), request.proposedBy(), request.notes()));
+        return ResponseEntity.ok(mapper.toResponse(rider));
+    }
+
+    // ── POST /api/v1/riders/{riderId}/line-items/{lineItemId}/substitution/decision ──
+    @PostMapping("/{riderId}/line-items/{lineItemId}/substitution/decision")
+    @PreAuthorize("hasRole('PROMOTER')")
+    public ResponseEntity<RiderResponse> decideSubstitution(
+            @PathVariable String riderId,
+            @PathVariable String lineItemId,
+            @RequestBody @Valid DecideSubstitutionRequest request,
+            @AuthenticationPrincipal String promoterId) {
+
+        var rider = decideSubstitutionUseCase.execute(riderId, promoterId, lineItemId, request.approve());
+        return ResponseEntity.ok(mapper.toResponse(rider));
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private UpdateRiderCommand buildUpdateCommand(String riderId, String promoterId, UpdateRiderRequest r) {
         List<UpdateRiderCommand.StaffData> staff = r.staff() == null ? null :
                 r.staff().stream().map(s -> new UpdateRiderCommand.StaffData(s.role(), s.name())).toList();
-
-        List<UpdateRiderCommand.InputChannelData> channels = r.inputChannels() == null ? null :
-                r.inputChannels().stream().map(c -> new UpdateRiderCommand.InputChannelData(
-                        c.channelNumber(), c.instrument(), c.microphone(), c.inserts(), c.notes())).toList();
-
-        UpdateRiderCommand.SoundSystemData ss = r.soundSystem() == null ? null :
-                new UpdateRiderCommand.SoundSystemData(r.soundSystem().consoleBrand(),
-                        r.soundSystem().consoleChannels(), r.soundSystem().monitorMixes(),
-                        r.soundSystem().paDescription(), r.soundSystem().processorNotes());
-
-        List<UpdateRiderCommand.BacklineItemData> backline = r.backlineItems() == null ? null :
-                r.backlineItems().stream().map(b -> new UpdateRiderCommand.BacklineItemData(
-                        b.category(), b.description(), b.brand(), b.model(), b.required())).toList();
 
         UpdateRiderCommand.StageDimensionsData sd = r.stageDimensions() == null ? null :
                 new UpdateRiderCommand.StageDimensionsData(r.stageDimensions().widthMeters(),
@@ -164,17 +223,8 @@ public class RiderController {
                         e.elementId(), e.type(), e.xPercent(), e.yPercent(),
                         e.rotationDegrees(), e.label())).toList();
 
-        UpdateRiderCommand.HospitalityData hosp = r.hospitality() == null ? null :
-                new UpdateRiderCommand.HospitalityData(r.hospitality().dressingRoomCapacity(),
-                        r.hospitality().cateringNotes(), r.hospitality().waterBottlesOnStage(),
-                        r.hospitality().passesCount());
-
-        UpdateRiderCommand.TransportData transport = r.transport() == null ? null :
-                new UpdateRiderCommand.TransportData(r.transport().vehicleType(),
-                        r.transport().passengerCapacity(), r.transport().notes());
-
         return new UpdateRiderCommand(riderId, promoterId, r.name(),
                 r.soundCheckDurationMinutes(), r.soundCheckNotes(),
-                staff, channels, ss, backline, sd, elements, hosp, transport, r.additionalNotes());
+                staff, sd, elements, r.additionalNotes());
     }
 }

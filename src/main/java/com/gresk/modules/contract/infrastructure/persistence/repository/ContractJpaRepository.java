@@ -22,6 +22,8 @@ public interface ContractJpaRepository extends JpaRepository<ContractEntity, UUI
 
     Optional<ContractEntity> findByShareToken(String shareToken);
 
+    List<ContractEntity> findByLinkedEventId(UUID linkedEventId);
+
     @Query("SELECT COUNT(c) FROM ContractEntity c WHERE c.promoterId = :promoterId AND c.referenceNumber LIKE :prefix%")
     int countByPromoterIdAndYearPrefix(@Param("promoterId") UUID promoterId, @Param("prefix") String prefix);
 

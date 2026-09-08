@@ -50,6 +50,12 @@ public class SecurityConfig {
                         // Gmail: push de Pub/Sub (token compartido) y callback OAuth (state anti-CSRF)
                         .requestMatchers("/api/v1/email/gmail/webhook").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/email/gmail/callback").permitAll()
+                        // Calendar sync: callbacks OAuth (state anti-CSRF) y webhooks push de Google/Outlook
+                        // (verificados por clientStateSecret propio de cada cuenta, no un token compartido)
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/agenda/calendar-sync/*/callback").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/agenda/calendar-sync/webhook/**").permitAll()
+                        // Firma digital: webhook del proveedor (Signaturit/DocuSign/stub), protegido por token compartido
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/webhooks/signature/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/events").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/events/last-minute").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/events/{id}").permitAll()
